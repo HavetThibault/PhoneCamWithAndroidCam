@@ -42,8 +42,7 @@ namespace PhoneCamWithAndroidCam
             PhoneCamClient client = new("192.168.1.37");
             byte[] frame = await client.MockPhoneVideoStream();
             MemoryStream ms = new(frame);
-            BitmapImage bmpImage = Utils.Convert(ms);
-            ms.Close();
+            BitmapImage bmpImage = Utils.Convert(ms); // The bitmap now own the stream, so you must not close the memoryStream
             MainImage.Source = bmpImage;
         }
     }

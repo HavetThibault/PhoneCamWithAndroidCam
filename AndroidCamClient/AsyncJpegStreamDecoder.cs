@@ -31,7 +31,7 @@ namespace AndroidCamClient
                         break;
                     }
 
-                    byte[] content = GetContent(stream, contentLength);
+                    byte[] content = GetContent(stream, 320 * 240 * 4 + 5);
                     if (content == null)
                     {
                         break;
@@ -230,22 +230,22 @@ namespace AndroidCamClient
 
         internal static byte[] GetContent(Stream stream, int contentLength)
         {
-            byte[] array = new byte[contentLength];
-            array[0] = 255;
-            array[1] = 216;
-            array[2] = 255;
+            byte[] bytesContent = new byte[contentLength];
+            bytesContent[0] = 255;
+            bytesContent[1] = 216;
+            bytesContent[2] = 255;
 
             int num;
             for (int i = 3;  i != contentLength; i += num)
             {
-                num = stream.Read(array, i, contentLength - i);
+                num = stream.Read(bytesContent, i, contentLength - i);
                 if (num == 0)
                 {
                     return null;
                 }
             }
 
-            return array;
+            return bytesContent;
         }
     }
 }
