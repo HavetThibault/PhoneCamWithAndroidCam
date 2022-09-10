@@ -1,4 +1,5 @@
-﻿using ImageProcessingUtils;
+﻿using AndroidCamClient.JpegStream;
+using ImageProcessingUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -49,9 +50,18 @@ namespace PhoneCamWithAndroidCam
             MainImage.Source = bmpImage;
         }
 
-        private void LaunchStream(object sender, RoutedEventArgs e)
+        private async void LaunchStream(object sender, RoutedEventArgs e)
         {
-
+            Stream mjpegStream = await phoneCamClient.LaunchStream();
+            for (int i = 0; i < 200; i++)
+            {
+                JpegFrame frame = PhoneCamClient.GetStreamFrame(mjpegStream);
+                MemoryStream ms = new();
+                ms.Write(frame.Scan);
+                BitmapImage bmpImage = Utils.Convert(ms); // The bitmap now own the stream, so you must not close the memoryStream
+                MainImage.Source = bmpImage;
+            }
+            mjpegStream.Close();
         }
     }
 }
