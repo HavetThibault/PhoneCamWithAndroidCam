@@ -23,11 +23,6 @@ namespace WebAPIClients
 
         public void Dispose() => _jpegStreamDecoder.Dispose();
 
-        public async Task<byte[]> MockPhoneVideoStream()
-        {
-            return await _jpegStreamDecoder.GetFrameAsync(_phoneUrl + "/video?320x240");
-        }
-
         public Task<Stream> LaunchStream()
         {
             return _jpegStreamDecoder.InitMJpegStream(_phoneUrl + "/video?320x240");
@@ -35,7 +30,7 @@ namespace WebAPIClients
 
         public static JpegFrame GetStreamFrame(Stream mjpegStream)
         {
-            return JpegStreamDecoder.GetJpegFrame(mjpegStream);
+            return JpegStreamDecoder.ReadOneFrame(mjpegStream);
         }
     }
 }

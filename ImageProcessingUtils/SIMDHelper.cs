@@ -22,6 +22,21 @@ namespace ImageProcessingUtils
             pinnedSrcBuffer.Free();
         }
 
+        public static void Copy(byte[] sourceBuffer, byte[] destinationBuffer, int dstOffset)
+        {
+            GCHandle pinnedSrcBuffer = GCHandle.Alloc(sourceBuffer, GCHandleType.Pinned);
+            IntPtr srcBufferPtr = pinnedSrcBuffer.AddrOfPinnedObject();
+
+            GCHandle pinnedDestBuffer = GCHandle.Alloc(destinationBuffer, GCHandleType.Pinned);
+            IntPtr destBuffer = pinnedDestBuffer.AddrOfPinnedObject();
+            IntPtr destBufferMoreOffset = IntPtr.Add(destBuffer, dstOffset);
+
+            SIMD.SimdCopy(srcBufferPtr, sourceBuffer.Length, sourceBuffer.Length, 1, 1, destBufferMoreOffset, sourceBuffer.Length);
+
+            pinnedDestBuffer.Free();
+            pinnedSrcBuffer.Free();
+        }
+
         public static void SimdGrayToBgra(byte[] grayBuffer, int width, int height, int stride, byte[] bgrBuffer, int bgrStride)
         {
             GCHandle pinnedSrcBuffer = GCHandle.Alloc(grayBuffer, GCHandleType.Pinned);

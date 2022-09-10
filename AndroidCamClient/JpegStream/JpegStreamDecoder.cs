@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
+using ImageProcessingUtils;
 
 namespace AndroidCamClient.JpegStream
 {
@@ -14,8 +15,6 @@ namespace AndroidCamClient.JpegStream
     {
         public static readonly string HEADER_SEPARATOR = "\r\n";
         public static readonly string HEADER_KEYVALUE_SEPARATOR = ": ";
-        public static readonly byte[] JPEG_START_OF_IMAGE = new byte[2] { 255, 216 };
-        public static readonly byte[] JPEG_END_OF_IMAGE = new byte[2] { 255, 217 };
 
         private HttpClient _httpClient;
 
@@ -26,45 +25,14 @@ namespace AndroidCamClient.JpegStream
 
         public void Dispose() => _httpClient.Dispose();
 
-        public async Task<byte[]> GetFrameAsync(string uri)
-        {
-            while (true)
-            {
-                using Stream stream = await _httpClient.GetStreamAsync(uri).ConfigureAwait(continueOnCapturedContext: false);
-                while (true)
-                {
-                    Dictionary<string, string> headers = ConvertBytesHeaders(GetBytesHeaders(stream, out int contentOffset));
-                    if (!headers.TryGetValue("Content-Length", out string strContentLength))
-                        throw new IOException("The headers of the response don't contain the content length.");
-
-                    if (strContentLength == null || strContentLength.Length == 0)
-                        throw new IOException("The headers of the response don't contain the content length.");
-
-                    int contentLength = int.Parse(strContentLength);
-                    if (contentLength == 0)
-                    {
-                        break;
-                    }
-
-                    byte[] content = GetContent(stream, 320 * 240 * 4 + 5, contentLength);
-                    if (content == null)
-                    {
-                        break;
-                    }
-
-                    return content;
-                }
-            }
-        }
-
         public Task<Stream> InitMJpegStream(string uri)
         {
             return _httpClient.GetStreamAsync(uri);
         }
 
-        public static JpegFrame GetJpegFrame(Stream mjpegStream)
+        public static JpegFrame ReadOneFrame(Stream mjpegStream)
         {
-            Dictionary<string, string> headers = ConvertBytesHeaders(GetBytesHeaders(mjpegStream, out _));
+            Dictionary<string, string> headers = ConvertBytesHeaders(GetBytesHeaders(mjpegStream, out int offset));
             if (!headers.TryGetValue("Content-Length", out string strContentLength) || strContentLength == null || strContentLength.Length == 0)
                 throw new JpegDecodingException("The headers of the response don't contain the content length.");
 
@@ -72,19 +40,7 @@ namespace AndroidCamClient.JpegStream
             if (contentLength == 0)
                 throw new JpegDecodingException("Jpeg headers are empty.");
 
-            byte[] bytesJpegHeaders = new byte[contentLength];
-            bytesJpegHeaders[0] = JPEG_START_OF_IMAGE[0];
-            bytesJpegHeaders[1] = JPEG_START_OF_IMAGE[1];
-            int readBytesNbr;
-            for (int i = 0; i < contentLength - 2; i += readBytesNbr)
-            {
-                readBytesNbr = mjpegStream.Read(bytesJpegHeaders, i, contentLength - 2 - i);
-                if (readBytesNbr == 0)
-                    throw new JpegDecodingException("Unable to read byte from mjpeg stream.");
-            }
-
-            byte[] bytesJpegContent = GetContent(mjpegStream, 320 * 240 * 4 + 4, contentLength);
-            return new(bytesJpegHeaders, bytesJpegContent);
+            return GetJpegFrame(mjpegStream, contentLength);
         }
 
         internal static byte[] GetBytesHeaders(Stream stream, out int offset)
@@ -103,9 +59,9 @@ namespace AndroidCamClient.JpegStream
                 subMemoryStream.WriteByte(b);
                 if (foundCr)
                 {
-                    if (b == JPEG_START_OF_IMAGE[0] && !foundJpegBeginning1)
+                    if (b == JpegMarkers.JPEG_START_OF_IMAGE[0] && !foundJpegBeginning1)
                         foundJpegBeginning1 = true;
-                    else if (b == JPEG_START_OF_IMAGE[1] && foundJpegBeginning1)
+                    else if (b == JpegMarkers.JPEG_START_OF_IMAGE[1] && foundJpegBeginning1)
                         foundJpegBeginning = true;
                     else
                     {
@@ -181,34 +137,49 @@ namespace AndroidCamClient.JpegStream
             return headers;
         }
 
-        internal static byte[] GetContent(Stream stream, int contentLength, int offset)
+        /// <summary>
+        /// Stream must be set after the start of image marker
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        internal static JpegFrame GetJpegFrame(Stream stream, int length)
         {
-            byte[] dummyArray = new byte[offset];
-            int num;
-            for (int i = 0; i < offset; i += num)
+            bool foundJpegFirstTag = false, foundJpegScanTag = false;
+            MemoryStream memoryStream = new ();
+            while(!foundJpegScanTag)
             {
-                num = stream.Read(dummyArray, i, offset - i);
-                if (num == 0)
+                byte b = (byte)stream.ReadByte();
+                memoryStream.WriteByte(b);
+                if (b == JpegMarkers.JPEG_START_OF_SCAN[0])
+                    foundJpegFirstTag = true;
+                else if (b == JpegMarkers.JPEG_START_OF_SCAN[1] && foundJpegFirstTag)
+                    foundJpegScanTag = true;
+            }
+            byte[] bytesHeader = memoryStream.ToArray();
+            byte[] fullBytesHeader = new byte[bytesHeader.Length + 2];
+            fullBytesHeader[0] = JpegMarkers.JPEG_START_OF_IMAGE[0];
+            fullBytesHeader[1] = JpegMarkers.JPEG_START_OF_IMAGE[1];
+            SIMDHelper.Copy(bytesHeader, fullBytesHeader, 2);
+
+            int scanLength = length - fullBytesHeader.Length - 2;
+            byte[] bytesScan = new byte[scanLength];
+            int readBytesNbr;
+            for (int i = 0; i < scanLength; i += readBytesNbr) // Do not read the 2 last jpeg marker
+            {
+                readBytesNbr = stream.Read(bytesScan, i, scanLength - i);
+                if (readBytesNbr == 0)
                     throw new JpegDecodingException("Unable to read byte from mjpeg stream.");
             }
 
-            byte[] bytesContent = new byte[contentLength];
-            
-            for (int i = 0; i < contentLength; i += num)
-            {
-                num = stream.Read(bytesContent, i, contentLength - i);
-                if (num == 0)
-                    throw new JpegDecodingException("Unable to read byte from mjpeg stream.");
-            }
-
-            return bytesContent;
+            return new JpegFrame(fullBytesHeader, bytesScan);
         }
 
         internal static byte[] GetContentWithoutJpegMarker(Stream stream, int contentLength)
         {
             byte[] bytesContent = new byte[contentLength];
 
-            if (stream.ReadByte() != JPEG_START_OF_IMAGE[0] || stream.ReadByte() != JPEG_START_OF_IMAGE[1])
+            if (stream.ReadByte() != JpegMarkers.JPEG_START_OF_IMAGE[0] || stream.ReadByte() != JpegMarkers.JPEG_START_OF_IMAGE[1])
                 throw new JpegDecodingException("The jpeg begenning of image marker doesn't exist.");
 
             int readBytesNbr;
@@ -219,7 +190,7 @@ namespace AndroidCamClient.JpegStream
                     throw new JpegDecodingException("Unable to read byte from mjpeg stream.");
             }
 
-            if (stream.ReadByte() != JPEG_END_OF_IMAGE[0] || stream.ReadByte() != JPEG_END_OF_IMAGE[1])
+            if (stream.ReadByte() != JpegMarkers.JPEG_END_OF_IMAGE[0] || stream.ReadByte() != JpegMarkers.JPEG_END_OF_IMAGE[1])
                 throw new JpegDecodingException("The jpeg end of image marker doesn't exist.");
 
             return bytesContent;
