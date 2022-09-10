@@ -13,7 +13,7 @@ namespace AndroidCamClient
         public static readonly string HeaderSeparator = "\r\n";
         public static readonly string HeaderKeyValueSeparator = ": ";
 
-        public static async IAsyncEnumerable<byte[]> GetFrameAsync(string uri)
+        public static async Task<byte[]> GetFrameAsync(string uri)
         {
             using HttpClient client = new ();
             while (true)
@@ -21,8 +21,7 @@ namespace AndroidCamClient
                 using Stream stream = await client.GetStreamAsync(uri).ConfigureAwait(continueOnCapturedContext: false);
                 while (true)
                 {
-                    byte[] byteHeaders = GetBytesHeaders(stream);
-                    Dictionary<string, string> headers = ConvertBytesHeaders(byteHeaders);
+                    Dictionary<string, string> headers = ConvertBytesHeaders(GetBytesHeaders(stream, out int contentOffset));
                     if (!headers.TryGetValue("Content-Length", out string strContentLength))
                         throw new IOException("The headers of the response don't contain the content length.");
 
@@ -38,12 +37,12 @@ namespace AndroidCamClient
                         break;
                     }
 
-                    yield return content;
+                    return content;
                 }
             }
         }
 
-        internal static byte[] GetBytesHeaders(Stream stream)
+        internal static byte[] GetBytesHeaders(Stream stream, out int offset)
         {
             bool firstCharCr = false;
             bool foundCr = false;
@@ -53,20 +52,19 @@ namespace AndroidCamClient
             byte b;
             MemoryStream mainMemoryStream = new ();
             MemoryStream subMemoryStream = new ();
+            offset = 0;
             while (!foundJpegBeginning)
             {
                 b = (byte)stream.ReadByte();
                 subMemoryStream.WriteByte(b);
                 if (foundCr)
                 {
-                    if (b == 255)
+                    if (b == 255 && !foundJpegBeginning1)
                         foundJpegBeginning1 = true;
                     else if (b == 216 && !foundJpegBeginning2 && foundJpegBeginning1)
                         foundJpegBeginning2 = true;
                     else if (b == 255 && foundJpegBeginning1 && foundJpegBeginning2)
-                    {
                         foundJpegBeginning = true;
-                    }
                     else
                     {
                         foundJpegBeginning1 = false;
@@ -81,31 +79,32 @@ namespace AndroidCamClient
                     foundCr = true;
                     mainMemoryStream.Write(subMemoryStream.ToArray());
                     subMemoryStream.Close();
-                    subMemoryStream.Dispose();
                     subMemoryStream = new();
                 }
                 else
                     firstCharCr = false;
+
+                offset++;
             }
+            offset -= 3; // Less the 3 magic characters that begin a jpeg
             byte[] byteHeaders = mainMemoryStream.ToArray();
             mainMemoryStream.Close();
-            mainMemoryStream.Dispose();
             subMemoryStream.Close();
-            subMemoryStream.Dispose();
             return byteHeaders;
         }
 
         internal static Dictionary<string,string> ConvertBytesHeaders(byte[] bytesHeaders)
         {
-            MemoryStream mainMemoryStream; // a disposer et réinstancier
+            MemoryStream mainMemoryStream;
             var headers = new Dictionary<string, string>();
 
-            bool firstCharCr = false;
-            bool foundCr = false;
+            bool firstCharCr, foundCr;
             int offset = 0;
             while (offset < bytesHeaders.Length)
             {
                 mainMemoryStream = new();
+                foundCr = false;
+                firstCharCr = false;
                 while (!foundCr && offset < bytesHeaders.Length)
                 {
                     if (bytesHeaders[offset] == 13)
@@ -119,18 +118,23 @@ namespace AndroidCamClient
                     offset++;
                 }
                 byte[] bytesOneHeaderKeyValue = mainMemoryStream.ToArray();
+                if (bytesOneHeaderKeyValue.Length == 0)
+                    continue;
+
                 string headerKeyValue = Encoding.UTF8.GetString(bytesOneHeaderKeyValue, 0, bytesOneHeaderKeyValue.Length);
+
+                if (headerKeyValue[0] == '-' && headerKeyValue[1] == '-')
+                    continue;
 
                 string[] headerKeyValueArray = headerKeyValue.Split(new string[2] { HeaderKeyValueSeparator, HeaderSeparator }, StringSplitOptions.RemoveEmptyEntries);
                 if (headerKeyValueArray.Length != 2)
-                    throw new InvalidDataException();
+                    continue;
 
                 string headerKey = headerKeyValueArray[0];
                 string headerValue = headerKeyValueArray[1];
 
                 headers.Add(headerKey, headerValue);
                 mainMemoryStream.Close();
-                mainMemoryStream.Dispose();
             }
 
             return headers;
@@ -226,10 +230,13 @@ namespace AndroidCamClient
 
         internal static byte[] GetContent(Stream stream, int contentLength)
         {
-            int i = 0;
             byte[] array = new byte[contentLength];
+            array[0] = 255;
+            array[1] = 216;
+            array[2] = 255;
+
             int num;
-            for (; i != contentLength; i += num)
+            for (int i = 3;  i != contentLength; i += num)
             {
                 num = stream.Read(array, i, contentLength - i);
                 if (num == 0)

@@ -7,6 +7,12 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
 
+        <Image x:Name="MainImage" Grid.Column="0"/>
+        <Button Grid.Column="1" Click="MockTest" Width="50" Height="50" Content="Mock"/>
     </Grid>
 </Window>

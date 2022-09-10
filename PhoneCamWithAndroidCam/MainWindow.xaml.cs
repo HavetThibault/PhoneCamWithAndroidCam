@@ -1,6 +1,7 @@
 ﻿using ImageProcessingUtils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WebAPIClients;
+using WpfUtils;
 
 namespace PhoneCamWithAndroidCam
 {
@@ -26,8 +28,6 @@ namespace PhoneCamWithAndroidCam
         {
             SIMD.LoadAssembly();
             InitializeComponent();
-            PhoneCamClient client = new ("192.168.0.33");
-            client.MockPhoneVideoStream();
 
             Closing += MainWindowClosing;
         }
@@ -35,6 +35,16 @@ namespace PhoneCamWithAndroidCam
         private void MainWindowClosing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
             SIMD.UnloadAssembly();
+        }
+
+        private async void MockTest(object sender, RoutedEventArgs e)
+        {
+            PhoneCamClient client = new("192.168.1.37");
+            byte[] frame = await client.MockPhoneVideoStream();
+            MemoryStream ms = new(frame);
+            BitmapImage bmpImage = Utils.Convert(ms);
+            ms.Close();
+            MainImage.Source = bmpImage;
         }
     }
 }
