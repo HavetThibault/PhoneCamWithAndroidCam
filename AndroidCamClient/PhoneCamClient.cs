@@ -1,5 +1,4 @@
-﻿
-using AndroidCamClient;
+﻿using AndroidCamClient.JpegStream;
 using System;
 using System.ComponentModel;
 using System.Net;
@@ -10,18 +9,22 @@ using System.Xml;
 
 namespace WebAPIClients
 {
-    public class PhoneCamClient
+    public class PhoneCamClient : IDisposable
     {
-        private string phoneUrl;
+        private string _phoneUrl;
+        private JpegStreamDecoder _jpegStreamDecoder;
 
         public PhoneCamClient(string phoneIp)
         {
-            phoneUrl = $"http://{phoneIp}:4747";
+            _phoneUrl = $"http://{phoneIp}:4747";
+            _jpegStreamDecoder = new();
         }
+
+        public void Dispose() => _jpegStreamDecoder.Dispose();
 
         public async Task<byte[]> MockPhoneVideoStream()
         {
-            return await AsyncJpegStreamDecoder.GetFrameAsync(phoneUrl + "/video?320x240");
+            return await _jpegStreamDecoder.GetFrameAsync(_phoneUrl + "/video?320x240");
         }
     }
 }

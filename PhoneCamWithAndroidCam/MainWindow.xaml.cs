@@ -24,10 +24,13 @@ namespace PhoneCamWithAndroidCam
     /// </summary>
     public partial class MainWindow : Window
     {
+        private PhoneCamClient phoneCamClient;
         public MainWindow()
         {
             SIMD.LoadAssembly();
             InitializeComponent();
+
+            phoneCamClient = new("192.168.1.37");
 
             Closing += MainWindowClosing;
         }
@@ -35,15 +38,20 @@ namespace PhoneCamWithAndroidCam
         private void MainWindowClosing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
             SIMD.UnloadAssembly();
+            phoneCamClient.Dispose();
         }
 
         private async void MockTest(object sender, RoutedEventArgs e)
         {
-            PhoneCamClient client = new("192.168.1.37");
-            byte[] frame = await client.MockPhoneVideoStream();
+            byte[] frame = await phoneCamClient.MockPhoneVideoStream();
             MemoryStream ms = new(frame);
             BitmapImage bmpImage = Utils.Convert(ms); // The bitmap now own the stream, so you must not close the memoryStream
             MainImage.Source = bmpImage;
+        }
+
+        private void LaunchStream(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

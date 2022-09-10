@@ -12,7 +12,13 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <Image x:Name="MainImage" Grid.Column="0"/>
-        <Button Grid.Column="1" Click="MockTest" Width="50" Height="50" Content="Mock"/>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Image x:Name="MainImage" Grid.Column="0" Grid.RowSpan="2"/>
+        <Button Grid.Column="1" Grid.Row="0" Click="MockTest" Width="50" Height="50" Content="Mock"/>
+        <Button Grid.Column="1" Grid.Row="2" Click="LaunchStream" Width="50" Height="50" Content="Launch stream"/>
     </Grid>
 </Window>
