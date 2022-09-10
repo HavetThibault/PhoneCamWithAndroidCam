@@ -10,6 +10,9 @@ namespace AndroidCamClient
 {
     public static class AsyncJpegStreamDecoder
     {
+        public static readonly string HeaderSeparator = "\r\n";
+        public static readonly string HeaderKeyValueSeparator = ": ";
+
         public static async IAsyncEnumerable<byte[]> GetFrameAsync(string uri)
         {
             using HttpClient client = new ();
@@ -94,7 +97,7 @@ namespace AndroidCamClient
 
         internal static Dictionary<string,string> ConvertBytesHeaders(byte[] bytesHeaders)
         {
-            MemoryStream memoryStream = new (); // a disposer et réinstancier
+            MemoryStream mainMemoryStream; // a disposer et réinstancier
             var headers = new Dictionary<string, string>();
 
             bool firstCharCr = false;
@@ -102,7 +105,8 @@ namespace AndroidCamClient
             int offset = 0;
             while (offset < bytesHeaders.Length)
             {
-                while (!foundCr)
+                mainMemoryStream = new();
+                while (!foundCr && offset < bytesHeaders.Length)
                 {
                     if (bytesHeaders[offset] == 13)
                         firstCharCr = true;
@@ -111,13 +115,13 @@ namespace AndroidCamClient
                     else
                         firstCharCr = false;
 
-                    memoryStream.WriteByte(bytesHeaders[offset]);
+                    mainMemoryStream.WriteByte(bytesHeaders[offset]);
                     offset++;
                 }
-                byte[] bytesOneHeaderKeyValue = memoryStream.ToArray();
+                byte[] bytesOneHeaderKeyValue = mainMemoryStream.ToArray();
                 string headerKeyValue = Encoding.UTF8.GetString(bytesOneHeaderKeyValue, 0, bytesOneHeaderKeyValue.Length);
 
-                string[] headerKeyValueArray = headerKeyValue.Split(": ");
+                string[] headerKeyValueArray = headerKeyValue.Split(new string[2] { HeaderKeyValueSeparator, HeaderSeparator }, StringSplitOptions.RemoveEmptyEntries);
                 if (headerKeyValueArray.Length != 2)
                     throw new InvalidDataException();
 
@@ -125,6 +129,8 @@ namespace AndroidCamClient
                 string headerValue = headerKeyValueArray[1];
 
                 headers.Add(headerKey, headerValue);
+                mainMemoryStream.Close();
+                mainMemoryStream.Dispose();
             }
 
             return headers;

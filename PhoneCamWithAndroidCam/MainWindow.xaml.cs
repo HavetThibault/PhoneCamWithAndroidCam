@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImageProcessingUtils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,9 +24,17 @@ namespace PhoneCamWithAndroidCam
     {
         public MainWindow()
         {
+            SIMD.LoadAssembly();
             InitializeComponent();
-            PhoneCamClient client = new PhoneCamClient("192.168.0.33");
+            PhoneCamClient client = new ("192.168.0.33");
             client.MockPhoneVideoStream();
+
+            Closing += MainWindowClosing;
+        }
+
+        private void MainWindowClosing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            SIMD.UnloadAssembly();
         }
     }
 }
