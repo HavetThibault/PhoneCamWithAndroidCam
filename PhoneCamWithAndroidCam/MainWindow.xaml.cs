@@ -2,6 +2,7 @@
 using ImageProcessingUtils;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -59,11 +60,14 @@ namespace PhoneCamWithAndroidCam
         private async void ReceiveAndDisplayPictures()
         {
             Stream mjpegStream = await phoneCamClient.LaunchStream();
+            CannyEdgeDetection cannyEdgeDetection = new(320, 240);
             for (int i = 0; i < 1000; i++)
             {
                 JpegFrame frame = PhoneCamClient.GetStreamFrame(mjpegStream);
-                MemoryStream memoryStream = new(frame.ToFullBytesImage());
-                Dispatcher.Invoke(UpdateMainPicture, memoryStream);
+                MemoryStream pngMemoryStream = new(frame.ToFullBytesImage());
+                MemoryStream bmpMemoryStream = new(JpegConversion.ConvertJpegToBmp(pngMemoryStream));
+                Bitmap bmpFrame = new(bmpMemoryStream);
+                Dispatcher.Invoke(UpdateMainPicture, bmpFrame);
             }
             mjpegStream.Close();
         }
