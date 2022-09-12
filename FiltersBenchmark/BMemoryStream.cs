@@ -5,12 +5,12 @@ using BenchmarkDotNet.Running;
 
 namespace FiltersBenchmark;
 
-public class TestMemoryStream
+public class BMemoryStream
 {
     private byte[] _dummyBuffer;
     private MemoryStream _memoryStream;
 
-    public TestMemoryStream()
+    public BMemoryStream()
     {
         _dummyBuffer = new byte[7000];
     }

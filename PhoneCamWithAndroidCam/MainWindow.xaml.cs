@@ -68,16 +68,10 @@ namespace PhoneCamWithAndroidCam
             {
                 JpegFrame frame = PhoneCamClient.GetStreamFrame(mjpegStream);
                 MemoryStream pngMemoryStream = new(frame.ToFullBytesImage());
-                //Second try
                 var bmpTryFrame = new Bitmap(pngMemoryStream);
                 byte[] pixels = new byte[320 * 240 * 4];
                 BitmapHelper.ToByteArray(bmpTryFrame, out _, pixels);
                 byte[] cannyResultBuffer = cannyEdgeDetection.ApplyCannyFilter(pixels);
-                /*// First try
-                MemoryStream bmpMemoryStream = new(JpegConversion.ConvertJpegToBmp(pngMemoryStream));
-                Bitmap bmpFrame = new(bmpMemoryStream);
-                byte[] resultBuffer = BitmapHelper.CopyBytePixelArray(bmpFrame, out _, out _);
-                byte[] cannyResultBuffer = cannyEdgeDetection.ApplyCannyFilter(resultBuffer);*/
                 BitmapHelper.FromBgraBufferToBitmap(bmpTryFrame, cannyResultBuffer, 320, 240);
                 MemoryStream cannyStream = new();
                 bmpTryFrame.Save(cannyStream, ImageFormat.Bmp);
