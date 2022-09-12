@@ -39,6 +39,9 @@ namespace ImageProcessingUtils
 
         [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void SimdGrayToBgra(IntPtr gray, nint width, nint height, nint grayStride, IntPtr bgr, nint bgrStride);
+        
+        [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void SimdGrayToBgr(IntPtr gray, nint width, nint height, nint grayStride, IntPtr bgr, nint bgrStride); 	
 
         [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void SimdInterleaveBgr(IntPtr bluePointer, nint blueStride, IntPtr greenPointer, nint greenStride, IntPtr redPointer, nint redStride, nint imageWidth, nint imageHeight,

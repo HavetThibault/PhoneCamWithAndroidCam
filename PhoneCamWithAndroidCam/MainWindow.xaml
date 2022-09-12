@@ -8,11 +8,19 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
         <Image x:Name="MainImage" Grid.Column="0"/>
-        <Button Grid.Column="1" Click="LaunchStream" Width="120" Height="50" Content="Launch stream"/>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            
+            <Button Click="LaunchStream" Width="120" Height="50" Content="Launch stream"/>
+            <Label Grid.Row="2" x:Name="LabelCountFrame" Content=""/>
+        </Grid>
     </Grid>
 </Window>

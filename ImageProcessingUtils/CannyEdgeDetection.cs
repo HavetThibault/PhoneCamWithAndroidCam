@@ -64,40 +64,4 @@ public class CannyEdgeDetection
         SIMDHelper.SimdGrayToBgra(_grayBuffer1, _width, _height, _width, resultBuffer, _width * 4);
         return resultBuffer;
     }
-    /*
-    public override Point? FindBestPoint(byte[] sourceVideoframeBuffer)
-    {
-        FilterHelper.ToGraySquareCrop(sourceVideoframeBuffer, cursorPosition, CursorSize, _grayBuffer1);
-        SIMD.GaussBlur(_grayBuffer1, CursorSize, CursorSize, SIGMA_BLUR, GAUSS_KERNEL_DIMENSION, _grayBuffer2);
-        SIMD.SimdSobelGradient(_grayBuffer2, CursorSize, CursorSize, CursorSize, _sobelDxBuffer, _sobelDyBuffer, _magnitudeBuffer, _angleBuffer);
-        FilterHelper.FindLocalMaxima(_magnitudeBuffer, _angleBuffer, CursorSize, CursorSize, _grayBuffer1, out byte max);
-
-        if (max < MIN_CONTRAST) // if not enough contrast (max gradient magnitude too low), give up !
-            return null;
-
-        if (max < MIN_GRADIENT_MAGNITUDE)
-            max = MIN_GRADIENT_MAGNITUDE;
-
-        byte adaptedMax = Convert.ToByte(max * MAX_GRADIENT_MAGNITUDE_SCALE);
-        byte adaptedMin = Convert.ToByte(max * MIN_GRADIENT_MAGNITUDE_SCALE);
-
-        FilterHelper.DoubleThreshold(_grayBuffer1, adaptedMin, adaptedMax, _grayBuffer2, WEAK_PIXEL);
-        FilterHelper.Hysteresis(_grayBuffer2, CursorSize, CursorSize, _grayBuffer1, WEAK_PIXEL);
-
-        if (FilterHelper.BestPointEscargot(_grayBuffer1, CursorSize, CursorSize, true) is Point foundPoint)
-            return new Point(foundPoint.X + cursorPosition.X - CursorSize / 2, foundPoint.Y + cursorPosition.Y - CursorSize / 2);
-        else
-            return null;
-    }
-
-    public override Point? FindBestPointAndCopyResult(IVideoFrameBuffer sourceVideoframeBuffer, Point cursorPosition, IEdgeDetectionResultBuffer edgeDetectionResultBuffer)
-    {
-        Point? resultPoint = FindBestPoint(sourceVideoframeBuffer, cursorPosition);
-
-        if (resultPoint != null)
-            lock (edgeDetectionResultBuffer.EdgeDetectionResultBufferLock)
-                SIMD.SimdGrayToBgra(_grayBuffer1, CursorSize, CursorSize, CursorSize, edgeDetectionResultBuffer.EdgeDetectionResultBuffer, CursorSize * 4);
-
-        return resultPoint;
-    }*/
 }
