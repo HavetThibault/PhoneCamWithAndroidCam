@@ -2,8 +2,10 @@
 using ImageProcessingUtils;
 using ImageProcessingUtils.Pipeline;
 using PhoneCamWithAndroidCam.Threads;
+using ProcessingPipelines.ImageProcessingPipeline;
 using ProcessingPipelines.PipelineFeeder;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -26,6 +28,9 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private PipelineFeederPipeline _pipelineFeeder;
         private Dispatcher _uiDispatcher;
         private ImageSource _mainImageSource;
+        private MultipleBuffering _pipelineFeederOutput;
+        private ListBuffering<byte[]> _convertToRawJpegOutput;
+        private ConvertToRawJpegThread _convertToRawJpegThreads;
 
         public ImageSource MainImageSource
         {
@@ -59,16 +64,19 @@ namespace PhoneCamWithAndroidCam.ViewModels
             CommandStopStreaming = new RelayCommand(StopStreaming, CanStopStreaming);
             _phoneCamClient = new("192.168.1.37");
             _uiDispatcher = uiDispatcher;
+            _pipelineFeederOutput = new(320, 240, 320 * 4, 10, EBufferPixelsFormat.Bgra32Bits);
+            _convertToRawJpegOutput = new(10);
         }
 
         public void LaunchStreaming()
         {
             IsStreaming = true;
-            MultipleBuffering outputMultipleBuffering = new(320, 240, 320 * 4, 10, EBufferPixelsFormat.Bgra32Bits);
-            _pipelineFeeder = new(_phoneCamClient, outputMultipleBuffering);
+            _pipelineFeeder = new(_phoneCamClient, _pipelineFeederOutput);
             _pipelineCancellationTokenSource = new();
+            _convertToRawJpegThreads = new(_pipelineFeederOutput, _convertToRawJpegOutput);
             _pipelineFeeder.StartFeeding(_pipelineCancellationTokenSource);
-            new Thread(RefreshMainPicture).Start(outputMultipleBuffering);
+            _convertToRawJpegThreads.LaunchNewWorker(_pipelineCancellationTokenSource);
+            new Thread(RefreshMainPicture).Start();
         }
 
         public bool CanLaunchStreaming()
@@ -87,39 +95,43 @@ namespace PhoneCamWithAndroidCam.ViewModels
             return IsStreaming;
         }
 
-        public void RefreshMainPicture(object? inputMultipleBufferingObj)
+        public void RefreshMainPicture()
         {
-            if(inputMultipleBufferingObj is MultipleBuffering inputMultipleBuffering)
+            Stopwatch watch = new();
+            int framesNbrInASecond = 0;
+            while (!_pipelineCancellationTokenSource.IsCancellationRequested)
             {
-                while(!_pipelineCancellationTokenSource.IsCancellationRequested)
-                {
-                    Bitmap bmp;
-                    MemoryStream cannyStream;
-                    BitmapFrame bitmapFrame = inputMultipleBuffering.WaitNextReaderBuffer();
-                    lock (bitmapFrame)
-                    {
-                        bmp = bitmapFrame.Bitmap;
-                        BitmapHelper.FromBgraBufferToBitmap(bitmapFrame.Bitmap, bitmapFrame.Data, 320, 240);
-                        cannyStream = new();
-                        bitmapFrame.Bitmap.Save(cannyStream, ImageFormat.Jpeg);
-                    }
-                    bmp.Dispose();
-                    inputMultipleBuffering.FinishReading();
+                watch.Start();
+                byte[] frame = _convertToRawJpegOutput.GetRawFrame();
+                    
+                MemoryStream simpleStream = new(frame);
+                _uiDispatcher.Invoke(UpdateMainPicture, simpleStream);
 
-                    _uiDispatcher.Invoke(UpdateMainPicture, cannyStream);
+                watch.Stop();
+                framesNbrInASecond++;
+                if (watch.ElapsedMilliseconds > 1000)
+                {
+                    watch.Reset();
+                    _uiDispatcher.Invoke(UpdateFps, framesNbrInASecond);
+                    framesNbrInASecond = 0;
                 }
             }
         }
 
         private void UpdateMainPicture(MemoryStream memoryStream)
         {
-            BitmapImage bmpImage = Utils.Convert(memoryStream); // The bitmap now own the stream, so you must not close the memoryStream
-            MainImageSource = bmpImage;
+            MainImageSource = Utils.Convert(memoryStream); // The bitmap now own the stream, so you must not close the memoryStream
+        }
+
+        private void UpdateFps(int fps)
+        {
+            Fps = fps;
         }
 
         public void Dispose()
         {
-            
+            _pipelineFeeder.Dispose();
+            _pipelineFeederOutput.Dispose();
         }
     }
 }

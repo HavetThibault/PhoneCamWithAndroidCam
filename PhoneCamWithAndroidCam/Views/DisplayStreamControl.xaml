@@ -19,12 +19,8 @@
             <Button Command="{Binding CommandLaunchStreaming}" Width="120" Height="40" Content="Launch stream" Margin="5"/>
             <Button Command="{Binding CommandStopStreaming}" Width="120" Height="40" Content="Stop stream" Margin="5"/>
             <StackPanel Orientation="Horizontal">
-                <Label Content="Frames displayed"/>
-                <Label x:Name="LabelCountFrame" Content="" Margin="5"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
                 <Label Content="Frames per seconds"/>
-                <Label x:Name="LabelFps" Content="" Margin="5"/>
+                <Label x:Name="LabelFps" Content="{Binding Fps}" Margin="5"/>
             </StackPanel>
         </StackPanel>
     </Grid>

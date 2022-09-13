@@ -96,6 +96,31 @@ namespace PhoneCamWithAndroidCam.Threads
                 UnReadBufferNbr--;
         }
 
+        public bool WriteBuffer(byte[] newBuffer)
+        {
+            if (UnReadBufferNbr < BufferNbr)
+            {
+                int bufferWriterPointer;
+                lock (_bufferPointerLock)
+                {
+                    bufferWriterPointer = _bufferWriterPointer++;
+                    if (_bufferWriterPointer == BufferNbr)
+                        _bufferWriterPointer = 0;
+                }
+
+                lock (BytesBuffers[bufferWriterPointer])
+                {
+                    SIMDHelper.Copy(newBuffer, BytesBuffers[bufferWriterPointer].Data);
+                }
+
+                lock (_bufferPointerLock)
+                    UnReadBufferNbr++;
+
+                return true;
+            }
+            return false;
+        }
+
         public bool WriteBuffer(byte[] newBuffer, Bitmap associatedBitmap)
         {
             if (UnReadBufferNbr < BufferNbr)
@@ -126,8 +151,21 @@ namespace PhoneCamWithAndroidCam.Threads
         {
             while (true)
             {
-                if (!WriteBuffer(newBuffer, associatedBitmap))
-                    _canWriteBuffer.WaitOne();
+                if (WriteBuffer(newBuffer, associatedBitmap))
+                    return;
+
+                _canWriteBuffer.WaitOne();
+            }
+        }
+
+        public void WaitWriteBuffer(byte[] newBuffer)
+        {
+            while (true)
+            {
+                if (!WriteBuffer(newBuffer))
+                    return;
+
+                _canWriteBuffer.WaitOne();
             }
         }
 

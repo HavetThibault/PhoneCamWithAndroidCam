@@ -67,7 +67,7 @@ namespace PhoneCamWithAndroidCam.Threads
                     if (_unReadElementNbr > 0)
                     {
                         T oldestBuffer = BytesBuffers.First();
-                        BytesBuffers.RemoveAt(0);
+                        BytesBuffers.Remove(oldestBuffer);
                         UnReadBufferNbr--;
                         return oldestBuffer;
                     }
