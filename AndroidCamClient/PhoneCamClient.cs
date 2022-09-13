@@ -1,12 +1,4 @@
 ﻿using AndroidCamClient.JpegStream;
-using System;
-using System.ComponentModel;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text.Json;
-using System.Xml;
-using System.Runtime.CompilerServices;
 
 namespace AndroidCamClient
 {

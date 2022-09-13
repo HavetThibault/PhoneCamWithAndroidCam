@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
+﻿using ImageProcessingUtils;
 using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
-using ImageProcessingUtils;
 
 namespace AndroidCamClient.JpegStream
 {
@@ -146,8 +138,8 @@ namespace AndroidCamClient.JpegStream
         internal static JpegFrame GetJpegFrame(Stream stream, int length)
         {
             bool foundJpegFirstTag = false, foundJpegScanTag = false;
-            MemoryStream memoryStream = new ();
-            while(!foundJpegScanTag)
+            MemoryStream memoryStream = new();
+            while (!foundJpegScanTag)
             {
                 byte b = (byte)stream.ReadByte();
                 memoryStream.WriteByte(b);

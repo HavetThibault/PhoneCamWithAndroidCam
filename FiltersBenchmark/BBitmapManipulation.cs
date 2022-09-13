@@ -1,10 +1,7 @@
 ﻿
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Running;
 using ImageProcessingUtils;
 using System.Drawing.Imaging;
-using System.IO;
 
 namespace FiltersBenchmark;
 

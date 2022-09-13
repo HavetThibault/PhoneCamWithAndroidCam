@@ -1,9 +1,5 @@
-﻿using ImageProcessingUtils;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace ImageProcessingUtils
@@ -28,7 +24,7 @@ namespace ImageProcessingUtils
 
         public static void FromBgraBufferToBitmap(Bitmap destBitmap, byte[] buffer, int width, int height)
         {
-            BitmapData srcData = destBitmap.LockBits(new Rectangle(0,0,width,height), ImageLockMode.WriteOnly, PixelFormat.Format32bppRgb);
+            BitmapData srcData = destBitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppRgb);
 
             GCHandle pinnedSrcBuffer = GCHandle.Alloc(buffer, GCHandleType.Pinned);
             IntPtr srcBufferPtr = pinnedSrcBuffer.AddrOfPinnedObject();

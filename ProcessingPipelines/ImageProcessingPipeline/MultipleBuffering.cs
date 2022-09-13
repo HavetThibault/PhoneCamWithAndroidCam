@@ -1,11 +1,5 @@
 ﻿using ImageProcessingUtils;
 using ImageProcessingUtils.Pipeline;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace PhoneCamWithAndroidCam.Threads
 {
@@ -37,13 +31,13 @@ namespace PhoneCamWithAndroidCam.Threads
 
                 if (value == 1)
                     _canReadBuffer.Set();
-                else if(value == BufferNbr - 1)
+                else if (value == BufferNbr - 1)
                     _canWriteBuffer.Set();
             }
         }
 
 
-        public MultipleBuffering(int bufferWidth, int bufferHeight, int bufferNbr, EBufferPixelsFormat bufferPixelsFormat) 
+        public MultipleBuffering(int bufferWidth, int bufferHeight, int bufferNbr, EBufferPixelsFormat bufferPixelsFormat)
             : this(bufferWidth, bufferHeight, bufferWidth, bufferNbr, bufferPixelsFormat) { }
 
         public MultipleBuffering(int bufferWidth, int bufferHeight, int bufferStride, int bufferNbr, EBufferPixelsFormat bufferPixelsFormat)
@@ -70,7 +64,7 @@ namespace PhoneCamWithAndroidCam.Threads
 
         public int GetNextReaderBuffer()
         {
-            lock(_bufferPointerLock)
+            lock (_bufferPointerLock)
             {
                 if (UnReadBufferNbr == 0) return -1;
                 UnReadBufferNbr--;
@@ -80,7 +74,7 @@ namespace PhoneCamWithAndroidCam.Threads
 
         public int WaitNextReaderBuffer()
         {
-            while(true)
+            while (true)
             {
                 int nextReaderBuffer = GetNextReaderBuffer();
 
@@ -104,7 +98,7 @@ namespace PhoneCamWithAndroidCam.Threads
 
                 //lock (BytesBuffers[bufferWriterPointer])
                 SIMDHelper.Copy(newBuffer, BytesBuffers[bufferWriterPointer].Data);
-                    
+
                 return true;
             }
             return false;
@@ -112,9 +106,9 @@ namespace PhoneCamWithAndroidCam.Threads
 
         public void WaitWriteBuffer(byte[] newBuffer)
         {
-            while(true)
+            while (true)
             {
-                if(!WriteBuffer(newBuffer))
+                if (!WriteBuffer(newBuffer))
                     _canWriteBuffer.WaitOne();
             }
         }

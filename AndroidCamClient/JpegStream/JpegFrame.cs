@@ -1,9 +1,4 @@
 ﻿using ImageProcessingUtils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AndroidCamClient.JpegStream
 {
@@ -16,7 +11,7 @@ namespace AndroidCamClient.JpegStream
         /// <summary>
         /// Only contains pixels
         /// </summary>
-        public byte[] Scan { get; set; } 
+        public byte[] Scan { get; set; }
 
         public JpegFrame(byte[] headers, byte[] scan)
         {

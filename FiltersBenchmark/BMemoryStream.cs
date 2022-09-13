@@ -1,7 +1,5 @@
 ﻿
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Running;
 
 namespace FiltersBenchmark;
 

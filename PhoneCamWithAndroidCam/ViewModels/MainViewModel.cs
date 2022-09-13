@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AndroidCamClient;
+﻿using AndroidCamClient;
+using System;
 using WpfUtils;
 
 namespace PhoneCamWithAndroidCam.ViewModels

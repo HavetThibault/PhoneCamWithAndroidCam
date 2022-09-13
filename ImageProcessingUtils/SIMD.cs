@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace ImageProcessingUtils
 {
@@ -39,9 +38,9 @@ namespace ImageProcessingUtils
 
         [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void SimdGrayToBgra(IntPtr gray, nint width, nint height, nint grayStride, IntPtr bgr, nint bgrStride);
-        
+
         [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void SimdGrayToBgr(IntPtr gray, nint width, nint height, nint grayStride, IntPtr bgr, nint bgrStride); 	
+        public static extern void SimdGrayToBgr(IntPtr gray, nint width, nint height, nint grayStride, IntPtr bgr, nint bgrStride);
 
         [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void SimdInterleaveBgr(IntPtr bluePointer, nint blueStride, IntPtr greenPointer, nint greenStride, IntPtr redPointer, nint redStride, nint imageWidth, nint imageHeight,
@@ -95,7 +94,7 @@ namespace ImageProcessingUtils
 
         [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void SimdFill(IntPtr dst, int stride, int width, int height, int pixelSize, int value);
-        
+
         public static void LoadAssembly()
         {
             if (!IsLoaded) m_LibraryPointer = LoadLibrary(SIMD_LIBRARY_FILENAME);

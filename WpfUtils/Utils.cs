@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.IO;
+﻿using System.IO;
 using System.Windows.Media.Imaging;
 
 
@@ -20,6 +19,6 @@ namespace WpfUtils
             image.StreamSource = pictureStream;
             image.EndInit();
             return image;
-        }   
+        }
     }
 }
