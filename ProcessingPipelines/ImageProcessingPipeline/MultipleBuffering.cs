@@ -3,7 +3,7 @@ using ImageProcessingUtils.Pipeline;
 
 namespace PhoneCamWithAndroidCam.Threads
 {
-    public class MultipleBuffering
+    public class MultipleBuffering : IDisposable
     {
         private int _bufferWriterPointer;
         private int _bufferReaderPointer;
@@ -111,6 +111,12 @@ namespace PhoneCamWithAndroidCam.Threads
                 if (!WriteBuffer(newBuffer))
                     _canWriteBuffer.WaitOne();
             }
+        }
+
+        public void Dispose()
+        {
+            _canWriteBuffer.Dispose();
+            _canReadBuffer.Dispose();
         }
     }
 }
