@@ -65,7 +65,6 @@ namespace ProcessingPipelines.PipelineFeeder
                 {
                     Bitmap bmp = Bitmaps.GetRawFrame();
                     BitmapHelper.ToByteArray(bmp, out _, pixelsBuffer);
-                    bmp.Dispose();
                     OutputMultipleBuffering.WriteBuffer(pixelsBuffer, bmp);
                 }
             }

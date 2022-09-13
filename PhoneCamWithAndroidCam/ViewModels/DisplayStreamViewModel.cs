@@ -93,13 +93,12 @@ namespace PhoneCamWithAndroidCam.ViewModels
             {
                 while(!_pipelineCancellationTokenSource.IsCancellationRequested)
                 {
-                    BitmapFrame bitmapFrame = inputMultipleBuffering.WaitNextReaderBuffer();
-                    if (bitmapFrame.Bitmap == null)
-                        throw new Exception("AAAAAAAh");
+                    Bitmap bmp;
                     MemoryStream cannyStream;
-                    Bitmap bmp = bitmapFrame.Bitmap;
+                    BitmapFrame bitmapFrame = inputMultipleBuffering.WaitNextReaderBuffer();
                     lock (bitmapFrame)
                     {
+                        bmp = bitmapFrame.Bitmap;
                         BitmapHelper.FromBgraBufferToBitmap(bitmapFrame.Bitmap, bitmapFrame.Data, 320, 240);
                         cannyStream = new();
                         bitmapFrame.Bitmap.Save(cannyStream, ImageFormat.Jpeg);

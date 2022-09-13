@@ -68,8 +68,12 @@ namespace PhoneCamWithAndroidCam.Threads
             lock (_bufferPointerLock)
             {
                 if (UnReadBufferNbr == 0) return null;
-                
-                return BytesBuffers[_bufferReaderPointer++];
+
+                int bufferReaderPointer = _bufferReaderPointer++;
+
+                if (_bufferReaderPointer == BufferNbr)
+                    _bufferReaderPointer = 0;
+                return BytesBuffers[bufferReaderPointer];
             }
         }
 
@@ -98,11 +102,17 @@ namespace PhoneCamWithAndroidCam.Threads
             {
                 int bufferWriterPointer;
                 lock (_bufferPointerLock)
+                {
                     bufferWriterPointer = _bufferWriterPointer++;
+                    if (_bufferWriterPointer == BufferNbr)
+                        _bufferWriterPointer = 0;
+                } 
 
-                //lock (BytesBuffers[bufferWriterPointer])
-                SIMDHelper.Copy(newBuffer, BytesBuffers[bufferWriterPointer].Data);
-                BytesBuffers[bufferWriterPointer].Bitmap = associatedBitmap;
+                lock (BytesBuffers[bufferWriterPointer])
+                {
+                    SIMDHelper.Copy(newBuffer, BytesBuffers[bufferWriterPointer].Data);
+                    BytesBuffers[bufferWriterPointer].Bitmap = associatedBitmap;
+                }
 
                 lock (_bufferPointerLock)
                     UnReadBufferNbr++;

@@ -24,7 +24,7 @@ namespace ImageProcessingUtils
 
         public static void FromBgraBufferToBitmap(Bitmap destBitmap, byte[] buffer, int width, int height)
         {
-            BitmapData srcData = destBitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
+            BitmapData srcData = destBitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 
             GCHandle pinnedSrcBuffer = GCHandle.Alloc(buffer, GCHandleType.Pinned);
             IntPtr srcBufferPtr = pinnedSrcBuffer.AddrOfPinnedObject();
