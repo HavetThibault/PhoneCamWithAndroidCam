@@ -9,7 +9,7 @@ namespace ImageProcessingUtils
         public static void ToByteArray(Bitmap srcImage, out int stride, byte[] dest)
         {
             var canvas = new Rectangle(0, 0, srcImage.Width, srcImage.Height);
-            BitmapData srcData = srcImage.LockBits(canvas, ImageLockMode.ReadOnly, PixelFormat.Format32bppRgb);
+            BitmapData srcData = srcImage.LockBits(canvas, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
             stride = srcData.Stride;
 
@@ -24,7 +24,7 @@ namespace ImageProcessingUtils
 
         public static void FromBgraBufferToBitmap(Bitmap destBitmap, byte[] buffer, int width, int height)
         {
-            BitmapData srcData = destBitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppRgb);
+            BitmapData srcData = destBitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
 
             GCHandle pinnedSrcBuffer = GCHandle.Alloc(buffer, GCHandleType.Pinned);
             IntPtr srcBufferPtr = pinnedSrcBuffer.AddrOfPinnedObject();

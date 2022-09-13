@@ -15,7 +15,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhoneCamWithAndroidCamTests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FiltersBenchmark", "FiltersBenchmark\FiltersBenchmark.csproj", "{F0360C2E-260F-4FF9-8658-E64465422643}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessingPipelines", "ProcessingPipelines\ProcessingPipelines.csproj", "{E4A63805-E3A4-4C1B-9679-CC9B367D1959}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessingPipelines", "ProcessingPipelines\ProcessingPipelines.csproj", "{E4A63805-E3A4-4C1B-9679-CC9B367D1959}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2C1CC59D-CBD1-4AEF-844E-63A08CA9DD9E}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

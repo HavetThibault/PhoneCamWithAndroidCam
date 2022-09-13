@@ -1,5 +1,6 @@
 ﻿using ImageProcessingUtils;
 using ImageProcessingUtils.Pipeline;
+using System.Drawing;
 
 namespace PhoneCamWithAndroidCam.Threads
 {
@@ -16,7 +17,7 @@ namespace PhoneCamWithAndroidCam.Threads
         private readonly object _bufferPointerLock = new();
 
         public int BufferNbr { get; init; }
-        public Frame[] BytesBuffers { get; init; }
+        public BitmapFrame[] BytesBuffers { get; init; }
         public int Height { get; init; }
         public int Width { get; init; }
         public int Stride { get; init; }
@@ -42,7 +43,7 @@ namespace PhoneCamWithAndroidCam.Threads
 
         public MultipleBuffering(int bufferWidth, int bufferHeight, int bufferStride, int bufferNbr, EBufferPixelsFormat bufferPixelsFormat)
         {
-            BytesBuffers = new Frame[bufferNbr];
+            BytesBuffers = new BitmapFrame[bufferNbr];
 
             Height = bufferHeight;
             Width = bufferWidth;
@@ -51,7 +52,7 @@ namespace PhoneCamWithAndroidCam.Threads
 
             for (int i = 0; i < bufferNbr; i++)
             {
-                BytesBuffers[i] = new Frame(new byte[bufferHeight * bufferStride]);
+                BytesBuffers[i] = new BitmapFrame(new byte[bufferHeight * bufferStride]);
             }
 
             BufferNbr = bufferNbr;
@@ -62,53 +63,60 @@ namespace PhoneCamWithAndroidCam.Threads
             _canWriteBuffer = new(true);
         }
 
-        public int GetNextReaderBuffer()
+        public BitmapFrame GetNextReaderBuffer()
         {
             lock (_bufferPointerLock)
             {
-                if (UnReadBufferNbr == 0) return -1;
-                UnReadBufferNbr--;
-                return _bufferReaderPointer++;
+                if (UnReadBufferNbr == 0) return null;
+                
+                return BytesBuffers[_bufferReaderPointer++];
             }
         }
 
-        public int WaitNextReaderBuffer()
+        public BitmapFrame WaitNextReaderBuffer()
         {
             while (true)
             {
-                int nextReaderBuffer = GetNextReaderBuffer();
+                BitmapFrame nextReaderBuffer = GetNextReaderBuffer();
 
-                if (nextReaderBuffer != -1)
+                if (nextReaderBuffer != null)
                     return nextReaderBuffer;
 
                 _canReadBuffer.WaitOne();
             }
         }
 
-        public bool WriteBuffer(byte[] newBuffer)
+        public void FinishReading()
+        {
+            lock (_bufferPointerLock)
+                UnReadBufferNbr--;
+        }
+
+        public bool WriteBuffer(byte[] newBuffer, Bitmap associatedBitmap)
         {
             if (UnReadBufferNbr < BufferNbr)
             {
                 int bufferWriterPointer;
                 lock (_bufferPointerLock)
-                {
                     bufferWriterPointer = _bufferWriterPointer++;
-                    UnReadBufferNbr++;
-                }
 
                 //lock (BytesBuffers[bufferWriterPointer])
                 SIMDHelper.Copy(newBuffer, BytesBuffers[bufferWriterPointer].Data);
+                BytesBuffers[bufferWriterPointer].Bitmap = associatedBitmap;
+
+                lock (_bufferPointerLock)
+                    UnReadBufferNbr++;
 
                 return true;
             }
             return false;
         }
 
-        public void WaitWriteBuffer(byte[] newBuffer)
+        public void WaitWriteBuffer(byte[] newBuffer, Bitmap associatedBitmap)
         {
             while (true)
             {
-                if (!WriteBuffer(newBuffer))
+                if (!WriteBuffer(newBuffer, associatedBitmap))
                     _canWriteBuffer.WaitOne();
             }
         }

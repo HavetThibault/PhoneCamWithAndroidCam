@@ -10,11 +10,16 @@
   <ItemGroup>
     <ProjectReference Include="..\AndroidCamClient\AndroidCamClient.csproj" />
     <ProjectReference Include="..\ImageProcessingUtils\ImageProcessingUtils.csproj" />
+    <ProjectReference Include="..\ProcessingPipelines\ProcessingPipelines.csproj" />
     <ProjectReference Include="..\WpfUtils\WpfUtils.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
 </Project>

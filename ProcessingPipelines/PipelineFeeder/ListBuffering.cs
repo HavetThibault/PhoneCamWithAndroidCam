@@ -38,6 +38,7 @@ namespace PhoneCamWithAndroidCam.Threads
             _canAdd = new(true);
         }
 
+        /// <exception cref="ObjectDisposedException"/>
         public void AddRawFrame(T frameBuffer)
         {
             while(true)
@@ -56,6 +57,7 @@ namespace PhoneCamWithAndroidCam.Threads
             }
         }
 
+        /// <exception cref="ObjectDisposedException"/>
         public T GetRawFrame()
         {
             while(true)

@@ -1,6 +1,7 @@
 ﻿using AndroidCamClient;
 using AndroidCamClient.JpegStream;
 using ImageProcessingUtils;
+using PhoneCamWithAndroidCam.ViewModels;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -18,31 +19,26 @@ namespace PhoneCamWithAndroidCam
     /// </summary>
     public partial class MainWindow : Window
     {
-        private PhoneCamClient phoneCamClient;
-        private int _frameDisplayed;
+        private MainViewModel _mainViewModel;
+
         public MainWindow()
         {
             SIMD.LoadAssembly();
             InitializeComponent();
 
-            phoneCamClient = new("192.168.1.37");
-            _frameDisplayed = 0;
+            _mainViewModel = new MainViewModel(Dispatcher);
+            DataContext = _mainViewModel;
 
             Closing += MainWindowClosing;
         }
 
         private void MainWindowClosing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
+            _mainViewModel.Dispose();
             SIMD.UnloadAssembly();
-            phoneCamClient.Dispose();
         }
 
-        private void LaunchStream(object sender, RoutedEventArgs e)
-        {
-            new Thread(ReceiveAndDisplayPictures).Start();
-        }
-
-        private void UpdateMainPicture(MemoryStream memoryStream)
+        /*private void UpdateMainPicture(MemoryStream memoryStream)
         {
             BitmapImage bmpImage = Utils.Convert(memoryStream); // The bitmap now own the stream, so you must not close the memoryStream
             MainImage.Source = bmpImage;
@@ -83,6 +79,6 @@ namespace PhoneCamWithAndroidCam
                 }
             }
             mjpegStream.Close();
-        }
+        }*/
     }
 }

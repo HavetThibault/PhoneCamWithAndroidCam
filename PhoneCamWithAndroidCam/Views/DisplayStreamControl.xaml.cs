@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using PhoneCamWithAndroidCam.ViewModels;
+using System.Windows.Controls;
 
 namespace PhoneCamWithAndroidCam.Views
 {

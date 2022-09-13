@@ -1,59 +1,41 @@
 ﻿using AndroidCamClient;
+using ImageProcessingUtils;
+using ImageProcessingUtils.Pipeline;
+using PhoneCamWithAndroidCam.Threads;
+using ProcessingPipelines.PipelineFeeder;
 using System;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Threading;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using WpfUtils;
+using BitmapFrame = ImageProcessingUtils.Pipeline.BitmapFrame;
 
 namespace PhoneCamWithAndroidCam.ViewModels
 {
-    internal class MainViewModel : BindableClass, IDisposable
+    public class MainViewModel : BindableClass
     {
-        private int _fps = 0;
-        private bool _isStreaming = false;
-        private PhoneCamClient _phoneCamClient;
+        private BindableClass _currentViewModel;
+        private DisplayStreamViewModel _displayStreamViewModel;
 
-        public int Fps
+        public BindableClass CurrentViewModel
         {
-            get => _fps;
-            set => SetProperty(ref _fps, value);
+            get => _currentViewModel;
+            set => SetProperty(ref _currentViewModel, value);
         }
 
-        public bool IsStreaming
+        public MainViewModel(Dispatcher uiDispatcher)
         {
-            get => _isStreaming;
-            set => SetProperty(ref _isStreaming, value);
-        }
-
-        public RelayCommand CommandLaunchStreaming { get; set; }
-
-        public MainViewModel()
-        {
-            CommandLaunchStreaming = new RelayCommand(LaunchStreaming, CanLaunchStreaming);
-            _phoneCamClient = new("192.168.1.37");
-        }
-
-        public void LaunchStreaming()
-        {
-            IsStreaming = true;
-
-        }
-
-        public bool CanLaunchStreaming()
-        {
-            return !IsStreaming;
-        }
-
-        public void StopStreaming()
-        {
-
-        }
-
-        public bool CanStopStreaming()
-        {
-            return IsStreaming;
+            _displayStreamViewModel = new DisplayStreamViewModel(uiDispatcher);
+            CurrentViewModel = _displayStreamViewModel;
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _displayStreamViewModel.Dispose();
         }
     }
 }

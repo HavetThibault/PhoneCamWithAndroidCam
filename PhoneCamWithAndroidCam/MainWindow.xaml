@@ -4,25 +4,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PhoneCamWithAndroidCam"
+        xmlns:views="clr-namespace:PhoneCamWithAndroidCam.Views"
+        xmlns:viewModels="clr-namespace:PhoneCamWithAndroidCam.ViewModels"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
 
-        <Image x:Name="MainImage" Grid.Column="0"/>
-        <StackPanel Grid.Column="1">
-            <Button Click="LaunchStream" Width="120" Height="40" Content="Launch stream" Margin="5"/>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Frames displayed"/>
-                <Label x:Name="LabelCountFrame" Content="" Margin="5"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Frames per seconds"/>
-                <Label x:Name="LabelFps" Content="" Margin="5"/>
-            </StackPanel>
-        </StackPanel>
+    <Grid>
+        <ContentControl Content = "{Binding CurrentViewModel}"/>
     </Grid>
+
+    <Window.Resources>
+        <DataTemplate DataType = "{x:Type viewModels:DisplayStreamViewModel}">
+            <views:MainUserControl/>
+        </DataTemplate>
+    </Window.Resources>
 </Window>
