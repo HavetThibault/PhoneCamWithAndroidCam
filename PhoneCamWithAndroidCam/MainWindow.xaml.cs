@@ -2,6 +2,7 @@
 using ImageProcessingUtils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -19,7 +20,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using WebAPIClients;
+using AndroidCamClient;
 using WpfUtils;
 
 namespace PhoneCamWithAndroidCam
@@ -60,22 +61,38 @@ namespace PhoneCamWithAndroidCam
             LabelCountFrame.Content = ++_frameDisplayed;
         }
 
+        private void UpdateFps(int fps)
+        {
+            LabelFps.Content = fps;
+        }
+
         private async void ReceiveAndDisplayPictures()
         {
             Stream mjpegStream = await phoneCamClient.LaunchStream();
             CannyEdgeDetection cannyEdgeDetection = new(320, 240);
+            Stopwatch watch = new();
+            int framesNbrInASecond = 0;
             for (int i = 0; i < 1000; i++)
             {
-                JpegFrame frame = PhoneCamClient.GetStreamFrame(mjpegStream);
-                MemoryStream pngMemoryStream = new(frame.ToFullBytesImage());
-                var bmpTryFrame = new Bitmap(pngMemoryStream);
+                watch.Start();
+                JpegFrame jpegFrame = PhoneCamClient.GetStreamFrame(mjpegStream);
+                MemoryStream jpegMemoryStream = new(jpegFrame.ToFullBytesImage());
+                var bmpTryFrame = new Bitmap(jpegMemoryStream);
                 byte[] pixels = new byte[320 * 240 * 4];
                 BitmapHelper.ToByteArray(bmpTryFrame, out _, pixels);
                 byte[] cannyResultBuffer = cannyEdgeDetection.ApplyCannyFilter(pixels);
                 BitmapHelper.FromBgraBufferToBitmap(bmpTryFrame, cannyResultBuffer, 320, 240);
                 MemoryStream cannyStream = new();
-                bmpTryFrame.Save(cannyStream, ImageFormat.Bmp);
+                bmpTryFrame.Save(cannyStream, ImageFormat.Jpeg);
                 Dispatcher.Invoke(UpdateMainPicture, cannyStream);
+                watch.Stop();
+                framesNbrInASecond++;
+                if (watch.ElapsedMilliseconds > 1000)
+                {
+                    watch.Reset();
+                    Dispatcher.Invoke(UpdateFps, framesNbrInASecond);
+                    framesNbrInASecond = 0;
+                }
             }
             mjpegStream.Close();
         }

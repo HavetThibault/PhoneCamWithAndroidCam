@@ -33,7 +33,7 @@ namespace AndroidCamClient.JpegStream
         public static JpegFrame ReadOneFrame(Stream mjpegStream)
         {
             Dictionary<string, string> headers = ConvertBytesHeaders(GetBytesHeaders(mjpegStream, out int offset));
-            if (!headers.TryGetValue("Content-Length", out string strContentLength) || strContentLength == null || strContentLength.Length == 0)
+            if (!headers.TryGetValue("Content-Length", out string? strContentLength) || strContentLength == null || strContentLength.Length == 0)
                 throw new JpegDecodingException("The headers of the response don't contain the content length.");
 
             int contentLength = int.Parse(strContentLength);

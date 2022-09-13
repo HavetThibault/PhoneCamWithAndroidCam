@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
-namespace Kyla.Vision.Helpers
+namespace ImageProcessingUtils
 {
     public static class FilterHelper
     {

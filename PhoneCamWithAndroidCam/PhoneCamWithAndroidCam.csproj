@@ -13,4 +13,8 @@
     <ProjectReference Include="..\WpfUtils\WpfUtils.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
 </Project>

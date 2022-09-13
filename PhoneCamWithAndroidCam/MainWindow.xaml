@@ -13,14 +13,16 @@
         </Grid.ColumnDefinitions>
 
         <Image x:Name="MainImage" Grid.Column="0"/>
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            
-            <Button Click="LaunchStream" Width="120" Height="50" Content="Launch stream"/>
-            <Label Grid.Row="2" x:Name="LabelCountFrame" Content=""/>
-        </Grid>
+        <StackPanel Grid.Column="1">
+            <Button Click="LaunchStream" Width="120" Height="40" Content="Launch stream" Margin="5"/>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Frames displayed"/>
+                <Label x:Name="LabelCountFrame" Content="" Margin="5"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Frames per seconds"/>
+                <Label x:Name="LabelFps" Content="" Margin="5"/>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Window>

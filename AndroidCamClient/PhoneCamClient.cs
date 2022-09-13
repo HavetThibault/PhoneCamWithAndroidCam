@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Xml;
 using System.Runtime.CompilerServices;
 
-namespace WebAPIClients
+namespace AndroidCamClient
 {
     public class PhoneCamClient : IDisposable
     {
