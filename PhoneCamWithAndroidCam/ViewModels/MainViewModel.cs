@@ -8,7 +8,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private BindableClass _currentViewModel;
         private DisplayStreamViewModel _displayStreamViewModel;
 
-        public BindableClass CurrentViewModel
+        public BindableClass BigViewModel
         {
             get => _currentViewModel;
             set => SetProperty(ref _currentViewModel, value);
@@ -16,8 +16,8 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
         public MainViewModel(Dispatcher uiDispatcher)
         {
-            _displayStreamViewModel = new DisplayStreamViewModel(uiDispatcher);
-            CurrentViewModel = _displayStreamViewModel;
+            _displayStreamViewModel = new DisplayStreamViewModel(uiDispatcher, new(uiDispatcher));
+            BigViewModel = _displayStreamViewModel;
         }
 
         public void Dispose()

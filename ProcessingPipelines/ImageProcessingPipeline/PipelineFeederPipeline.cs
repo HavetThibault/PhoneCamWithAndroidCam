@@ -15,10 +15,9 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         public ListBuffering<Bitmap> Bitmaps;
         public MultipleBuffering OutputMultipleBuffering;
 
-        public long LastProcessRawJegStreamMsTime { get; set; }
-        public long LastProcessRawJegMsTime { get; set; }
-        public long LastProcessBitmapMsTime { get; set; }
-        public object LastProcessLock { get; set; } = new();
+        public ProcessPerformances ProcessRawJpegStreamPerf { get; set; }
+        public ProcessPerformances ProcessRawJpegPerf { get; set; }
+        public ProcessPerformances ProcessBitmapsPerf { get; set; }
 
         public PipelineFeederPipeline(PhoneCamClient phoneCamClient, MultipleBuffering outputMultipleBuffering)
         {
@@ -26,6 +25,10 @@ namespace ProcessingPipelines.ImageProcessingPipeline
             OutputMultipleBuffering = outputMultipleBuffering;
             Bitmaps = new(10);
             RawJpegBuffering = new(10);
+
+            ProcessRawJpegStreamPerf = new("ProcessRawJpegStream");
+            ProcessRawJpegPerf = new("ProcessRawJpeg");
+            ProcessBitmapsPerf = new("ProcessBitmap");
         }
 
         public void StartFeeding(CancellationTokenSource cancellationTokenSource)
@@ -41,23 +44,34 @@ namespace ProcessingPipelines.ImageProcessingPipeline
             if (cancellationTokenSourceObj is CancellationTokenSource cancellationTokenSource)
             {
                 Stream _rawJpegStream = await _phoneCamClient.LaunchStream();
-                Stopwatch watch = new();
-                int framesNbrInASecond = 0;
+                Stopwatch waitingReadTimeWatch = new();
+                Stopwatch waitingWriteTimeWatch = new();
+                Stopwatch processTimeWatch = new();
                 while (!cancellationTokenSource.IsCancellationRequested)
                 {
-                    watch.Start();
-
+                    waitingReadTimeWatch.Start();
                     JpegFrame jpegFrame = PhoneCamClient.GetStreamFrame(_rawJpegStream);
-                    RawJpegBuffering.AddRawFrame(new MemoryStream(jpegFrame.ToFullBytesImage()));
+                    waitingReadTimeWatch.Stop();
 
-                    watch.Stop();
-                    framesNbrInASecond++;
-                    if (watch.ElapsedMilliseconds > 1000)
+                    processTimeWatch.Start();
+                    var bmpMemoryStream = new MemoryStream(jpegFrame.ToFullBytesImage());
+                    processTimeWatch.Stop();
+
+                    waitingWriteTimeWatch.Start();
+                    RawJpegBuffering.AddRawFrame(bmpMemoryStream);
+                    waitingWriteTimeWatch.Stop();
+
+                    if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                     {
-                        watch.Reset();
-                        lock (LastProcessLock)
-                            LastProcessRawJegStreamMsTime = watch.ElapsedMilliseconds;
-                        framesNbrInASecond = 0;
+                        lock(ProcessRawJpegStreamPerf)
+                        {
+                            ProcessRawJpegStreamPerf.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
+                            ProcessRawJpegStreamPerf.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
+                            ProcessRawJpegStreamPerf.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
+                        }
+                        waitingReadTimeWatch.Reset();
+                        processTimeWatch.Reset();
+                        waitingWriteTimeWatch.Reset();
                     }
                 }
                 _rawJpegStream.Close();
@@ -68,29 +82,40 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         {
             if (cancellationTokenSourceObj is CancellationTokenSource cancellationTokenSource)
             {
-                Stopwatch watch = new();
-                int framesNbrInASecond = 0;
+                Stopwatch waitingReadTimeWatch = new();
+                Stopwatch waitingWriteTimeWatch = new();
+                Stopwatch processTimeWatch = new();
                 try
                 {
                     while (!cancellationTokenSource.IsCancellationRequested)
                     {
-                        watch.Start();
-
+                        waitingReadTimeWatch.Start();
                         MemoryStream jpegMemoryStream = RawJpegBuffering.GetRawFrame();
-                        Bitmaps.AddRawFrame(new Bitmap(jpegMemoryStream));
+                        waitingReadTimeWatch.Stop();
 
-                        watch.Stop();
-                        framesNbrInASecond++;
-                        if (watch.ElapsedMilliseconds > 1000)
+                        processTimeWatch.Start();
+                        var bmpFrame = new Bitmap(jpegMemoryStream);
+                        processTimeWatch.Stop();
+
+                        waitingWriteTimeWatch.Start();
+                        Bitmaps.AddRawFrame(bmpFrame);
+                        waitingWriteTimeWatch.Stop();
+
+                        if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                         {
-                            watch.Reset();
-                            lock (LastProcessLock)
-                                LastProcessRawJegMsTime = watch.ElapsedMilliseconds;
-                            framesNbrInASecond = 0;
+                            lock (ProcessRawJpegPerf)
+                            {
+                                ProcessRawJpegPerf.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
+                                ProcessRawJpegPerf.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
+                                ProcessRawJpegPerf.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
+                            }
+                            waitingReadTimeWatch.Reset();
+                            processTimeWatch.Reset();
+                            waitingWriteTimeWatch.Reset();
                         }
                     }
                 }
-                catch { }
+                catch { } // For 'RawJpegBuffering.GetRawFrame();'
             }
         }
 
@@ -99,30 +124,40 @@ namespace ProcessingPipelines.ImageProcessingPipeline
             if (cancellationTokenSourceObj is CancellationTokenSource cancellationTokenSource)
             {
                 byte[] pixelsBuffer = new byte[320 * 240 * 4];
-                Stopwatch watch = new();
-                int framesNbrInASecond = 0;
+                Stopwatch waitingReadTimeWatch = new();
+                Stopwatch waitingWriteTimeWatch = new();
+                Stopwatch processTimeWatch = new();
                 try
                 {
                     while (!cancellationTokenSource.IsCancellationRequested)
                     {
-                        watch.Start();
-
+                        waitingReadTimeWatch.Start();
                         Bitmap bmp = Bitmaps.GetRawFrame();
-                        BitmapHelper.ToByteArray(bmp, out _, pixelsBuffer);
-                        OutputMultipleBuffering.WaitWriteBuffer(pixelsBuffer, bmp);
+                        waitingReadTimeWatch.Stop();
 
-                        watch.Stop();
-                        framesNbrInASecond++;
-                        if (watch.ElapsedMilliseconds > 1000)
+                        processTimeWatch.Start();
+                        BitmapHelper.ToByteArray(bmp, out _, pixelsBuffer);
+                        processTimeWatch.Stop();
+
+                        waitingWriteTimeWatch.Start();
+                        OutputMultipleBuffering.WaitWriteBuffer(pixelsBuffer, bmp);
+                        waitingWriteTimeWatch.Stop();
+
+                        if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                         {
-                            watch.Reset();
-                            lock (LastProcessLock)
-                                LastProcessBitmapMsTime = watch.ElapsedMilliseconds;
-                            framesNbrInASecond = 0;
+                            lock (ProcessBitmapsPerf)
+                            {
+                                ProcessBitmapsPerf.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
+                                ProcessBitmapsPerf.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
+                                ProcessBitmapsPerf.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
+                            }
+                            waitingReadTimeWatch.Reset();
+                            processTimeWatch.Reset();
+                            waitingWriteTimeWatch.Reset();
                         }
                     }
                 }
-                catch { }
+                catch { } // For Bitmaps.GetRawFrame();
             }
         }
 

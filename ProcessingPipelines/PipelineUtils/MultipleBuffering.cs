@@ -170,10 +170,10 @@ namespace ProcessingPipelines.PipelineUtils
 
         public void Dispose()
         {
-            _canWriteBuffer.SafeWaitHandle.SetHandleAsInvalid();
-            _canWriteBuffer.Close();
-            _canReadBuffer.SafeWaitHandle.SetHandleAsInvalid();
-            _canReadBuffer.Close();
+            _canWriteBuffer?.SafeWaitHandle.SetHandleAsInvalid();
+            _canWriteBuffer?.Close();
+            _canReadBuffer?.SafeWaitHandle.SetHandleAsInvalid();
+            _canReadBuffer?.Close();
         }
     }
 }

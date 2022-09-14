@@ -5,9 +5,9 @@ namespace PhoneCamWithAndroidCam.Views
     /// <summary>
     /// Logique d'interaction pour MainUserControl.xaml
     /// </summary>
-    public partial class MainUserControl : UserControl
+    public partial class DisplayStreamControl : UserControl
     {
-        public MainUserControl()
+        public DisplayStreamControl()
         {
             InitializeComponent();
         }

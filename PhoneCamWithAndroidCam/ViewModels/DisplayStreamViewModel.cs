@@ -2,6 +2,7 @@
 using ProcessingPipelines.ImageProcessingPipeline;
 using ProcessingPipelines.PipelineUtils;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -28,6 +29,8 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private long _lastProcessRawJegMsTime;
         private long _lastProcessBitmapMsTime;
         private Timer _refreshProcessTimer;
+
+        public ProcessPerformancesViewModel ProcessPerformancesViewModel { get; set; }
 
 
         public ImageSource MainImageSource
@@ -75,14 +78,15 @@ namespace PhoneCamWithAndroidCam.ViewModels
         public RelayCommand CommandLaunchStreaming { get; set; }
         public RelayCommand CommandStopStreaming { get; set; }
 
-        public DisplayStreamViewModel(Dispatcher uiDispatcher)
+        public DisplayStreamViewModel(Dispatcher uiDispatcher, ProcessPerformancesViewModel processPerformancesViewModel)
         {
             CommandLaunchStreaming = new RelayCommand(LaunchStreaming, CanLaunchStreaming);
             CommandStopStreaming = new RelayCommand(StopStreaming, CanStopStreaming);
-            _phoneCamClient = new("192.168.1.37");
+            _phoneCamClient = new("192.168.0.33");
             _uiDispatcher = uiDispatcher;
             _pipelineFeederOutput = new(320, 240, 320 * 4, 10, EBufferPixelsFormat.Bgra32Bits);
             _convertToRawJpegOutput = new(10);
+            ProcessPerformancesViewModel = processPerformancesViewModel;
         }
 
         public void LaunchStreaming()
@@ -145,12 +149,14 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
         public void RefreshProcessTime(object? arg)
         {
-            lock (_pipelineFeeder.LastProcessLock)
+            List<ProcessPerformances> perfsList = new()
             {
-                LastProcessRawJegStreamMsTime = _pipelineFeeder.LastProcessRawJegStreamMsTime;
-                LastProcessRawJegMsTime = _pipelineFeeder.LastProcessRawJegMsTime;
-                LastProcessBitmapMsTime = _pipelineFeeder.LastProcessBitmapMsTime;
-            }
+                _pipelineFeeder.ProcessRawJpegPerf,
+                _pipelineFeeder.ProcessRawJpegStreamPerf,
+                _pipelineFeeder.ProcessBitmapsPerf
+            };
+            
+            ProcessPerformancesViewModel.UpdatePerformances(perfsList);
         }
 
         private void UpdateMainPicture(MemoryStream memoryStream)

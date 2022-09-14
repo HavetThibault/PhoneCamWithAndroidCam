@@ -76,8 +76,8 @@
 
         public void Dispose()
         {
-            _canAdd.Close();
-            _canRetreive.Close();
+            _canAdd?.Close();
+            _canRetreive?.Close();
         }
     }
 }
