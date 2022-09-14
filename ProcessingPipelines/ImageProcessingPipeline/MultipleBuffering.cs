@@ -86,7 +86,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 if (nextReaderBuffer != null)
                     return nextReaderBuffer;
 
-                _canReadBuffer.WaitOne();
+                while (!_canReadBuffer.WaitOne(100)) ;
             }
         }
 
@@ -111,7 +111,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 BitmapFrame frame = BytesBuffers[bufferWriterPointer];
                 lock(frame)
                 {
-                    SIMDHelper.Copy(newBuffer, frame.Data);
+                    Buffer.BlockCopy(newBuffer, 0, frame.Data, 0, newBuffer.Length);
                 }
 
                 lock (_bufferPointerLock)
@@ -136,7 +136,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                 lock (BytesBuffers[bufferWriterPointer])
                 {
-                    SIMDHelper.Copy(newBuffer, BytesBuffers[bufferWriterPointer].Data);
+                    Buffer.BlockCopy(newBuffer, 0, BytesBuffers[bufferWriterPointer].Data, 0, newBuffer.Length);
                     BytesBuffers[bufferWriterPointer].Bitmap = associatedBitmap;
                 }
 
@@ -155,7 +155,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 if (WriteBuffer(newBuffer, associatedBitmap))
                     return;
 
-                _canWriteBuffer.WaitOne();
+                while (!_canWriteBuffer.WaitOne(100)) ;
             }
         }
 
@@ -172,8 +172,10 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
         public void Dispose()
         {
-            _canWriteBuffer.Dispose();
-            _canReadBuffer.Dispose();
+            _canWriteBuffer.SafeWaitHandle.SetHandleAsInvalid();
+            _canWriteBuffer.Close();
+            _canReadBuffer.SafeWaitHandle.SetHandleAsInvalid();
+            _canReadBuffer.Close();
         }
     }
 }

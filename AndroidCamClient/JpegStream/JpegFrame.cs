@@ -22,9 +22,9 @@ namespace AndroidCamClient.JpegStream
         public byte[] ToFullBytesImage()
         {
             byte[] fullBytesImage = new byte[Headers.Length + Scan.Length + 2];
-            SIMDHelper.Copy(Headers, fullBytesImage);
-            SIMDHelper.Copy(Scan, fullBytesImage, Headers.Length);
-            SIMDHelper.Copy(JpegMarkers.JPEG_END_OF_IMAGE, fullBytesImage, Headers.Length + Scan.Length);
+            Buffer.BlockCopy(Headers, 0, fullBytesImage, 0, Headers.Length);
+            Buffer.BlockCopy(Scan, 0, fullBytesImage, Headers.Length, Scan.Length);
+            Buffer.BlockCopy(JpegMarkers.JPEG_END_OF_IMAGE, 0, fullBytesImage, Headers.Length + Scan.Length, JpegMarkers.JPEG_END_OF_IMAGE.Length);
             return fullBytesImage;
         }
     }

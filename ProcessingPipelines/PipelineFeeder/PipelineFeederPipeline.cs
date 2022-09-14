@@ -72,23 +72,27 @@ namespace ProcessingPipelines.PipelineFeeder
             {
                 Stopwatch watch = new();
                 int framesNbrInASecond = 0;
-                while (!cancellationTokenSource.IsCancellationRequested)
+                try
                 {
-                    watch.Start();
-
-                    MemoryStream jpegMemoryStream = RawJpegBuffering.GetRawFrame();
-                    Bitmaps.AddRawFrame(new Bitmap(jpegMemoryStream));
-
-                    watch.Stop();
-                    framesNbrInASecond++;
-                    if (watch.ElapsedMilliseconds > 1000)
+                    while (!cancellationTokenSource.IsCancellationRequested)
                     {
-                        watch.Reset();
-                        lock (LastProcessLock)
-                            LastProcessRawJegMsTime = watch.ElapsedMilliseconds;
-                        framesNbrInASecond = 0;
+                        watch.Start();
+
+                        MemoryStream jpegMemoryStream = RawJpegBuffering.GetRawFrame();
+                        Bitmaps.AddRawFrame(new Bitmap(jpegMemoryStream));
+
+                        watch.Stop();
+                        framesNbrInASecond++;
+                        if (watch.ElapsedMilliseconds > 1000)
+                        {
+                            watch.Reset();
+                            lock (LastProcessLock)
+                                LastProcessRawJegMsTime = watch.ElapsedMilliseconds;
+                            framesNbrInASecond = 0;
+                        }
                     }
                 }
+                catch { }
             }
         }
 
@@ -99,24 +103,28 @@ namespace ProcessingPipelines.PipelineFeeder
                 byte[] pixelsBuffer = new byte[320 * 240 * 4];
                 Stopwatch watch = new();
                 int framesNbrInASecond = 0;
-                while (!cancellationTokenSource.IsCancellationRequested)
+                try
                 {
-                    watch.Start();
-
-                    Bitmap bmp = Bitmaps.GetRawFrame();
-                    BitmapHelper.ToByteArray(bmp, out _, pixelsBuffer);
-                    OutputMultipleBuffering.WaitWriteBuffer(pixelsBuffer, bmp);
-
-                    watch.Stop();
-                    framesNbrInASecond++;
-                    if (watch.ElapsedMilliseconds > 1000)
+                    while (!cancellationTokenSource.IsCancellationRequested)
                     {
-                        watch.Reset();
-                        lock (LastProcessLock)
-                            LastProcessBitmapMsTime = watch.ElapsedMilliseconds;
-                        framesNbrInASecond = 0;
+                        watch.Start();
+
+                        Bitmap bmp = Bitmaps.GetRawFrame();
+                        BitmapHelper.ToByteArray(bmp, out _, pixelsBuffer);
+                        OutputMultipleBuffering.WaitWriteBuffer(pixelsBuffer, bmp);
+
+                        watch.Stop();
+                        framesNbrInASecond++;
+                        if (watch.ElapsedMilliseconds > 1000)
+                        {
+                            watch.Reset();
+                            lock (LastProcessLock)
+                                LastProcessBitmapMsTime = watch.ElapsedMilliseconds;
+                            framesNbrInASecond = 0;
+                        }
                     }
                 }
+                catch { }
             }
         }
 

@@ -52,7 +52,7 @@ namespace PhoneCamWithAndroidCam.Threads
                     }
                 }
 
-                _canAdd.WaitOne();
+                while (!_canAdd.WaitOne(100)) ;
             }
         }
 
@@ -72,14 +72,14 @@ namespace PhoneCamWithAndroidCam.Threads
                     }
                 }
 
-                _canRetreive.WaitOne();
+                while (!_canRetreive.WaitOne(100));
             }
         }
 
         public void Dispose()
-        { 
-            _canAdd.Dispose();
-            _canRetreive.Dispose();
+        {
+            _canAdd.Close();
+            _canRetreive.Close();
         }
     }
 }
