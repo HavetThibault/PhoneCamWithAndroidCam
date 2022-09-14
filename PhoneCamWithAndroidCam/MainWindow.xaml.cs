@@ -1,16 +1,6 @@
-﻿using AndroidCamClient;
-using AndroidCamClient.JpegStream;
-using ImageProcessingUtils;
+﻿using ImageProcessingUtils;
 using PhoneCamWithAndroidCam.ViewModels;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Threading;
 using System.Windows;
-using System.Windows.Media.Imaging;
-using System.Windows.Threading;
-using WpfUtils;
 
 namespace PhoneCamWithAndroidCam
 {

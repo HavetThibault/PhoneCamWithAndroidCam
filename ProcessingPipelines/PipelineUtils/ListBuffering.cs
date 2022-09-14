@@ -1,6 +1,4 @@
-﻿using ImageProcessingUtils;
-
-namespace PhoneCamWithAndroidCam.Threads
+﻿namespace ProcessingPipelines.PipelineUtils
 {
     public class ListBuffering<T> : IDisposable
     {
@@ -29,7 +27,7 @@ namespace PhoneCamWithAndroidCam.Threads
 
         public ListBuffering(int bufferNbr)
         {
-            BytesBuffers = new ();
+            BytesBuffers = new();
 
             ElementsNbr = bufferNbr;
             _unReadElementNbr = 0;
@@ -40,7 +38,7 @@ namespace PhoneCamWithAndroidCam.Threads
         /// <exception cref="ObjectDisposedException"/>
         public void AddRawFrame(T frameBuffer)
         {
-            while(true)
+            while (true)
             {
                 lock (_elementsLock)
                 {
@@ -59,7 +57,7 @@ namespace PhoneCamWithAndroidCam.Threads
         /// <exception cref="ObjectDisposedException"/>
         public T GetRawFrame()
         {
-            while(true)
+            while (true)
             {
                 lock (_elementsLock)
                 {
@@ -72,7 +70,7 @@ namespace PhoneCamWithAndroidCam.Threads
                     }
                 }
 
-                while (!_canRetreive.WaitOne(100));
+                while (!_canRetreive.WaitOne(100)) ;
             }
         }
 

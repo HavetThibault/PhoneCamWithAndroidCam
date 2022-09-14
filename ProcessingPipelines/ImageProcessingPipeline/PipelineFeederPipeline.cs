@@ -1,13 +1,11 @@
 ﻿using AndroidCamClient;
 using AndroidCamClient.JpegStream;
 using ImageProcessingUtils;
-using PhoneCamWithAndroidCam.Threads;
-using ProcessingPipelines.ImageProcessingPipeline;
+using ProcessingPipelines.PipelineUtils;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 
-namespace ProcessingPipelines.PipelineFeeder
+namespace ProcessingPipelines.ImageProcessingPipeline
 {
     public class PipelineFeederPipeline
     {
@@ -27,7 +25,7 @@ namespace ProcessingPipelines.PipelineFeeder
             _phoneCamClient = phoneCamClient;
             OutputMultipleBuffering = outputMultipleBuffering;
             Bitmaps = new(10);
-            RawJpegBuffering = new (10);
+            RawJpegBuffering = new(10);
         }
 
         public void StartFeeding(CancellationTokenSource cancellationTokenSource)
@@ -40,7 +38,7 @@ namespace ProcessingPipelines.PipelineFeeder
 
         private async void ProcessRawJegStream(object? cancellationTokenSourceObj)
         {
-            if(cancellationTokenSourceObj is CancellationTokenSource cancellationTokenSource)
+            if (cancellationTokenSourceObj is CancellationTokenSource cancellationTokenSource)
             {
                 Stream _rawJpegStream = await _phoneCamClient.LaunchStream();
                 Stopwatch watch = new();
@@ -57,7 +55,7 @@ namespace ProcessingPipelines.PipelineFeeder
                     if (watch.ElapsedMilliseconds > 1000)
                     {
                         watch.Reset();
-                        lock(LastProcessLock)
+                        lock (LastProcessLock)
                             LastProcessRawJegStreamMsTime = watch.ElapsedMilliseconds;
                         framesNbrInASecond = 0;
                     }

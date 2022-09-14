@@ -1,14 +1,7 @@
 ﻿using ImageProcessingUtils;
-using PhoneCamWithAndroidCam.Threads;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing.Imaging;
+using ProcessingPipelines.PipelineUtils;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
+using System.Drawing.Imaging;
 
 namespace ProcessingPipelines.ImageProcessingPipeline
 {
@@ -32,7 +25,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         {
             if (cancellationTokenSourceObject is CancellationTokenSource cancellationTokenSource)
             {
-                while(!cancellationTokenSource.IsCancellationRequested)
+                while (!cancellationTokenSource.IsCancellationRequested)
                 {
                     Bitmap bmp;
                     MemoryStream cannyStream;

@@ -1,8 +1,6 @@
-﻿using ImageProcessingUtils;
-using System.Drawing;
-using System.Runtime.InteropServices;
+﻿using System.Drawing;
 
-namespace ProcessingPipelines.ImageProcessingPipeline
+namespace ProcessingPipelines.PipelineUtils
 {
     public class MultipleBuffering : IDisposable
     {
@@ -109,7 +107,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 }
 
                 BitmapFrame frame = BytesBuffers[bufferWriterPointer];
-                lock(frame)
+                lock (frame)
                 {
                     Buffer.BlockCopy(newBuffer, 0, frame.Data, 0, newBuffer.Length);
                 }
@@ -132,7 +130,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                     bufferWriterPointer = _bufferWriterPointer++;
                     if (_bufferWriterPointer == BufferNbr)
                         _bufferWriterPointer = 0;
-                } 
+                }
 
                 lock (BytesBuffers[bufferWriterPointer])
                 {

@@ -38,15 +38,15 @@ public class CannyEdgeDetection
         _sobelDyBuffer = new short[width * height];
     }
 
-    public byte[] ApplyCannyFilter(byte[] bytesSource)
+    public void ApplyCannyFilter(byte[] bytesSource, byte[] bytesDestination)
     {
         FilterHelper.CropBgra32BitsAndToGray(bytesSource, _pictureArea, _width * 4, _grayBuffer1);
         SIMDHelper.GaussBlur(_grayBuffer1, _width, _height, SIGMA_BLUR, GAUSS_KERNEL_DIMENSION, _grayBuffer2);
         SIMDHelper.SimdSobelGradient(_grayBuffer2, _width, _height, _width, _sobelDxBuffer, _sobelDyBuffer, _magnitudeBuffer, _angleBuffer);
         FilterHelper.FindLocalMaxima(_magnitudeBuffer, _angleBuffer, _width, _height, _grayBuffer1, out byte max);
 
-        if (max < MIN_CONTRAST) // if not enough contrast (max gradient magnitude too low), give up !
-            return null;
+        //if (max < MIN_CONTRAST) // if not enough contrast (max gradient magnitude too low), give up !
+        //return;
 
         if (max < MIN_GRADIENT_MAGNITUDE)
             max = MIN_GRADIENT_MAGNITUDE;
@@ -57,8 +57,6 @@ public class CannyEdgeDetection
         FilterHelper.DoubleThreshold(_grayBuffer1, adaptedMin, adaptedMax, _grayBuffer2, WEAK_PIXEL);
         FilterHelper.Hysteresis(_grayBuffer2, _width, _height, _grayBuffer1, WEAK_PIXEL);
 
-        byte[] resultBuffer = new byte[_width * _height * 4];
-        SIMDHelper.SimdGrayToBgra(_grayBuffer1, _width, _height, _width, resultBuffer, _width * 4);
-        return resultBuffer;
+        SIMDHelper.SimdGrayToBgra(_grayBuffer1, _width, _height, _width, bytesDestination, _width * 4);
     }
 }

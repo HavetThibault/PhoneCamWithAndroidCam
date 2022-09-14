@@ -1,6 +1,4 @@
-﻿using ImageProcessingUtils;
-
-namespace AndroidCamClient.JpegStream
+﻿namespace AndroidCamClient.JpegStream
 {
     public class JpegFrame
     {

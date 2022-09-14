@@ -1,17 +1,11 @@
 ﻿using AndroidCamClient;
-using ImageProcessingUtils;
-using PhoneCamWithAndroidCam.Threads;
 using ProcessingPipelines.ImageProcessingPipeline;
-using ProcessingPipelines.PipelineFeeder;
+using ProcessingPipelines.PipelineUtils;
 using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
-using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using WpfUtils;
 
@@ -24,7 +18,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private PhoneCamClient _phoneCamClient;
         private CancellationTokenSource _pipelineCancellationTokenSource;
         private PipelineFeederPipeline _pipelineFeeder;
-        private MedianImageProcessingPipeline _imageProcessingPipeline;
+        private CannyImageProcessingPipeline _imageProcessingPipeline;
         private Dispatcher _uiDispatcher;
         private ImageSource _mainImageSource;
         private MultipleBuffering _pipelineFeederOutput;
@@ -65,7 +59,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
             set => SetProperty(ref _lastProcessRawJegStreamMsTime, value);
         }
 
-        public long LastProcessRawJegMsTime 
+        public long LastProcessRawJegMsTime
         {
             get => _lastProcessRawJegMsTime;
             set => SetProperty(ref _lastProcessRawJegMsTime, value);
@@ -141,7 +135,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
                     if (watch.ElapsedMilliseconds > 1000)
                     {
                         watch.Reset();
-                        _uiDispatcher.Invoke(UpdateFps, framesNbrInASecond);
+                        Fps = framesNbrInASecond;
                         framesNbrInASecond = 0;
                     }
                 }
@@ -151,29 +145,17 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
         public void RefreshProcessTime(object? arg)
         {
-            lock(_pipelineFeeder.LastProcessLock)
+            lock (_pipelineFeeder.LastProcessLock)
             {
                 LastProcessRawJegStreamMsTime = _pipelineFeeder.LastProcessRawJegStreamMsTime;
                 LastProcessRawJegMsTime = _pipelineFeeder.LastProcessRawJegMsTime;
                 LastProcessBitmapMsTime = _pipelineFeeder.LastProcessBitmapMsTime;
             }
-
-            //UpdateProcessTime(LastProcessRawJegStreamMsTime, LastProcessRawJegMsTime, LastProcessBitmapMsTime);
-        }
-
-        private void UpdateProcessTime(long lastProcessRawJegStreamMsTime, long lastProcessRawJegMsTime, long lastProcessBitmapMsTime)
-        {
-            
         }
 
         private void UpdateMainPicture(MemoryStream memoryStream)
         {
             MainImageSource = Utils.Convert(memoryStream); // The bitmap now own the stream, so you must not close the memoryStream
-        }
-
-        private void UpdateFps(int fps)
-        {
-            Fps = fps;
         }
 
         public void Dispose()

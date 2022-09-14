@@ -1,21 +1,22 @@
-﻿using PhoneCamWithAndroidCam.Threads;
-using System.Diagnostics;
+﻿using ProcessingPipelines.PipelineUtils;
 
 
 namespace ProcessingPipelines.ImageProcessingPipeline;
 
 public class PipelineElement
 {
-    private IPipelineProcess _process;
+    public delegate void Process(MultipleBuffering inputBuffer, MultipleBuffering outputBuffer);
+
+    private Process _process;
 
     public MultipleBuffering InputMultipleBuffering { get; set; }
     public MultipleBuffering OutputMultipleBuffering { get; set; }
     public string Name { get; set; }
 
-    public PipelineElement(string name, IPipelineProcess process, MultipleBuffering outputMultipleBuffering)
+    public PipelineElement(string name, Process process, MultipleBuffering outputMultipleBuffering)
         : this(name, process, null, outputMultipleBuffering) { }
 
-    public PipelineElement(string name, IPipelineProcess process, MultipleBuffering inputMultipleBuffering, MultipleBuffering outputMultipleBuffering)
+    public PipelineElement(string name, Process process, MultipleBuffering inputMultipleBuffering, MultipleBuffering outputMultipleBuffering)
     {
         OutputMultipleBuffering = outputMultipleBuffering;
         InputMultipleBuffering = inputMultipleBuffering;
@@ -34,7 +35,7 @@ public class PipelineElement
         {
             while (!cancellationTokenSource.IsCancellationRequested)
             {
-                _process.Process(InputMultipleBuffering, OutputMultipleBuffering);
+                _process.Invoke(InputMultipleBuffering, OutputMultipleBuffering);
             }
         }
     }

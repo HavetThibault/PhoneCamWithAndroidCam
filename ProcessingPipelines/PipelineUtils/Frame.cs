@@ -1,4 +1,4 @@
-﻿namespace ProcessingPipelines.ImageProcessingPipeline
+﻿namespace ProcessingPipelines.PipelineUtils
 {
     public class Frame
     {

@@ -1,5 +1,4 @@
-﻿using PhoneCamWithAndroidCam.Threads;
-
+﻿using ProcessingPipelines.PipelineUtils;
 
 namespace ProcessingPipelines.ImageProcessingPipeline;
 
@@ -19,7 +18,7 @@ public class ImageProcessingPipeline
 
     public void AddPipelineElement(PipelineElement pipelineElement)
     {
-        if(_pipelineElements.Count > 0)
+        if (_pipelineElements.Count > 0)
         {
             pipelineElement.InputMultipleBuffering = _pipelineElements.Last().OutputMultipleBuffering;
         }
