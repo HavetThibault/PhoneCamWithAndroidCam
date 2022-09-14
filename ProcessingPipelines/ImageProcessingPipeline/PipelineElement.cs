@@ -6,18 +6,16 @@ namespace ProcessingPipelines.ImageProcessingPipeline;
 
 public class PipelineElement
 {
-    public delegate void Process(MultipleBuffering inputMultipleBuffering, MultipleBuffering outputMultipleBuffering);
-
-    private Process _process;
+    private IPipelineProcess _process;
 
     public MultipleBuffering InputMultipleBuffering { get; set; }
     public MultipleBuffering OutputMultipleBuffering { get; set; }
     public string Name { get; set; }
 
-    public PipelineElement(string name, Process process, MultipleBuffering outputMultipleBuffering)
+    public PipelineElement(string name, IPipelineProcess process, MultipleBuffering outputMultipleBuffering)
         : this(name, process, null, outputMultipleBuffering) { }
 
-    public PipelineElement(string name, Process process, MultipleBuffering inputMultipleBuffering, MultipleBuffering outputMultipleBuffering)
+    public PipelineElement(string name, IPipelineProcess process, MultipleBuffering inputMultipleBuffering, MultipleBuffering outputMultipleBuffering)
     {
         OutputMultipleBuffering = outputMultipleBuffering;
         InputMultipleBuffering = inputMultipleBuffering;
@@ -36,7 +34,7 @@ public class PipelineElement
         {
             while (!cancellationTokenSource.IsCancellationRequested)
             {
-                _process.Invoke(InputMultipleBuffering, OutputMultipleBuffering);
+                _process.Process(InputMultipleBuffering, OutputMultipleBuffering);
             }
         }
     }

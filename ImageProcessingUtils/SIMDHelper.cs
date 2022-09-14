@@ -7,6 +7,9 @@ namespace ImageProcessingUtils
 
         public static void Copy(byte[] sourceBuffer, byte[] destinationBuffer)
         {
+            if (sourceBuffer.Length > destinationBuffer.Length)
+                throw new ArgumentException("The destination byte arrays must be long enough.");
+
             GCHandle pinnedSrcBuffer = GCHandle.Alloc(sourceBuffer, GCHandleType.Pinned);
             IntPtr srcBufferPtr = pinnedSrcBuffer.AddrOfPinnedObject();
 

@@ -1,5 +1,6 @@
 ﻿using ImageProcessingUtils;
 using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace ProcessingPipelines.ImageProcessingPipeline
 {
@@ -107,9 +108,10 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                         _bufferWriterPointer = 0;
                 }
 
-                lock (BytesBuffers[bufferWriterPointer])
+                BitmapFrame frame = BytesBuffers[bufferWriterPointer];
+                lock(frame)
                 {
-                    SIMDHelper.Copy(newBuffer, BytesBuffers[bufferWriterPointer].Data);
+                    SIMDHelper.Copy(newBuffer, frame.Data);
                 }
 
                 lock (_bufferPointerLock)

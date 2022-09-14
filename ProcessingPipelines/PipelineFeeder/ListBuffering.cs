@@ -77,7 +77,7 @@ namespace PhoneCamWithAndroidCam.Threads
         }
 
         public void Dispose()
-        {
+        { 
             _canAdd.Dispose();
             _canRetreive.Dispose();
         }
