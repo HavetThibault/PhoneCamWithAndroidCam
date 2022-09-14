@@ -1,6 +1,5 @@
 ﻿using AndroidCamClient;
 using ImageProcessingUtils;
-using ImageProcessingUtils.Pipeline;
 using PhoneCamWithAndroidCam.Threads;
 using ProcessingPipelines.PipelineFeeder;
 using System;
@@ -12,7 +11,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using WpfUtils;
-using BitmapFrame = ImageProcessingUtils.Pipeline.BitmapFrame;
 
 namespace PhoneCamWithAndroidCam.ViewModels
 {

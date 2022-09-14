@@ -1,4 +1,4 @@
-﻿namespace PhoneCamWithAndroidCam.Threads
+﻿namespace ProcessingPipelines.ImageProcessingPipeline
 {
     public enum EBufferPixelsFormat
     {

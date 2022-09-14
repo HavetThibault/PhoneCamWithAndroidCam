@@ -2,7 +2,10 @@
 using AndroidCamClient.JpegStream;
 using ImageProcessingUtils;
 using PhoneCamWithAndroidCam.Threads;
+using ProcessingPipelines.ImageProcessingPipeline;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 
 namespace ProcessingPipelines.PipelineFeeder
 {
@@ -13,6 +16,11 @@ namespace ProcessingPipelines.PipelineFeeder
         public ListBuffering<MemoryStream> RawJpegBuffering;
         public ListBuffering<Bitmap> Bitmaps;
         public MultipleBuffering OutputMultipleBuffering;
+
+        public long LastProcessRawJegStreamMsTime { get; set; }
+        public long LastProcessRawJegMsTime { get; set; }
+        public long LastProcessBitmapMsTime { get; set; }
+        public object LastProcessLock { get; set; } = new();
 
         public PipelineFeederPipeline(PhoneCamClient phoneCamClient, MultipleBuffering outputMultipleBuffering)
         {
@@ -35,10 +43,24 @@ namespace ProcessingPipelines.PipelineFeeder
             if(cancellationTokenSourceObj is CancellationTokenSource cancellationTokenSource)
             {
                 Stream _rawJpegStream = await _phoneCamClient.LaunchStream();
+                Stopwatch watch = new();
+                int framesNbrInASecond = 0;
                 while (!cancellationTokenSource.IsCancellationRequested)
                 {
+                    watch.Start();
+
                     JpegFrame jpegFrame = PhoneCamClient.GetStreamFrame(_rawJpegStream);
                     RawJpegBuffering.AddRawFrame(new MemoryStream(jpegFrame.ToFullBytesImage()));
+
+                    watch.Stop();
+                    framesNbrInASecond++;
+                    if (watch.ElapsedMilliseconds > 1000)
+                    {
+                        watch.Reset();
+                        lock(LastProcessLock)
+                            LastProcessRawJegStreamMsTime = watch.ElapsedMilliseconds;
+                        framesNbrInASecond = 0;
+                    }
                 }
                 _rawJpegStream.Close();
             }
@@ -48,10 +70,24 @@ namespace ProcessingPipelines.PipelineFeeder
         {
             if (cancellationTokenSourceObj is CancellationTokenSource cancellationTokenSource)
             {
+                Stopwatch watch = new();
+                int framesNbrInASecond = 0;
                 while (!cancellationTokenSource.IsCancellationRequested)
                 {
+                    watch.Start();
+
                     MemoryStream jpegMemoryStream = RawJpegBuffering.GetRawFrame();
                     Bitmaps.AddRawFrame(new Bitmap(jpegMemoryStream));
+
+                    watch.Stop();
+                    framesNbrInASecond++;
+                    if (watch.ElapsedMilliseconds > 1000)
+                    {
+                        watch.Reset();
+                        lock (LastProcessLock)
+                            LastProcessRawJegMsTime = watch.ElapsedMilliseconds;
+                        framesNbrInASecond = 0;
+                    }
                 }
             }
         }
@@ -61,11 +97,25 @@ namespace ProcessingPipelines.PipelineFeeder
             if (cancellationTokenSourceObj is CancellationTokenSource cancellationTokenSource)
             {
                 byte[] pixelsBuffer = new byte[320 * 240 * 4];
+                Stopwatch watch = new();
+                int framesNbrInASecond = 0;
                 while (!cancellationTokenSource.IsCancellationRequested)
                 {
+                    watch.Start();
+
                     Bitmap bmp = Bitmaps.GetRawFrame();
                     BitmapHelper.ToByteArray(bmp, out _, pixelsBuffer);
                     OutputMultipleBuffering.WaitWriteBuffer(pixelsBuffer, bmp);
+
+                    watch.Stop();
+                    framesNbrInASecond++;
+                    if (watch.ElapsedMilliseconds > 1000)
+                    {
+                        watch.Reset();
+                        lock (LastProcessLock)
+                            LastProcessBitmapMsTime = watch.ElapsedMilliseconds;
+                        framesNbrInASecond = 0;
+                    }
                 }
             }
         }

@@ -191,5 +191,19 @@ namespace ImageProcessingUtils
             pinnedGrayPixels.Free();
             pinnedGaussBlur.Free();
         }
+
+        public static void MedianFilter(byte[] srcBuffer, int width, int height, int stride, int channelCount, byte[] destination)
+        {
+            GCHandle pinnedSrc = GCHandle.Alloc(srcBuffer, GCHandleType.Pinned);
+            IntPtr ptrSrc = pinnedSrc.AddrOfPinnedObject();
+
+            GCHandle pinnedResult = GCHandle.Alloc(destination, GCHandleType.Pinned);
+            IntPtr ptrResult = pinnedResult.AddrOfPinnedObject();
+
+            SIMD.SimdMedianFilterRhomb3x3(ptrSrc, stride, width, height, channelCount, ptrResult, stride);
+
+            pinnedSrc.Free();
+            pinnedResult.Free();
+        }
     }
 }

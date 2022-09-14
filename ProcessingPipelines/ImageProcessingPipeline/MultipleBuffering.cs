@@ -1,8 +1,7 @@
 ﻿using ImageProcessingUtils;
-using ImageProcessingUtils.Pipeline;
 using System.Drawing;
 
-namespace PhoneCamWithAndroidCam.Threads
+namespace ProcessingPipelines.ImageProcessingPipeline
 {
     public class MultipleBuffering : IDisposable
     {

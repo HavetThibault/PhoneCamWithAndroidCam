@@ -1,6 +1,5 @@
 ﻿using AndroidCamClient;
 using ImageProcessingUtils;
-using ImageProcessingUtils.Pipeline;
 using PhoneCamWithAndroidCam.Threads;
 using ProcessingPipelines.ImageProcessingPipeline;
 using ProcessingPipelines.PipelineFeeder;
@@ -15,7 +14,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using WpfUtils;
-using BitmapFrame = ImageProcessingUtils.Pipeline.BitmapFrame;
 
 namespace PhoneCamWithAndroidCam.ViewModels
 {
@@ -26,11 +24,17 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private PhoneCamClient _phoneCamClient;
         private CancellationTokenSource _pipelineCancellationTokenSource;
         private PipelineFeederPipeline _pipelineFeeder;
+        private MedianImageProcessingPipeline _imageProcessingPipeline;
         private Dispatcher _uiDispatcher;
         private ImageSource _mainImageSource;
         private MultipleBuffering _pipelineFeederOutput;
         private ListBuffering<byte[]> _convertToRawJpegOutput;
         private ConvertToRawJpegThread _convertToRawJpegThreads;
+        private long _lastProcessRawJegStreamMsTime;
+        private long _lastProcessRawJegMsTime;
+        private long _lastProcessBitmapMsTime;
+        private Timer _refreshProcessTimer;
+
 
         public ImageSource MainImageSource
         {
@@ -55,6 +59,25 @@ namespace PhoneCamWithAndroidCam.ViewModels
             }
         }
 
+        public long LastProcessRawJegStreamMsTime
+        {
+            get => _lastProcessRawJegStreamMsTime;
+            set => SetProperty(ref _lastProcessRawJegStreamMsTime, value);
+        }
+
+        public long LastProcessRawJegMsTime 
+        {
+            get => _lastProcessRawJegMsTime;
+            set => SetProperty(ref _lastProcessRawJegMsTime, value);
+        }
+
+        public long LastProcessBitmapMsTime
+        {
+            get => _lastProcessBitmapMsTime;
+            set => SetProperty(ref _lastProcessBitmapMsTime, value);
+        }
+
+
         public RelayCommand CommandLaunchStreaming { get; set; }
         public RelayCommand CommandStopStreaming { get; set; }
 
@@ -71,12 +94,15 @@ namespace PhoneCamWithAndroidCam.ViewModels
         public void LaunchStreaming()
         {
             IsStreaming = true;
-            _pipelineFeeder = new(_phoneCamClient, _pipelineFeederOutput);
+            _pipelineFeeder = new PipelineFeederPipeline(_phoneCamClient, _pipelineFeederOutput);
+            _imageProcessingPipeline = new(_pipelineFeederOutput);
             _pipelineCancellationTokenSource = new();
-            _convertToRawJpegThreads = new(_pipelineFeederOutput, _convertToRawJpegOutput);
+            _convertToRawJpegThreads = new(_imageProcessingPipeline.OutputBuffer, _convertToRawJpegOutput);
             _pipelineFeeder.StartFeeding(_pipelineCancellationTokenSource);
-            _convertToRawJpegThreads.LaunchNewWorker(_pipelineCancellationTokenSource);
-            new Thread(RefreshMainPicture).Start();
+            _imageProcessingPipeline.Start(_pipelineCancellationTokenSource);
+            //_convertToRawJpegThreads.LaunchNewWorker(_pipelineCancellationTokenSource);
+            //new Thread(RefreshMainPicture).Start();
+            //_refreshProcessTimer = new Timer(RefreshProcessTime, null, 400, 1000);
         }
 
         public bool CanLaunchStreaming()
@@ -88,6 +114,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         {
             IsStreaming = false;
             _pipelineCancellationTokenSource.Cancel();
+            _refreshProcessTimer.Dispose();
         }
 
         public bool CanStopStreaming()
@@ -116,6 +143,23 @@ namespace PhoneCamWithAndroidCam.ViewModels
                     framesNbrInASecond = 0;
                 }
             }
+        }
+
+        public void RefreshProcessTime(object? arg)
+        {
+            lock(_pipelineFeeder.LastProcessLock)
+            {
+                LastProcessRawJegStreamMsTime = _pipelineFeeder.LastProcessRawJegStreamMsTime;
+                LastProcessRawJegMsTime = _pipelineFeeder.LastProcessRawJegMsTime;
+                LastProcessBitmapMsTime = _pipelineFeeder.LastProcessBitmapMsTime;
+            }
+
+            //UpdateProcessTime(LastProcessRawJegStreamMsTime, LastProcessRawJegMsTime, LastProcessBitmapMsTime);
+        }
+
+        private void UpdateProcessTime(long lastProcessRawJegStreamMsTime, long lastProcessRawJegMsTime, long lastProcessBitmapMsTime)
+        {
+            
         }
 
         private void UpdateMainPicture(MemoryStream memoryStream)

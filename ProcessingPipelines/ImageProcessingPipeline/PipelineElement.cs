@@ -2,9 +2,9 @@
 using System.Diagnostics;
 
 
-namespace ImageProcessingUtils.Pipeline;
+namespace ProcessingPipelines.ImageProcessingPipeline;
 
-public abstract class PipelineElement
+public class PipelineElement
 {
     public delegate void Process(MultipleBuffering inputMultipleBuffering, MultipleBuffering outputMultipleBuffering);
 
@@ -12,7 +12,6 @@ public abstract class PipelineElement
 
     public MultipleBuffering InputMultipleBuffering { get; set; }
     public MultipleBuffering OutputMultipleBuffering { get; set; }
-    public long LastProcessMsTime { get; set; }
     public string Name { get; set; }
 
     public PipelineElement(string name, Process process, MultipleBuffering outputMultipleBuffering)
@@ -35,13 +34,9 @@ public abstract class PipelineElement
     {
         if (cancellationTokenSourceObject is CancellationTokenSource cancellationTokenSource)
         {
-            Stopwatch watch = new();
             while (!cancellationTokenSource.IsCancellationRequested)
             {
-                watch.Restart();
                 _process.Invoke(InputMultipleBuffering, OutputMultipleBuffering);
-                watch.Stop();
-                LastProcessMsTime = watch.ElapsedMilliseconds;
             }
         }
     }

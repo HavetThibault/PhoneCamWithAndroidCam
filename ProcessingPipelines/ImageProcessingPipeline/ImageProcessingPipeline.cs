@@ -1,48 +1,40 @@
 ﻿using PhoneCamWithAndroidCam.Threads;
 
 
-namespace ImageProcessingUtils.Pipeline;
+namespace ProcessingPipelines.ImageProcessingPipeline;
 
 public class ImageProcessingPipeline
 {
-    private List<PipelineElement> _pipelineElements { get; set; }
-    private CancellationTokenSource _cancellationTokenSource;
+    private List<PipelineElement> _pipelineElements;
 
-    public ImageProcessingPipeline()
+    public ImageProcessingPipeline(MultipleBuffering inputBuffer)
     {
         _pipelineElements = new();
+        InputBuffer = inputBuffer;
     }
 
-    public MultipleBuffering GetInputBuffer() => _pipelineElements.First().InputMultipleBuffering;
+    public MultipleBuffering InputBuffer { get; set; }
 
     public MultipleBuffering GetOutputBuffer() => _pipelineElements.Last().OutputMultipleBuffering;
 
     public void AddPipelineElement(PipelineElement pipelineElement)
     {
-        pipelineElement.InputMultipleBuffering = _pipelineElements.Last().OutputMultipleBuffering;
+        if(_pipelineElements.Count > 0)
+        {
+            pipelineElement.InputMultipleBuffering = _pipelineElements.Last().OutputMultipleBuffering;
+        }
+        else
+        {
+            pipelineElement.InputMultipleBuffering = InputBuffer;
+        }
         _pipelineElements.Add(pipelineElement);
     }
 
-    public void StartPipeline()
+    public void StartPipeline(CancellationTokenSource cancellationTokenSource)
     {
-        _cancellationTokenSource = new();
         foreach (PipelineElement pipelineElement in _pipelineElements)
         {
-            pipelineElement.LaunchNewWorker(_cancellationTokenSource);
+            pipelineElement.LaunchNewWorker(cancellationTokenSource);
         }
-    }
-
-    public List<(string, long)> GetPipelineElementStats()
-    {
-        var pipelineStats = new List<(string, long)>();
-        foreach (PipelineElement pipelineElement in _pipelineElements)
-            pipelineStats.Add(new(pipelineElement.Name, pipelineElement.LastProcessMsTime));
-
-        return pipelineStats;
-    }
-
-    public void StopPipeline()
-    {
-        _cancellationTokenSource.Cancel();
     }
 }

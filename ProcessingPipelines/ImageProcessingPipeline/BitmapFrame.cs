@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace ImageProcessingUtils.Pipeline
+namespace ProcessingPipelines.ImageProcessingPipeline
 {
     public class BitmapFrame : Frame
     {

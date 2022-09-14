@@ -20,7 +20,18 @@
             <Button Command="{Binding CommandStopStreaming}" Width="120" Height="40" Content="Stop stream" Margin="5"/>
             <StackPanel Orientation="Horizontal">
                 <Label Content="Frames per seconds"/>
-                <Label x:Name="LabelFps" Content="{Binding Fps}" Margin="5"/>
+                <Label Content="{Binding Fps}" Margin="5"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Frames per seconds"/>
+                <Label Content="{Binding Fps}" Margin="5"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Frames per seconds"/>
+                <Label Content="{Binding Fps}" Margin="5"/>
+            </StackPanel><StackPanel Orientation="Horizontal">
+                <Label Content="Frames per seconds"/>
+                <Label Content="{Binding Fps}" Margin="5"/>
             </StackPanel>
         </StackPanel>
     </Grid>

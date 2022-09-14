@@ -1,5 +1,4 @@
 ﻿using ImageProcessingUtils;
-using ImageProcessingUtils.Pipeline;
 
 namespace PhoneCamWithAndroidCam.Threads
 {
