@@ -43,10 +43,16 @@ public class BBitmapManipulation
 
 
 
-    [GlobalSetup(Targets = new string[3] { "BitmapExtractPixels", "BitmapBmpSaveToMemoryStream", "BitmapJpegSaveToMemoryStream" })]
+    [GlobalSetup(Targets = new string[4] { "BitmapExtractPixels", "BitmapBmpSaveToMemoryStream", "BitmapJpegSaveToMemoryStream", "CloneBitmap" })]
     public void GlobalSetup_BitmapExtractPixels_BitmapSaveToMemoryStream()
     {
         _bitmap = new Bitmap(new MemoryStream(_jpegBuffer));
+    }
+
+    [Benchmark]
+    public void CloneBitmap()
+    {
+        _bitmap.Clone();
     }
 
     [Benchmark]
@@ -80,9 +86,9 @@ public class BBitmapManipulation
         _memoryStream.Close();
     }
 
-    [GlobalCleanup(Targets = new string[3] { "BitmapExtractPixels", "BitmapSaveToMemoryStream", "BitmapJpegSaveToMemoryStream" })]
+    [GlobalCleanup(Targets = new string[4] { "BitmapExtractPixels", "BitmapSaveToMemoryStream", "BitmapJpegSaveToMemoryStream", "CloneBitmap" })]
     public void DisposeBitmap()
     {
-        _bitmap = new Bitmap(new MemoryStream(_jpegBuffer));
+        _bitmap.Dispose();
     }
 }
