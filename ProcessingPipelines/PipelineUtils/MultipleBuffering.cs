@@ -168,6 +168,11 @@ namespace ProcessingPipelines.PipelineUtils
             }
         }
 
+        public object Clone()
+        {
+            return new MultipleBuffering(Width, Height, Stride, BufferNbr, BufferPixelsFormat);
+        }
+
         public void Dispose()
         {
             _canWriteBuffer?.SafeWaitHandle.SetHandleAsInvalid();

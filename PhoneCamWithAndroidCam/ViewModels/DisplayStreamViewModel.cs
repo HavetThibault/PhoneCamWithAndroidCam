@@ -20,24 +20,20 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private PhoneCamClient _phoneCamClient;
         private CancellationTokenSource _pipelineCancellationTokenSource;
         private PipelineFeederPipeline _pipelineFeeder;
-        private ChangingColorImageProcessingPipeline _imageProcessingPipeline;
-        private Dispatcher _uiDispatcher;
-        private ImageSource _mainImageSource;
+        private DuplicateBuffersThread _duplicateBuffersThread;
+       
         private MultipleBuffering _pipelineFeederOutput;
-        private ListBuffering<byte[]> _convertToRawJpegOutput;
-        private ConvertToRawJpegThread _convertToRawJpegThreads;
-        private long _lastProcessRawJegStreamMsTime;
-        private long _lastProcessRawJegMsTime;
-        private long _lastProcessBitmapMsTime;
+
         private Timer _refreshProcessTimer;
+
+        private List<StreamViewModel> _streamViews;
 
         public ProcessPerformancesViewModel ProcessPerformancesViewModel { get; set; }
 
-
-        public ImageSource MainImageSource
+        public List<StreamViewModel> StreamViews
         {
-            get => _mainImageSource;
-            set => SetProperty(ref _mainImageSource, value);
+            get => _streamViews;
+            set => SetProperty(ref _streamViews, value);
         }
 
         public int Fps
@@ -57,25 +53,6 @@ namespace PhoneCamWithAndroidCam.ViewModels
             }
         }
 
-        public long LastProcessRawJegStreamMsTime
-        {
-            get => _lastProcessRawJegStreamMsTime;
-            set => SetProperty(ref _lastProcessRawJegStreamMsTime, value);
-        }
-
-        public long LastProcessRawJegMsTime
-        {
-            get => _lastProcessRawJegMsTime;
-            set => SetProperty(ref _lastProcessRawJegMsTime, value);
-        }
-
-        public long LastProcessBitmapMsTime
-        {
-            get => _lastProcessBitmapMsTime;
-            set => SetProperty(ref _lastProcessBitmapMsTime, value);
-        }
-
-
         public RelayCommand CommandLaunchStreaming { get; set; }
         public RelayCommand CommandStopStreaming { get; set; }
 
@@ -84,24 +61,29 @@ namespace PhoneCamWithAndroidCam.ViewModels
             CommandLaunchStreaming = new RelayCommand(LaunchStreaming, CanLaunchStreaming);
             CommandStopStreaming = new RelayCommand(StopStreaming, CanStopStreaming);
             _phoneCamClient = new("192.168.0.33");
-            _uiDispatcher = uiDispatcher;
             _pipelineFeederOutput = new(320, 240, 320 * 4, 10, EBufferPixelsFormat.Bgra32Bits);
-            _convertToRawJpegOutput = new(10);
             ProcessPerformancesViewModel = processPerformancesViewModel;
+
+            _duplicateBuffersThread = new(_pipelineFeederOutput);
+            MultipleBuffering outputBuffer1 = _duplicateBuffersThread.AddNewOutputBuffer();
+            MultipleBuffering outputBuffer2 = _duplicateBuffersThread.AddNewOutputBuffer();
+            ImageProcessingPipeline cannyImageProcessingPipeline = CannyImageProcessingPipeline.CreateCannyImageProcessingPipeline(outputBuffer1);
+            ImageProcessingPipeline changingColorProcessingPipeline = ChangingColorImageProcessingPipeline.CreateChangingColorImageProcessingPipeline(outputBuffer2);
+            _streamViews = new() { new(uiDispatcher, cannyImageProcessingPipeline), new StreamViewModel(uiDispatcher, changingColorProcessingPipeline) };
         }
 
         public void LaunchStreaming()
         {
             IsStreaming = true;
             _pipelineFeeder = new PipelineFeederPipeline(_phoneCamClient, _pipelineFeederOutput);
-            _imageProcessingPipeline = new(_pipelineFeederOutput);
             _pipelineCancellationTokenSource = new();
-            _convertToRawJpegThreads = new(_imageProcessingPipeline.OutputBuffer, _convertToRawJpegOutput);
             _pipelineFeeder.StartFeeding(_pipelineCancellationTokenSource);
-            _imageProcessingPipeline.Start(_pipelineCancellationTokenSource);
-            _convertToRawJpegThreads.LaunchNewWorker(_pipelineCancellationTokenSource);
-            new Thread(RefreshMainPicture).Start();
+            _duplicateBuffersThread.Start(_pipelineCancellationTokenSource);
             _refreshProcessTimer = new Timer(RefreshProcessTime, null, 400, 1000);
+            foreach(var streamView in _streamViews)
+            {
+                streamView.LaunchStreaming(_pipelineCancellationTokenSource);
+            }
         }
 
         public bool CanLaunchStreaming()
@@ -121,33 +103,6 @@ namespace PhoneCamWithAndroidCam.ViewModels
             return IsStreaming;
         }
 
-        public void RefreshMainPicture()
-        {
-            Stopwatch watch = new();
-            int framesNbrInASecond = 0;
-            try
-            {
-                while (!_pipelineCancellationTokenSource.IsCancellationRequested)
-                {
-                    watch.Start();
-                    byte[] frame = _convertToRawJpegOutput.GetRawFrame();
-
-                    MemoryStream simpleStream = new(frame);
-                    _uiDispatcher.Invoke(UpdateMainPicture, simpleStream);
-
-                    watch.Stop();
-                    framesNbrInASecond++;
-                    if (watch.ElapsedMilliseconds > 1000)
-                    {
-                        watch.Reset();
-                        Fps = framesNbrInASecond;
-                        framesNbrInASecond = 0;
-                    }
-                }
-            }
-            catch { } // Catch if GetRawFrame throw exception
-        }
-
         public void RefreshProcessTime(object? arg)
         {
             List<ProcessPerformances> perfsList = new()
@@ -156,19 +111,18 @@ namespace PhoneCamWithAndroidCam.ViewModels
                 _pipelineFeeder.ProcessRawJpegStreamPerf,
                 _pipelineFeeder.ProcessBitmapsPerf
             };
-            
-            ProcessPerformancesViewModel.UpdatePerformances(perfsList);
-        }
 
-        private void UpdateMainPicture(MemoryStream memoryStream)
-        {
-            MainImageSource = Utils.Convert(memoryStream); // The bitmap now own the stream, so you must not close the memoryStream
+            ProcessPerformancesViewModel.UpdatePerformances(perfsList);
         }
 
         public void Dispose()
         {
-            _pipelineFeeder.Dispose();
-            _pipelineFeederOutput.Dispose();
+            _pipelineFeeder?.Dispose();
+            _pipelineFeederOutput?.Dispose();
+            foreach (var streamView in _streamViews)
+            {
+                streamView.Dispose();
+            }
         }
     }
 }

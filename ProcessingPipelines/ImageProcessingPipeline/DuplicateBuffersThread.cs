@@ -1,7 +1,4 @@
-﻿using ImageProcessingUtils;
-using ProcessingPipelines.PipelineUtils;
-using System.Drawing;
-using System.Drawing.Imaging;
+﻿using ProcessingPipelines.PipelineUtils;
 
 namespace ProcessingPipelines.ImageProcessingPipeline
 {
@@ -21,10 +18,12 @@ namespace ProcessingPipelines.ImageProcessingPipeline
             new Thread(Process).Start(cancellationTokenSource);
         }
 
-        public void AddNewOutputBuffer(MultipleBuffering multipleBuffering)
+        public MultipleBuffering AddNewOutputBuffer()
         {
-            lock(OutputMultipleBuffers)
-                OutputMultipleBuffers.Add(multipleBuffering);
+            MultipleBuffering copiedInputMultipleBufferin = (MultipleBuffering)InputMultipleBuffering.Clone();
+            lock (OutputMultipleBuffers)
+                OutputMultipleBuffers.Add(copiedInputMultipleBufferin);
+            return copiedInputMultipleBufferin;
         }
 
         private void Process(object? cancellationTokenSourceObject)
@@ -33,19 +32,19 @@ namespace ProcessingPipelines.ImageProcessingPipeline
             {
                 while (!cancellationTokenSource.IsCancellationRequested)
                 {
-                    BitmapFrame bmpFrame = InputMultipleBuffering.GetNextReaderBuffer();
-                    BitmapFrame copiedBmpFrame;
-                    lock (bmpFrame)
-                        copiedBmpFrame = (BitmapFrame)bmpFrame.Clone();
+                    BitmapFrame bmpFrame = InputMultipleBuffering.WaitNextReaderBuffer();
 
                     lock (OutputMultipleBuffers)
                     {
                         foreach (MultipleBuffering buffer in OutputMultipleBuffers)
                         {
-                            BitmapFrame copied2BmpFrame = (BitmapFrame)copiedBmpFrame.Clone();
-                            buffer.WriteBuffer(copied2BmpFrame.Data, copied2BmpFrame.Bitmap); // Not synchronizing to not penalize the other streams
+                            BitmapFrame copiedBmpFrame;
+                            lock (bmpFrame)
+                                copiedBmpFrame = (BitmapFrame)bmpFrame.Clone();
+                            buffer.WriteBuffer(copiedBmpFrame.Data, copiedBmpFrame.Bitmap); // Not synchronizing to not penalize the other streams
                         }
                     }
+                    InputMultipleBuffering.FinishReading();
                 }
             }
         }

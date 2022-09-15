@@ -17,7 +17,10 @@ namespace ProcessingPipelines.PipelineUtils
         {
             byte[] data = new byte[Data.Length];
             Buffer.BlockCopy(Data, 0, data, 0, Data.Length);
-            return new BitmapFrame(data) { Bitmap = (Bitmap)Bitmap.Clone() };
+
+            if(Bitmap != null)
+                return new BitmapFrame(data) { Bitmap = (Bitmap)Bitmap.Clone() };
+            return new BitmapFrame(data);
         }
     }
 }

@@ -47,7 +47,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 {
                     _rawJpegStream = await _phoneCamClient.LaunchStream();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Console.WriteLine($"Exception de type : {ex.GetType()} : {ex.Message}");
                     cancellationTokenSource.Cancel();
@@ -72,7 +72,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                     if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                     {
-                        lock(ProcessRawJpegStreamPerf)
+                        lock (ProcessRawJpegStreamPerf)
                         {
                             ProcessRawJpegStreamPerf.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
                             ProcessRawJpegStreamPerf.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;

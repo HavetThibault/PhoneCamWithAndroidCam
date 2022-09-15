@@ -1,9 +1,4 @@
 ﻿using ProcessingPipelines.PipelineUtils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WpfUtils;
 
 namespace PhoneCamWithAndroidCam.Models;
@@ -15,7 +10,7 @@ public class ProcessPerformancesModel : BindableClass
     private long _waitingWriteTimeMs;
     private string _processName;
 
-    public long WaitingReadTimeMs 
+    public long WaitingReadTimeMs
     {
         get => _waitingReadTimeMs;
         set => SetProperty(ref _waitingReadTimeMs, value);

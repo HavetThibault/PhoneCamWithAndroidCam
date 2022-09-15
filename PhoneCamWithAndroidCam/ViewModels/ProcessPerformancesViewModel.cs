@@ -1,11 +1,8 @@
 ﻿using PhoneCamWithAndroidCam.Models;
 using ProcessingPipelines.PipelineUtils;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Threading;
 
 namespace PhoneCamWithAndroidCam.ViewModels
@@ -24,7 +21,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
         public void UpdatePerformances(List<ProcessPerformances> processPerformances)
         {
-            foreach(ProcessPerformances processPerformance in processPerformances)
+            foreach (ProcessPerformances processPerformance in processPerformances)
             {
                 if (ProcessPerformances.Where(p => p.ProcessName.Equals(processPerformance.ProcessName)).FirstOrDefault() is ProcessPerformancesModel matchingProcessPerf)
                 {
@@ -48,7 +45,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
         private void UpdatePerformance(ProcessPerformancesModel perfsModel, ProcessPerformances perf)
         {
-            lock(perf)
+            lock (perf)
                 perfsModel.Copy(perf);
         }
     }

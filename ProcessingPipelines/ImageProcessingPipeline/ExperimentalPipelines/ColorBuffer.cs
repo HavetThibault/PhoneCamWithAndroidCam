@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
+﻿namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
 {
     public class ColorBuffer
     {
@@ -13,7 +7,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
         public ColorBuffer()
         {
             ColorsBuffer = new byte[256];
-            for(int i = 0; i < ColorsBuffer.Length; i++)
+            for (int i = 0; i < ColorsBuffer.Length; i++)
                 ColorsBuffer[i] = (byte)i;
         }
 

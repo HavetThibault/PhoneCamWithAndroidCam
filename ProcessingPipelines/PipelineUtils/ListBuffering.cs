@@ -38,7 +38,8 @@
         /// <exception cref="ObjectDisposedException"/>
         public void AddRawFrame(T frameBuffer)
         {
-            while (true)
+            bool cancelRequired = false;
+            while (!cancelRequired)
             {
                 lock (_elementsLock)
                 {
@@ -50,7 +51,11 @@
                     }
                 }
 
-                while (!_canAdd.WaitOne(100)) ;
+                try
+                {
+                    while (!_canAdd.WaitOne(100)) ;
+                }
+                catch { cancelRequired = true; }
             }
         }
 

@@ -12,6 +12,10 @@
         <DataTemplate DataType = "{x:Type viewmodels:ProcessPerformancesViewModel}">
             <views:ProcessPerformancesControl/>
         </DataTemplate>
+
+        <DataTemplate  DataType = "{x:Type viewmodels:StreamViewModel}">
+            <Image Source="{Binding MainImageSource}" Width="320" Height="240"/>
+        </DataTemplate>
     </UserControl.Resources>
     
     <Grid>
@@ -20,7 +24,7 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <Image x:Name="MainImage" Grid.Column="0" Source="{Binding MainImageSource}"/>
+        <ItemsControl Grid.Column="0" ItemsSource="{Binding StreamViews}"/>
         <StackPanel Grid.Column="1">
             <Button Command="{Binding CommandLaunchStreaming}" Width="120" Height="40" Content="Launch stream" Margin="5"/>
             <Button Command="{Binding CommandStopStreaming}" Width="120" Height="40" Content="Stop stream" Margin="5"/>

@@ -1,6 +1,5 @@
 ﻿using ImageProcessingUtils;
 using ProcessingPipelines.PipelineUtils;
-using System.Threading;
 
 namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
 {
