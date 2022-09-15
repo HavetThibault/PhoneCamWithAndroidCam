@@ -1,5 +1,6 @@
 ﻿using AndroidCamClient;
 using ProcessingPipelines.ImageProcessingPipeline;
+using ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines;
 using ProcessingPipelines.PipelineUtils;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private PhoneCamClient _phoneCamClient;
         private CancellationTokenSource _pipelineCancellationTokenSource;
         private PipelineFeederPipeline _pipelineFeeder;
-        private CannyImageProcessingPipeline _imageProcessingPipeline;
+        private ChangingColorImageProcessingPipeline _imageProcessingPipeline;
         private Dispatcher _uiDispatcher;
         private ImageSource _mainImageSource;
         private MultipleBuffering _pipelineFeederOutput;

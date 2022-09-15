@@ -5,7 +5,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline;
 
 public class PipelineElement
 {
-    public delegate void Process(MultipleBuffering inputBuffer, MultipleBuffering outputBuffer);
+    public delegate void Process(MultipleBuffering inputBuffer, MultipleBuffering outputBuffer, CancellationTokenSource cancellationTokenSource);
 
     private Process _process;
 
@@ -33,10 +33,7 @@ public class PipelineElement
     {
         if (cancellationTokenSourceObject is CancellationTokenSource cancellationTokenSource)
         {
-            while (!cancellationTokenSource.IsCancellationRequested)
-            {
-                _process.Invoke(InputMultipleBuffering, OutputMultipleBuffering);
-            }
+            _process.Invoke(InputMultipleBuffering, OutputMultipleBuffering, cancellationTokenSource);
         }
     }
 }

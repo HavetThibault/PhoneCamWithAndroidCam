@@ -35,7 +35,6 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         {
             new Thread(ProcessRawJegStream).Start(cancellationTokenSource);
             new Thread(ProcessRawJpeg).Start(cancellationTokenSource);
-            new Thread(ProcessRawJpeg).Start(cancellationTokenSource);
             new Thread(ProcessBitmaps).Start(cancellationTokenSource);
         }
 
@@ -43,7 +42,17 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         {
             if (cancellationTokenSourceObj is CancellationTokenSource cancellationTokenSource)
             {
-                Stream _rawJpegStream = await _phoneCamClient.LaunchStream();
+                Stream _rawJpegStream;
+                try
+                {
+                    _rawJpegStream = await _phoneCamClient.LaunchStream();
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine($"Exception de type : {ex.GetType()} : {ex.Message}");
+                    cancellationTokenSource.Cancel();
+                    return;
+                }
                 Stopwatch waitingReadTimeWatch = new();
                 Stopwatch waitingWriteTimeWatch = new();
                 Stopwatch processTimeWatch = new();

@@ -94,6 +94,12 @@ namespace ImageProcessingUtils
 
         [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void SimdMedianFilterRhomb3x3(IntPtr src, nint srcStride, nint width, nint height, nint channelCount, IntPtr dst, nint dstStride);
+        
+        [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void SimdMedianFilterRhomb5x5(IntPtr src, nint srcStride, nint width, nint height, nint channelCount, IntPtr dst, nint dstStride);
+
+        [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void SimdChangeColors(IntPtr src, int srcStride, int width, int height, IntPtr colors, IntPtr dst, int dstStride);
 
         [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void SimdFill(IntPtr dst, int stride, int width, int height, int pixelSize, int value);

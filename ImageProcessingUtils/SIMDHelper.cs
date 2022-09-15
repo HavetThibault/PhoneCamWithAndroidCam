@@ -203,10 +203,37 @@ namespace ImageProcessingUtils
             GCHandle pinnedResult = GCHandle.Alloc(destination, GCHandleType.Pinned);
             IntPtr ptrResult = pinnedResult.AddrOfPinnedObject();
 
-            SIMD.SimdMedianFilterRhomb3x3(ptrSrc, stride, width, height, channelCount, ptrResult, stride);
+            SIMD.SimdMedianFilterRhomb5x5(ptrSrc, stride, width, height, channelCount, ptrResult, stride);
 
             pinnedSrc.Free();
             pinnedResult.Free();
+        }
+
+        /// <summary>
+        /// Destroy the content of the srcBuffer
+        /// </summary>
+        public static void BgraToGrayAndChangeColorAndToBgra(byte[] srcBuffer, int width, int height, int srcStride, byte[] colors, byte[] destBuffer, int destStride, byte[] tempGrayBuffer)
+        {
+            GCHandle pinnedSrc = GCHandle.Alloc(srcBuffer, GCHandleType.Pinned);
+            IntPtr srcPtr = pinnedSrc.AddrOfPinnedObject();
+
+            GCHandle pinnedResult = GCHandle.Alloc(destBuffer, GCHandleType.Pinned);
+            IntPtr resultPtr = pinnedResult.AddrOfPinnedObject();
+
+            GCHandle pinnedGrayBuffer = GCHandle.Alloc(tempGrayBuffer, GCHandleType.Pinned);
+            IntPtr grayPtr = pinnedGrayBuffer.AddrOfPinnedObject();
+
+            GCHandle pinnedColors = GCHandle.Alloc(colors, GCHandleType.Pinned);
+            IntPtr colorsPtr = pinnedColors.AddrOfPinnedObject();
+
+            SIMD.SimdBgraToGray(srcPtr, width, height, srcStride, grayPtr, width);
+            SIMD.SimdChangeColors(grayPtr, width, width, height, colorsPtr, srcPtr, srcStride);
+            SIMD.SimdGrayToBgra(srcPtr, width, height, srcStride, resultPtr, destStride);
+
+            pinnedColors.Free();
+            pinnedSrc.Free();
+            pinnedResult.Free();
+            pinnedGrayBuffer.Free();
         }
     }
 }
