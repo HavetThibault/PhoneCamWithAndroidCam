@@ -96,6 +96,10 @@ namespace PhoneCamWithAndroidCam.ViewModels
             IsStreaming = false;
             _pipelineCancellationTokenSource.Cancel();
             _refreshProcessTimer.Dispose();
+            foreach (var streamView in _streamViews)
+            {
+                streamView.StopStreaming();
+            }
         }
 
         public bool CanStopStreaming()

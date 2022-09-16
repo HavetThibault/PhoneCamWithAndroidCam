@@ -6,7 +6,7 @@
              xmlns:views="clr-namespace:PhoneCamWithAndroidCam.Views"
              xmlns:viewmodels="clr-namespace:PhoneCamWithAndroidCam.ViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="450" d:DesignWidth="850"
              Background="{StaticResource Theme.VeryDarkColor}">
 
     <UserControl.Resources>
@@ -15,17 +15,19 @@
         </DataTemplate>
 
         <DataTemplate  DataType = "{x:Type viewmodels:StreamViewModel}">
-            <Image Source="{Binding MainImageSource}" Width="800" Height="540"/>
+            <views:StreamControl/>
         </DataTemplate>
     </UserControl.Resources>
     
-    <Grid Background="{Binding }">
+    <Grid Background="{Binding}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2.5*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <ItemsControl Grid.Column="0" ItemsSource="{Binding StreamViews}"/>
+        <ScrollViewer>
+            <ItemsControl Grid.Column="0" ItemsSource="{Binding StreamViews}"/>
+        </ScrollViewer>
         <StackPanel Grid.Column="1">
             <Button Command="{Binding CommandLaunchStreaming}" Width="120" Height="40" Content="Launch stream" Margin="5"/>
             <Button Command="{Binding CommandStopStreaming}" Width="120" Height="40" Content="Stop stream" Margin="5"/>

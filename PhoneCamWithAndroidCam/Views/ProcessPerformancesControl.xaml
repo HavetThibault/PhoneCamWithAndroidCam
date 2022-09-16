@@ -4,9 +4,35 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PhoneCamWithAndroidCam.Views"
+             xmlns:models="clr-namespace:PhoneCamWithAndroidCam.Models"
+             xmlns:viewmodels="clr-namespace:PhoneCamWithAndroidCam.ViewModels"
+             xmlns:views="clr-namespace:PhoneCamWithAndroidCam.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <DataGrid ItemsSource="{Binding ProcessPerformances}"/>
-    </Grid>
+    <UserControl.Resources>
+        <DataTemplate DataType = "{x:Type viewmodels:ProcessPerformancesViewModel}">
+            <views:ProcessPerformancesControl/>
+        </DataTemplate>
+    </UserControl.Resources>
+    <StackPanel MinWidth="230">
+        <StackPanel Orientation="Horizontal">
+            <Label Content="Name" Width="80"/>
+            <Label Content="Read" Width="50"/>
+            <Label Content="Process" Width="50"/>
+            <Label Content="Write" Width="50"/>
+        </StackPanel>
+        <ItemsControl ItemsSource="{Binding ProcessPerformances}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type models:ProcessPerformancesModel}">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="{Binding ProcessName}" Width="80"/>
+                        <Label Content="{Binding WaitingReadTimeMs}" Width="50"/>
+                        <Label Content="{Binding ProcessTimeMs}" Width="50"/>
+                        <Label Content="{Binding WaitingWriteTimeMs}" Width="50"/>
+                        <Border BorderThickness="1" CornerRadius="0.5"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
 </UserControl>

@@ -7,7 +7,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
     {
         private ImageProcessingPipeline _imageProcessingPipeline;
 
-        public MultipleBuffering OutputBuffer => _imageProcessingPipeline.GetOutputBuffer();
+        public MultipleBuffering OutputBuffer => _imageProcessingPipeline.OutputBuffer;
 
         public MedianImageProcessingPipeline(MultipleBuffering inputBuffer)
         {
@@ -15,7 +15,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
             _imageProcessingPipeline.AddPipelineElement(new PipelineElement("MedianFiltering", Process, new MultipleBuffering(320, 240, 320 * 4, 10, EBufferPixelsFormat.Bgra32Bits)));
         }
 
-        void Process(MultipleBuffering inputBuffer, MultipleBuffering outputBuffer, CancellationTokenSource cancellationTokenSource)
+        void Process(MultipleBuffering inputBuffer, MultipleBuffering outputBuffer, CancellationTokenSource cancellationTokenSource, ProcessPerformances processPerf)
         {
             byte[] destBuffer = new byte[320 * 240 * 4];
             while (!cancellationTokenSource.IsCancellationRequested)

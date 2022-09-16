@@ -1,9 +1,11 @@
 ﻿using AndroidCamClient;
+using PhoneCamWithAndroidCam.Models;
 using ProcessingPipelines.ImageProcessingPipeline;
 using ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines;
 using ProcessingPipelines.PipelineUtils;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -23,6 +25,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private ConvertToRawJpegThread _convertToRawJpegThreads;
         private ListBuffering<byte[]> _convertToRawJpegOutput;
         private ImageProcessingPipeline _imageProcessingPipeline;
+        private Timer _refreshPipelinePerfs;
         private int _fps;
         private bool _isStreaming;
 
@@ -44,20 +47,24 @@ namespace PhoneCamWithAndroidCam.ViewModels
             set => SetProperty(ref _isStreaming, value);
         }
 
+        public ProcessPerformancesViewModel ProcessPerformancesViewModel { get; set; }
+
         public StreamViewModel(Dispatcher uiDispatcher, ImageProcessingPipeline imageProcessingPipeline)
         {
             _uiDispatcher = uiDispatcher;
             _convertToRawJpegOutput = new(10);
             _imageProcessingPipeline = imageProcessingPipeline;
+            ProcessPerformancesViewModel = new(uiDispatcher);
         }
 
         public void LaunchStreaming(CancellationTokenSource cancellationTokenSource)
         {
             IsStreaming = true;
-            _convertToRawJpegThreads = new(_imageProcessingPipeline.GetOutputBuffer(), _convertToRawJpegOutput);
+            _convertToRawJpegThreads = new(_imageProcessingPipeline.OutputBuffer, _convertToRawJpegOutput);
             _imageProcessingPipeline.StartPipeline(cancellationTokenSource);
             _convertToRawJpegThreads.LaunchNewWorker(cancellationTokenSource);
             new Thread(RefreshMainPicture).Start(cancellationTokenSource);
+            _refreshPipelinePerfs = new(RefreshImageProcessingPipelinePerfs, null, 400, 1000);
         }
 
         private void RefreshMainPicture(object? cancellationTokenSourceObj)
@@ -90,6 +97,16 @@ namespace PhoneCamWithAndroidCam.ViewModels
             }
         }
 
+        public void StopStreaming()
+        {
+            _refreshPipelinePerfs.Dispose();
+        }
+
+        private void RefreshImageProcessingPipelinePerfs(object? arg)
+        {
+            ProcessPerformancesViewModel.UpdatePerformances(_imageProcessingPipeline.ElementsProcessPerformances);
+        }
+
         private void UpdateMainPicture(MemoryStream memoryStream)
         {
             MainImageSource = Utils.Convert(memoryStream); 
@@ -98,7 +115,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         public void Dispose()
         {
             _imageProcessingPipeline.InputBuffer?.Dispose();
-            _imageProcessingPipeline.GetOutputBuffer()?.Dispose();
+            _imageProcessingPipeline.OutputBuffer?.Dispose();
             _convertToRawJpegOutput?.Dispose();
         }
     }
