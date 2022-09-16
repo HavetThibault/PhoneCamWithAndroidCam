@@ -6,7 +6,8 @@
              xmlns:views="clr-namespace:PhoneCamWithAndroidCam.Views"
              xmlns:viewmodels="clr-namespace:PhoneCamWithAndroidCam.ViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="{StaticResource Theme.VeryDarkColor}">
 
     <UserControl.Resources>
         <DataTemplate DataType = "{x:Type viewmodels:ProcessPerformancesViewModel}">
@@ -14,11 +15,11 @@
         </DataTemplate>
 
         <DataTemplate  DataType = "{x:Type viewmodels:StreamViewModel}">
-            <Image Source="{Binding MainImageSource}" Width="320" Height="240"/>
+            <Image Source="{Binding MainImageSource}" Width="800" Height="540"/>
         </DataTemplate>
     </UserControl.Resources>
     
-    <Grid>
+    <Grid Background="{Binding }">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2.5*"/>
             <ColumnDefinition/>
@@ -30,7 +31,7 @@
             <Button Command="{Binding CommandStopStreaming}" Width="120" Height="40" Content="Stop stream" Margin="5"/>
             <StackPanel Orientation="Horizontal">
                 <Label Content="Frames per seconds"/>
-                <Label Content="{Binding Fps}" Margin="5"/>
+                <Label Content="{Binding Fps}" Margin="5" VerticalAlignment="Center"/>
             </StackPanel>
             <ContentControl Content="{Binding ProcessPerformancesViewModel}"/>
         </StackPanel>

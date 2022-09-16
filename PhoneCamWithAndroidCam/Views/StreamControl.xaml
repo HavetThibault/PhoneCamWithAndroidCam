@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="PhoneCamWithAndroidCam.Views.StreamControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PhoneCamWithAndroidCam.Views"
+             xmlns:converters="clr-namespace:PhoneCamWithAndroidCam.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:FpsConverter x:Key="FpsConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Image Grid.Column="1" Source="{Binding MainImageSource}" Width="800" Height="540"/>
+        <StackPanel Grid.Column="2">
+            <Label Content="{Binding Fps, Converter={StaticResource FpsConverter}}"></Label>
+        </StackPanel>
+    </Grid>
+</UserControl>
