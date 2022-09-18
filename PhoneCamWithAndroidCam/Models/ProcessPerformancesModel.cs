@@ -13,20 +13,41 @@ public class ProcessPerformancesModel : BindableClass
     public long WaitingReadTimeMs
     {
         get => _waitingReadTimeMs;
-        set => SetProperty(ref _waitingReadTimeMs, value);
+        set
+        {
+            SetProperty(ref _waitingReadTimeMs, value);
+            NotifyPropertyChanged(nameof(WaitingReadTimeForHundred));
+        }
     }
+
+    public double WaitingReadTimeForHundred => (double)WaitingReadTimeMs / IterationTotalTime * 100; 
 
     public long ProcessTimeMs
     {
         get => _processTimeMs;
-        set => SetProperty(ref _processTimeMs, value);
+        set
+        {
+            SetProperty(ref _processTimeMs, value);
+            NotifyPropertyChanged(nameof(ProcessTimeForHundred));
+        }
     }
+
+    public double ProcessTimeForHundred => (double)ProcessTimeMs / IterationTotalTime * 100;
 
     public long WaitingWriteTimeMs
     {
         get => _waitingWriteTimeMs;
-        set => SetProperty(ref _waitingWriteTimeMs, value);
+        set
+        {
+            SetProperty(ref _waitingWriteTimeMs, value);
+            NotifyPropertyChanged(nameof(WaitingWriteTimeForHundred));
+        }
     }
+
+    public double WaitingWriteTimeForHundred => (double)WaitingWriteTimeMs / IterationTotalTime * 100;
+
+    public long IterationTotalTime => WaitingReadTimeMs + ProcessTimeMs + WaitingWriteTimeMs;
+
     public string ProcessName
     {
         get => _processName;

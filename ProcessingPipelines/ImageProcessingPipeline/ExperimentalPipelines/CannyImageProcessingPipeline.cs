@@ -9,14 +9,14 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
         public static ImageProcessingPipeline CreateCannyImageProcessingPipeline(MultipleBuffering inputBuffer)
         {
             ImageProcessingPipeline imageProcessingPipeline = new(inputBuffer);
-            imageProcessingPipeline.AddPipelineElement(new PipelineElement("MedianFiltering", Process, new MultipleBuffering(320, 240, 320 * 4, 10, EBufferPixelsFormat.Bgra32Bits)));
+            imageProcessingPipeline.AddPipelineElement(new PipelineElement("MedianFiltering", Process, (MultipleBuffering)inputBuffer.Clone()));
             return imageProcessingPipeline;
         }
 
         static void Process(MultipleBuffering inputBuffer, MultipleBuffering outputBuffer, CancellationTokenSource cancellationTokenSource, ProcessPerformances processPerf)
         {
-            byte[] destBuffer = new byte[320 * 240 * 4];
-            CannyEdgeDetection cannyEdgeDetection = new(320, 240);
+            byte[] destBuffer = new byte[inputBuffer.Stride * inputBuffer.Height];
+            CannyEdgeDetection cannyEdgeDetection = new(inputBuffer.Width, inputBuffer.Height);
             Stopwatch waitingReadTimeWatch = new();
             Stopwatch waitingWriteTimeWatch = new();
             Stopwatch processTimeWatch = new();

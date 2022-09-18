@@ -12,18 +12,18 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
         public MedianImageProcessingPipeline(MultipleBuffering inputBuffer)
         {
             _imageProcessingPipeline = new(inputBuffer);
-            _imageProcessingPipeline.AddPipelineElement(new PipelineElement("MedianFiltering", Process, new MultipleBuffering(320, 240, 320 * 4, 10, EBufferPixelsFormat.Bgra32Bits)));
+            _imageProcessingPipeline.AddPipelineElement(new PipelineElement("MedianFiltering", Process, (MultipleBuffering)inputBuffer.Clone()));
         }
 
         void Process(MultipleBuffering inputBuffer, MultipleBuffering outputBuffer, CancellationTokenSource cancellationTokenSource, ProcessPerformances processPerf)
         {
-            byte[] destBuffer = new byte[320 * 240 * 4];
+            byte[] destBuffer = new byte[inputBuffer.Stride * inputBuffer.Height];
             while (!cancellationTokenSource.IsCancellationRequested)
             {
                 BitmapFrame frame = inputBuffer.WaitNextReaderBuffer();
                 lock (frame)
                 {
-                    SIMDHelper.MedianFilter(frame.Data, 320, 240, 320 * 4, 4, destBuffer);
+                    SIMDHelper.MedianFilter(frame.Data, inputBuffer.Width, inputBuffer.Height, inputBuffer.Stride, 4, destBuffer);
                 }
                 inputBuffer.FinishReading();
 

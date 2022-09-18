@@ -9,14 +9,14 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
         static public ImageProcessingPipeline CreateChangingColorImageProcessingPipeline(MultipleBuffering inputBuffer)
         {
             ImageProcessingPipeline imageProcessingPipeline = new(inputBuffer);
-            imageProcessingPipeline.AddPipelineElement(new PipelineElement("ChangingColor", Process, new MultipleBuffering(320, 240, 320 * 4, 10, EBufferPixelsFormat.Bgra32Bits)));
+            imageProcessingPipeline.AddPipelineElement(new PipelineElement("ChangingColor", Process, (MultipleBuffering)inputBuffer.Clone()));
             return imageProcessingPipeline;
         }
 
         static void Process(MultipleBuffering inputBuffer, MultipleBuffering outputBuffer, CancellationTokenSource cancellationTokenSource, ProcessPerformances processPerf)
         {
-            byte[] destBuffer = new byte[320 * 240 * 4];
-            byte[] tempGrayBuffer = new byte[320 * 240];
+            byte[] destBuffer = new byte[inputBuffer.Height * inputBuffer.Stride];
+            byte[] tempGrayBuffer = new byte[inputBuffer.Width * inputBuffer.Height];
             Stopwatch waitingReadTimeWatch = new();
             Stopwatch waitingWriteTimeWatch = new();
             Stopwatch processTimeWatch = new();
@@ -30,7 +30,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
                 processTimeWatch.Start();
                 lock (frame)
                 {
-                    SIMDHelper.BgraToGrayAndChangeColorAndToBgra(frame.Data, 320, 240, 320 * 4, colorBuffer.ColorsBuffer, destBuffer, 320 * 4, tempGrayBuffer);
+                    SIMDHelper.BgraToGrayAndChangeColorAndToBgra(frame.Data, inputBuffer.Width, inputBuffer.Height, inputBuffer.Stride, colorBuffer.ColorsBuffer, destBuffer, inputBuffer.Stride, tempGrayBuffer);
                     colorBuffer.NextColorBuffer();
                 }
                 processTimeWatch.Stop();

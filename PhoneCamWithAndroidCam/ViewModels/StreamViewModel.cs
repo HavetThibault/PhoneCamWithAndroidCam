@@ -104,7 +104,11 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
         private void RefreshImageProcessingPipelinePerfs(object? arg)
         {
-            ProcessPerformancesViewModel.UpdatePerformances(_imageProcessingPipeline.ElementsProcessPerformances);
+            List<ProcessPerformances> perfs = new(_imageProcessingPipeline.ElementsProcessPerformances)
+            {
+                _convertToRawJpegThreads.ProcessPerformances
+            };
+            ProcessPerformancesViewModel.UpdatePerformances(perfs);
         }
 
         private void UpdateMainPicture(MemoryStream memoryStream)

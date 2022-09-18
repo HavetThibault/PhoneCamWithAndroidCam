@@ -60,7 +60,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         {
             CommandLaunchStreaming = new RelayCommand(LaunchStreaming, CanLaunchStreaming);
             CommandStopStreaming = new RelayCommand(StopStreaming, CanStopStreaming);
-            _phoneCamClient = new("192.168.1.37");
+            _phoneCamClient = new("192.168.43.1");
             _pipelineFeederOutput = new(320, 240, 320 * 4, 10, EBufferPixelsFormat.Bgra32Bits);
             ProcessPerformancesViewModel = processPerformancesViewModel;
 

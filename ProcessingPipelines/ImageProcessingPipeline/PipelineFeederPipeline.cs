@@ -132,7 +132,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         {
             if (cancellationTokenSourceObj is CancellationTokenSource cancellationTokenSource)
             {
-                byte[] pixelsBuffer = new byte[320 * 240 * 4];
+                byte[] pixelsBuffer = new byte[OutputMultipleBuffering.Stride * OutputMultipleBuffering.Height];
                 Stopwatch waitingReadTimeWatch = new();
                 Stopwatch waitingWriteTimeWatch = new();
                 Stopwatch processTimeWatch = new();

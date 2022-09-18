@@ -7,12 +7,14 @@
              xmlns:models="clr-namespace:PhoneCamWithAndroidCam.Models"
              xmlns:viewmodels="clr-namespace:PhoneCamWithAndroidCam.ViewModels"
              xmlns:views="clr-namespace:PhoneCamWithAndroidCam.Views"
+             xmlns:converters="clr-namespace:PhoneCamWithAndroidCam.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <DataTemplate DataType = "{x:Type viewmodels:ProcessPerformancesViewModel}">
             <views:ProcessPerformancesControl/>
         </DataTemplate>
+        <converters:ForHundredConverter x:Key="ForHundredConverter"/>
     </UserControl.Resources>
     <StackPanel MinWidth="230">
         <StackPanel Orientation="Horizontal">
@@ -26,9 +28,9 @@
                 <DataTemplate DataType="{x:Type models:ProcessPerformancesModel}">
                     <StackPanel Orientation="Horizontal">
                         <Label Content="{Binding ProcessName}" Width="80"/>
-                        <Label Content="{Binding WaitingReadTimeMs}" Width="50"/>
-                        <Label Content="{Binding ProcessTimeMs}" Width="50"/>
-                        <Label Content="{Binding WaitingWriteTimeMs}" Width="50"/>
+                        <Label Content="{Binding WaitingReadTimeForHundred, Converter={StaticResource ForHundredConverter}}" Width="50"/>
+                        <Label Content="{Binding ProcessTimeForHundred, Converter={StaticResource ForHundredConverter}}" Width="50"/>
+                        <Label Content="{Binding WaitingWriteTimeForHundred, Converter={StaticResource ForHundredConverter}}" Width="50"/>
                         <Border BorderThickness="1" CornerRadius="0.5"/>
                     </StackPanel>
                 </DataTemplate>
