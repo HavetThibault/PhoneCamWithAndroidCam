@@ -60,16 +60,24 @@ namespace PhoneCamWithAndroidCam.ViewModels
         {
             CommandLaunchStreaming = new RelayCommand(LaunchStreaming, CanLaunchStreaming);
             CommandStopStreaming = new RelayCommand(StopStreaming, CanStopStreaming);
-            _phoneCamClient = new("192.168.43.1");
+
+            FileStream fs = new("./Configuration.txt", FileMode.Open);
+            StreamReader sr = new(fs);
+            string ipAddress = sr.ReadLine();
+            _phoneCamClient = new(ipAddress);
+            sr.Close();
+
             _pipelineFeederOutput = new(320, 240, 320 * 4, 10, EBufferPixelsFormat.Bgra32Bits);
             ProcessPerformancesViewModel = processPerformancesViewModel;
 
             _duplicateBuffersThread = new(_pipelineFeederOutput);
             MultipleBuffering outputBuffer1 = _duplicateBuffersThread.AddNewOutputBuffer();
             MultipleBuffering outputBuffer2 = _duplicateBuffersThread.AddNewOutputBuffer();
+            MultipleBuffering outputBuffer3 = _duplicateBuffersThread.AddNewOutputBuffer();
             ImageProcessingPipeline cannyImageProcessingPipeline = CannyImageProcessingPipeline.CreateCannyImageProcessingPipeline(outputBuffer1);
-            ImageProcessingPipeline changingColorProcessingPipeline = ChangingColorImageProcessingPipeline.CreateChangingColorImageProcessingPipeline(outputBuffer2);
-            _streamViews = new() { new(uiDispatcher, cannyImageProcessingPipeline), new StreamViewModel(uiDispatcher, changingColorProcessingPipeline) };
+            ImageProcessingPipeline copyProcessingPipeline = CopyProcessingPipeline.CreateCopyProcessingPipeline(outputBuffer2);
+            ImageProcessingPipeline changingColorPipeline = ChangingColorImageProcessingPipeline.CreateChangingColorImageProcessingPipeline(outputBuffer3);
+            _streamViews = new() { new(uiDispatcher, copyProcessingPipeline), new (uiDispatcher, cannyImageProcessingPipeline), new (uiDispatcher, changingColorPipeline) };
         }
 
         public void LaunchStreaming()
