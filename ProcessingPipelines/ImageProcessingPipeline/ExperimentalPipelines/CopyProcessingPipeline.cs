@@ -26,10 +26,11 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
                 waitingReadTimeWatch.Stop();
 
                 processTimeWatch.Start();
-                lock (frame)
-                {
-                    Buffer.BlockCopy(frame.Data, 0, destBuffer, 0, destBuffer.Length);
-                }
+                
+                Buffer.BlockCopy(frame.Data, 0, destBuffer, 0, destBuffer.Length);
+
+                Monitor.Exit(frame);
+
                 processTimeWatch.Stop();
                 inputBuffer.FinishReading();
 

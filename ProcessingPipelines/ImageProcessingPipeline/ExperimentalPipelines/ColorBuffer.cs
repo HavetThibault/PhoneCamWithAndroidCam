@@ -22,13 +22,19 @@
                 {
                     color = ColorsBuffer[i] + 1;
                     if(color > 255)
+                    {
+                        color = 255;
                         UpOrDownBuffer[i] = false;
+                    }
                 } 
                 else
                 {
                     color = ColorsBuffer[i] - 1;
                     if (color < 0)
+                    {
+                        color = 0;
                         UpOrDownBuffer[i] = true;
+                    }  
                 }
                 
                 ColorsBuffer[i] = (byte)color;

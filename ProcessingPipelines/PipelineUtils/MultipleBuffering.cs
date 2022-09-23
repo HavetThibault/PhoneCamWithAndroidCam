@@ -4,6 +4,10 @@ namespace ProcessingPipelines.PipelineUtils
 {
     public class MultipleBuffering : IDisposable
     {
+        private static int idNextNumber = 1;
+        private static object idNextNumberLock = new();
+
+        private int _id;
         private int _bufferWriterPointer;
         private int _bufferReaderPointer;
         private int _unReadBufferNbr;
@@ -41,6 +45,9 @@ namespace ProcessingPipelines.PipelineUtils
 
         public MultipleBuffering(int bufferWidth, int bufferHeight, int bufferStride, int bufferNbr, EBufferPixelsFormat bufferPixelsFormat)
         {
+            lock (idNextNumberLock)
+                _id = idNextNumber++;
+
             BytesBuffers = new BitmapFrame[bufferNbr];
 
             Height = bufferHeight;
@@ -82,7 +89,10 @@ namespace ProcessingPipelines.PipelineUtils
                 BitmapFrame nextReaderBuffer = GetNextReaderBuffer();
 
                 if (nextReaderBuffer != null)
+                {
+                    Monitor.Enter(nextReaderBuffer);
                     return nextReaderBuffer;
+                }   
 
                 while (!_canReadBuffer.WaitOne(100)) ;
             }

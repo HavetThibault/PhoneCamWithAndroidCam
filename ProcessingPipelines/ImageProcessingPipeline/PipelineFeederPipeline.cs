@@ -33,9 +33,23 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
         public void StartFeeding(CancellationTokenSource cancellationTokenSource)
         {
-            new Thread(ProcessRawJegStream).Start(cancellationTokenSource);
-            new Thread(ProcessRawJpeg).Start(cancellationTokenSource);
-            new Thread(ProcessBitmaps).Start(cancellationTokenSource);
+            var processRawJpegStreamThread = new Thread(ProcessRawJegStream)
+            {
+                Name = nameof(ProcessRawJegStream)
+            };
+            processRawJpegStreamThread.Start(cancellationTokenSource);
+
+            var processRawJpegThread = new Thread(ProcessRawJpeg)
+            {
+                Name = nameof(ProcessRawJpeg)
+            };
+            processRawJpegThread.Start(cancellationTokenSource);
+
+            var processBitmapsThread = new Thread(ProcessBitmaps)
+            {
+                Name = nameof(ProcessBitmaps)
+            };
+            processBitmapsThread.Start(cancellationTokenSource);
         }
 
         private async void ProcessRawJegStream(object? cancellationTokenSourceObj)
@@ -145,7 +159,8 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                         waitingReadTimeWatch.Stop();
 
                         processTimeWatch.Start();
-                        BitmapHelper.ToByteArray(bmp, out _, pixelsBuffer);
+                        lock(bmp)
+                            BitmapHelper.ToByteArray(bmp, out _, pixelsBuffer);
                         processTimeWatch.Stop();
 
                         waitingWriteTimeWatch.Start();

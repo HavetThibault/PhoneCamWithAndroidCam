@@ -27,7 +27,8 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
         public void LaunchNewWorker(CancellationTokenSource cancellationTokenSource)
         {
-            new Thread(Process).Start(cancellationTokenSource);
+            var processThread = new Thread(Process) { Name = nameof(ConvertToRawJpegThread) };
+            processThread.Start(cancellationTokenSource);
         }
 
         private void Process(object? cancellationTokenSourceObject)
@@ -46,14 +47,28 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                     waitingReadTimeWatch.Stop();
 
                     processTimeWatch.Start();
-                    lock (bitmapFrame)
+ 
+                    bmp = bitmapFrame.Bitmap;
+                    bitmapFrame.Bitmap = null;
+                    try
                     {
-                        bmp = bitmapFrame.Bitmap;
-                        bitmapFrame.Bitmap = null;
-                        BitmapHelper.FromBgraBufferToBitmap(bmp, bitmapFrame.Data, _width, _height);
-                        cannyStream = new();
-                        bmp.Save(cannyStream, ImageFormat.Jpeg);
+                        lock(bmp)
+                            BitmapHelper.FromBgraBufferToBitmap(bmp, bitmapFrame.Data, _width, _height);
                     }
+                    catch
+                    {
+                        Monitor.Exit(bitmapFrame);
+                        InputMultipleBuffering.FinishReading();
+                        bmp.Dispose();
+                        continue;
+                    }
+                        
+                    cannyStream = new();
+                    lock(bmp)
+                        bmp.Save(cannyStream, ImageFormat.Jpeg);
+
+                    Monitor.Exit(bitmapFrame);
+
                     InputMultipleBuffering.FinishReading();
                     bmp.Dispose();
                     processTimeWatch.Stop();

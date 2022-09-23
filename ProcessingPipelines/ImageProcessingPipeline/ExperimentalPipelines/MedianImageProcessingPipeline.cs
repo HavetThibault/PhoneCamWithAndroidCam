@@ -21,10 +21,11 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
             while (!cancellationTokenSource.IsCancellationRequested)
             {
                 BitmapFrame frame = inputBuffer.WaitNextReaderBuffer();
-                lock (frame)
-                {
-                    SIMDHelper.MedianFilter(frame.Data, inputBuffer.Width, inputBuffer.Height, inputBuffer.Stride, 4, destBuffer);
-                }
+               
+                SIMDHelper.MedianFilter(frame.Data, inputBuffer.Width, inputBuffer.Height, inputBuffer.Stride, 4, destBuffer);
+
+                Monitor.Exit(frame);
+
                 inputBuffer.FinishReading();
 
                 outputBuffer.WaitWriteBuffer(destBuffer, frame.Bitmap);

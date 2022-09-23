@@ -15,7 +15,11 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
         public void Start(CancellationTokenSource cancellationTokenSource)
         {
-            new Thread(Process).Start(cancellationTokenSource);
+            var processThread = new Thread(Process)
+            {
+                Name = nameof(DuplicateBuffersThread)
+            };
+            processThread.Start(cancellationTokenSource);
         }
 
         public MultipleBuffering AddNewOutputBuffer()
@@ -32,19 +36,21 @@ namespace ProcessingPipelines.ImageProcessingPipeline
             {
                 while (!cancellationTokenSource.IsCancellationRequested)
                 {
+                    BitmapFrame copiedBmpFrame;
                     BitmapFrame bmpFrame = InputMultipleBuffering.WaitNextReaderBuffer();
+                    lock (bmpFrame)
+                        copiedBmpFrame = (BitmapFrame)bmpFrame.Clone();
+                    Monitor.Exit(bmpFrame);
+
+                    InputMultipleBuffering.FinishReading();
 
                     lock (OutputMultipleBuffers)
                     {
                         foreach (MultipleBuffering buffer in OutputMultipleBuffers)
                         {
-                            BitmapFrame copiedBmpFrame;
-                            lock (bmpFrame)
-                                copiedBmpFrame = (BitmapFrame)bmpFrame.Clone();
                             buffer.WriteBuffer(copiedBmpFrame.Data, copiedBmpFrame.Bitmap); // Not synchronizing to not penalize the other streams
                         }
                     }
-                    InputMultipleBuffering.FinishReading();
                 }
             }
         }

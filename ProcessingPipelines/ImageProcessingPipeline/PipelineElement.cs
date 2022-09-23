@@ -29,7 +29,11 @@ public class PipelineElement
 
     public void LaunchNewWorker(CancellationTokenSource cancellationTokenSource)
     {
-        new Thread(RunProcess).Start(cancellationTokenSource);
+        var processThread = new Thread(RunProcess)
+        {
+            Name = Name
+        };
+        processThread.Start(cancellationTokenSource);
     }
 
     private void RunProcess(object? cancellationTokenSourceObject)

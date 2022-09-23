@@ -27,10 +27,11 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
                 waitingReadTimeWatch.Stop();
 
                 processTimeWatch.Start();
-                lock (frame)
-                {
-                    cannyEdgeDetection.ApplyCannyFilter(frame.Data, destBuffer);
-                }
+               
+                cannyEdgeDetection.ApplyCannyFilter(frame.Data, destBuffer);
+                
+                Monitor.Exit(frame);
+
                 processTimeWatch.Stop();
                 inputBuffer.FinishReading();
 

@@ -28,11 +28,12 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
                 waitingReadTimeWatch.Stop();
 
                 processTimeWatch.Start();
-                lock (frame)
-                {
-                    SIMDHelper.BgraToGrayAndChangeColorAndToBgra(frame.Data, inputBuffer.Width, inputBuffer.Height, inputBuffer.Stride, colorBuffer.ColorsBuffer, destBuffer, inputBuffer.Stride, tempGrayBuffer);
-                    colorBuffer.NextColorBuffer();
-                }
+                
+                SIMDHelper.BgraToGrayAndChangeColorAndToBgra(frame.Data, inputBuffer.Width, inputBuffer.Height, inputBuffer.Stride, colorBuffer.ColorsBuffer, destBuffer, inputBuffer.Stride, tempGrayBuffer);
+                colorBuffer.NextColorBuffer();
+
+                Monitor.Exit(frame);
+
                 processTimeWatch.Stop();
                 inputBuffer.FinishReading();
 
