@@ -1,4 +1,5 @@
 ﻿using ProcessingPipelines.PipelineUtils;
+using System.Drawing;
 
 namespace ProcessingPipelines.ImageProcessingPipeline
 {
@@ -38,8 +39,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 {
                     BitmapFrame copiedBmpFrame;
                     BitmapFrame bmpFrame = InputMultipleBuffering.WaitNextReaderBuffer();
-                    lock (bmpFrame)
-                        copiedBmpFrame = (BitmapFrame)bmpFrame.Clone();
+                    copiedBmpFrame = (BitmapFrame)bmpFrame.Clone();
                     Monitor.Exit(bmpFrame);
 
                     InputMultipleBuffering.FinishReading();
@@ -48,9 +48,10 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                     {
                         foreach (MultipleBuffering buffer in OutputMultipleBuffers)
                         {
-                            buffer.WriteBuffer(copiedBmpFrame.Data, copiedBmpFrame.Bitmap); // Not synchronizing to not penalize the other streams
+                            buffer.WriteBuffer(copiedBmpFrame.Data, (Bitmap)copiedBmpFrame.Bitmap.Clone()); // Not synchronizing to not penalize the other streams
                         }
                     }
+                    copiedBmpFrame.Bitmap.Dispose();
                 }
             }
         }

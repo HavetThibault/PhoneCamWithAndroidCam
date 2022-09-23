@@ -9,7 +9,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
         public static ImageProcessingPipeline CreateCannyImageProcessingPipeline(MultipleBuffering inputBuffer)
         {
             ImageProcessingPipeline imageProcessingPipeline = new(inputBuffer);
-            imageProcessingPipeline.AddPipelineElement(new PipelineElement("ConnyEdgeDetection", Process, (MultipleBuffering)inputBuffer.Clone()));
+            imageProcessingPipeline.AddPipelineElement(new PipelineElement("CannyEdgeDetection", Process, (MultipleBuffering)inputBuffer.Clone()));
             return imageProcessingPipeline;
         }
 

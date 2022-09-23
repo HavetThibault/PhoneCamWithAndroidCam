@@ -72,12 +72,12 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
             _duplicateBuffersThread = new(_pipelineFeederOutput);
             MultipleBuffering outputBuffer1 = _duplicateBuffersThread.AddNewOutputBuffer();
-            //MultipleBuffering outputBuffer2 = _duplicateBuffersThread.AddNewOutputBuffer();
-            //MultipleBuffering outputBuffer3 = _duplicateBuffersThread.AddNewOutputBuffer();
+            MultipleBuffering outputBuffer2 = _duplicateBuffersThread.AddNewOutputBuffer();
+            MultipleBuffering outputBuffer3 = _duplicateBuffersThread.AddNewOutputBuffer();
             ImageProcessingPipeline cannyImageProcessingPipeline = CannyImageProcessingPipeline.CreateCannyImageProcessingPipeline(outputBuffer1);
-            //ImageProcessingPipeline copyProcessingPipeline = CopyProcessingPipeline.CreateCopyProcessingPipeline(outputBuffer2);
-            //ImageProcessingPipeline changingColorPipeline = ChangingColorImageProcessingPipeline.CreateChangingColorImageProcessingPipeline(outputBuffer3);
-            _streamViews = new() { new(uiDispatcher, cannyImageProcessingPipeline)  };//new(uiDispatcher, copyProcessingPipeline), new(uiDispatcher, cannyImageProcessingPipeline), new (uiDispatcher, changingColorPipeline) };
+            ImageProcessingPipeline copyProcessingPipeline = CopyProcessingPipeline.CreateCopyProcessingPipeline(outputBuffer2);
+            ImageProcessingPipeline changingColorPipeline = ChangingColorImageProcessingPipeline.CreateChangingColorImageProcessingPipeline(outputBuffer3);
+            _streamViews = new() { new(uiDispatcher, copyProcessingPipeline), new(uiDispatcher, cannyImageProcessingPipeline), new (uiDispatcher, changingColorPipeline) };
         }
 
         public void LaunchStreaming()
