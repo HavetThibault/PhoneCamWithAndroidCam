@@ -247,7 +247,7 @@ namespace ImageProcessingUtils
             GCHandle pinnedResult = GCHandle.Alloc(result, GCHandleType.Pinned);
             IntPtr resultPtr = pinnedResult.AddrOfPinnedObject();
 
-            SIMD.SimdOperationBinary8u(array1Ptr, array1Stride, array2Ptr, array2Stride, width, height, channelCount, resultPtr, resultStride, ESimdOperationBinary8uType.SimdOperationBinary8uSaturatedSubtraction);
+            SIMD.SimdOperationBinary8u(array1Ptr, array1Stride, array2Ptr, array2Stride, width, height, channelCount, resultPtr, resultStride, (nint)ESimdOperationBinary8uType.SimdOperationBinary8uSaturatedSubtraction);
 
             pinnedArray1.Free();
             pinnedArray2.Free();

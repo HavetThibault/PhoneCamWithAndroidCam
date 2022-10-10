@@ -9,7 +9,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
         public static ImageProcessingPipeline CreateCannyImageProcessingPipeline(MultipleBuffering inputBuffer)
         {
             ImageProcessingPipeline imageProcessingPipeline = new(inputBuffer);
-            imageProcessingPipeline.AddPipelineElement(new PipelineElement("CannyEdgeDetection", Process, (MultipleBuffering)inputBuffer.Clone()));
+            imageProcessingPipeline.AddPipelineElement(new PipelineElement("Motion detection", Process, (MultipleBuffering)inputBuffer.Clone()));
             return imageProcessingPipeline;
         }
 
@@ -30,6 +30,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
                 processTimeWatch.Start();
 
                 motionDetectionFilter.ApplyMotionDetectionFilter(frame.Data, destBuffer, lastFrameBuffer);
+                Buffer.BlockCopy(frame.Data, 0, lastFrameBuffer, 0, destBuffer.Length);
 
                 Monitor.Exit(frame);
 
@@ -52,8 +53,6 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
                     processTimeWatch.Reset();
                     waitingWriteTimeWatch.Reset();
                 }
-
-                Buffer.BlockCopy(destBuffer, 0, lastFrameBuffer, 0, destBuffer.Length);
             }
         }
     }

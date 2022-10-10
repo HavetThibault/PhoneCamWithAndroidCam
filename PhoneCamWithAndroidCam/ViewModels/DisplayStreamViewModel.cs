@@ -74,10 +74,12 @@ namespace PhoneCamWithAndroidCam.ViewModels
             MultipleBuffering outputBuffer1 = _duplicateBuffersThread.AddNewOutputBuffer();
             MultipleBuffering outputBuffer2 = _duplicateBuffersThread.AddNewOutputBuffer();
             MultipleBuffering outputBuffer3 = _duplicateBuffersThread.AddNewOutputBuffer();
+            MultipleBuffering outputBuffer4 = _duplicateBuffersThread.AddNewOutputBuffer();
             ImageProcessingPipeline cannyImageProcessingPipeline = CannyImageProcessingPipeline.CreateCannyImageProcessingPipeline(outputBuffer1);
             ImageProcessingPipeline copyProcessingPipeline = CopyProcessingPipeline.CreateCopyProcessingPipeline(outputBuffer2);
             ImageProcessingPipeline changingColorPipeline = ChangingColorImageProcessingPipeline.CreateChangingColorImageProcessingPipeline(outputBuffer3);
-            _streamViews = new() { new(uiDispatcher, copyProcessingPipeline), new(uiDispatcher, cannyImageProcessingPipeline), new (uiDispatcher, changingColorPipeline) };
+            ImageProcessingPipeline motionDetectionPipeline = MotionDetectionProcessingPipeline.CreateCannyImageProcessingPipeline(outputBuffer4);
+            _streamViews = new() { new(uiDispatcher, copyProcessingPipeline), new(uiDispatcher, cannyImageProcessingPipeline), new (uiDispatcher, changingColorPipeline), new StreamViewModel(uiDispatcher, motionDetectionPipeline) };
         }
 
         public void LaunchStreaming()

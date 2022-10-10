@@ -371,5 +371,40 @@ namespace ImageProcessingUtils
 
             SIMDHelper.FillUnManagedBorder(destination, width, height, 0, 2);
         }
+
+        public static void Substract(byte[] a, byte[] b, byte[] dest)
+        {
+            int result;
+            for(int i = 0; i < a.Length; i++)
+            {
+                result = a[i] - b[i];
+                if (result < 0)
+                {
+                    dest[i] = 0;
+                }
+                else
+                {
+                    dest[i] = (byte)result;
+                }
+            }
+        }
+
+        /// <summary>
+        /// For non-strided dest32Bits
+        /// </summary>
+        /// <param name="motion8bits"></param>
+        /// <param name="dest32bits"></param>
+        /// <param name="stride"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        public static void SetRedComponentIfMotion(byte[] motion8bits, byte[] dest32bits, int width, int height)
+        {
+            int length = width * height;
+            for(int i = 0; i < length; i++)
+            {
+                if (motion8bits[i] == 255)
+                    dest32bits[((i % width) * 4) + i / width * width * 4 + 2] = 255;
+            }
+        }
     }
 }
