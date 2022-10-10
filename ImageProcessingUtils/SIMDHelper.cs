@@ -235,5 +235,23 @@ namespace ImageProcessingUtils
             pinnedResult.Free();
             pinnedGrayBuffer.Free();
         }
+
+        public static void ByteArraysDiff(byte[] array1, int array1Stride, byte[] array2, int array2Stride, int width, int height, int channelCount, byte[] result, int resultStride)
+        {
+            GCHandle pinnedArray1 = GCHandle.Alloc(array1, GCHandleType.Pinned);
+            IntPtr array1Ptr = pinnedArray1.AddrOfPinnedObject();
+
+            GCHandle pinnedArray2 = GCHandle.Alloc(array2, GCHandleType.Pinned);
+            IntPtr array2Ptr = pinnedArray2.AddrOfPinnedObject();
+
+            GCHandle pinnedResult = GCHandle.Alloc(result, GCHandleType.Pinned);
+            IntPtr resultPtr = pinnedResult.AddrOfPinnedObject();
+
+            SIMD.SimdOperationBinary8u(array1Ptr, array1Stride, array2Ptr, array2Stride, width, height, channelCount, resultPtr, resultStride, ESimdOperationBinary8uType.SimdOperationBinary8uSaturatedSubtraction);
+
+            pinnedArray1.Free();
+            pinnedArray2.Free();
+            pinnedResult.Free();
+        }
     }
 }

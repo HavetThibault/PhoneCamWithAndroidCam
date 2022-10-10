@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
 
 namespace ImageProcessingUtils
@@ -35,6 +36,72 @@ namespace ImageProcessingUtils
 
             pinnedSrc.Free();
             pinnedDest.Free();
+        }
+
+        public static void Threshold(byte[] source, byte thresholdValue, byte[] dest)
+        {
+            for(int i = 0; i < source.Length; i++)
+            {
+                if (source[i] > thresholdValue)
+                    dest[i] = 255;
+                else
+                    dest[i] = 0;
+            }
+        }
+
+        public static void Dilation(byte[] source, int width, int height, byte[] dest, int size)
+        {
+            int xkernelOffset = (size - 1) / 2;
+            int ykernelOffset = (size - 1) / 2;
+            int yOffset;
+
+            int heightLessYOffset = height - ykernelOffset;
+            int widthLessXOffset = width - xkernelOffset;
+            for (int i = ykernelOffset; i < heightLessYOffset; i++)
+            {
+                for (int j = xkernelOffset; j < widthLessXOffset; j++)
+                {
+                    byte value = 255;
+
+                    for (int y = i - ykernelOffset; y <= i + ykernelOffset; y++)
+                    {
+                        yOffset = y * width;
+
+                        for (int x = j - xkernelOffset; x <= j + xkernelOffset; x++)
+                        {
+                            value = Math.Min(value, source[yOffset + x]);
+                        }
+                    }
+                    dest[j + i * width] = value;
+                }
+            }
+            FillUnManagedBorder(dest, width, height, 0, (size - 1) / 2);
+        }
+
+        /// <summary>
+        /// 'src' must be non-strided and 8-bit gray pixels
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        public static void FillUnManagedBorder(byte[] src, int width, int height, int value, int borderThickness)
+        {
+            GCHandle pinnedSrc = GCHandle.Alloc(src, GCHandleType.Pinned);
+            IntPtr ptrSrc = pinnedSrc.AddrOfPinnedObject();
+
+            SIMD.SimdFill(ptrSrc, width, width, borderThickness, 1, value);
+
+            IntPtr downBorderPtr = IntPtr.Add(ptrSrc, (height - borderThickness) * width);
+
+            SIMD.SimdFill(downBorderPtr, width, width, borderThickness, 1, value);
+
+            SIMD.SimdFill(ptrSrc, width, borderThickness, height, 1, value);
+
+            IntPtr rightBorderPtr = IntPtr.Add(ptrSrc, width - borderThickness);
+
+            SIMD.SimdFill(rightBorderPtr, width, borderThickness, height, 1, value);
+
+            pinnedSrc.Free();
         }
 
         public static void DoubleThreshold(byte[] source, byte min, byte max, byte[] destination, byte weakValue, byte notPixelValue = 0, byte strongPixelValue = 255)
@@ -105,6 +172,16 @@ namespace ImageProcessingUtils
             IntPtr rightBorderPtr = IntPtr.Add(ptrSrc, width - 1);
 
             SIMD.SimdFill(rightBorderPtr, width, 1, height, 1, value);
+
+            pinnedSrc.Free();
+        }
+
+        public static void Fill(int[] src, int width, int height, int value)
+        {
+            GCHandle pinnedSrc = GCHandle.Alloc(src, GCHandleType.Pinned);
+            IntPtr ptrSrc = pinnedSrc.AddrOfPinnedObject();
+
+            SIMD.SimdFill(ptrSrc, width, width, height, 4, value);
 
             pinnedSrc.Free();
         }
