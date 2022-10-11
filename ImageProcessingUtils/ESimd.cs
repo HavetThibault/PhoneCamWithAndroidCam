@@ -44,4 +44,37 @@ namespace ImageProcessingUtils
         /// </summary>
         SimdOperationBinary8uSaturatedAddition = 6
     }
+
+    public enum ESimdCompareType
+    {
+        /// <summary>
+        /// equal to: a == b
+        /// </summary>
+        SimdCompareEqual = 0,
+
+        /// <summary>
+        /// equal to: a != b
+        /// </summary>
+        SimdCompareNotEqual = 1,
+
+        /// <summary>
+        /// equal to: a > b
+        /// </summary>
+        SimdCompareGreater = 2,
+
+        /// <summary>
+        /// equal to: a >= b
+        /// </summary>
+        SimdCompareGreaterOrEqual = 3,
+
+        /// <summary>
+        /// equal to: a<b
+        /// </summary>
+        SimdCompareLesser = 4,
+
+        /// <summary>
+        /// equal to: a <= b
+        /// </summary>
+        SimdCompareLesserOrEqual = 5
+    }
 }

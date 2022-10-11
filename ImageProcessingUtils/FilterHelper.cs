@@ -372,20 +372,11 @@ namespace ImageProcessingUtils
             SIMDHelper.FillUnManagedBorder(destination, width, height, 0, 2);
         }
 
-        public static void Substract(byte[] a, byte[] b, byte[] dest)
+        public static void AbsSubstract(byte[] a, byte[] b, byte[] dest)
         {
-            int result;
             for(int i = 0; i < a.Length; i++)
             {
-                result = a[i] - b[i];
-                if (result < 0)
-                {
-                    dest[i] = 0;
-                }
-                else
-                {
-                    dest[i] = (byte)result;
-                }
+                dest[i] = (byte)Math.Abs(a[i] - b[i]);
             }
         }
 

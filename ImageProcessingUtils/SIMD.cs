@@ -105,6 +105,9 @@ namespace ImageProcessingUtils
         public static extern void SimdFill(IntPtr dst, int stride, int width, int height, int pixelSize, int value);
 
         [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void SimdBinarization(IntPtr src, nint srcStride, nint width, nint height, byte value, byte positive, byte negative, IntPtr dst, nint dstStride, nint ESimdCompareType);
+
+        [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void SimdOperationBinary8u(IntPtr a, nint aStride, IntPtr b, nint bStride, nint width, nint height, nint channelCount, IntPtr dst, nint dstStride, nint ESimdOperationBinary8uType);
 
         public static void LoadAssembly()

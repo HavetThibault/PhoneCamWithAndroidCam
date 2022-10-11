@@ -4,6 +4,19 @@ namespace ImageProcessingUtils
 {
     public static class SIMDHelper
     {
+        public static void Threshold(byte[] src, byte[] dest, int width, int height, byte thresholdValue, byte positive, byte negative)
+        {
+            GCHandle pinnedSrcBuffer = GCHandle.Alloc(src, GCHandleType.Pinned);
+            IntPtr srcBufferPtr = pinnedSrcBuffer.AddrOfPinnedObject();
+
+            GCHandle pinnedDestBuffer = GCHandle.Alloc(dest, GCHandleType.Pinned);
+            IntPtr destBuffer = pinnedDestBuffer.AddrOfPinnedObject();
+
+            SIMD.SimdBinarization(srcBufferPtr, width, width, height, thresholdValue, positive, negative, destBuffer, width, (int)ESimdCompareType.SimdCompareGreater);
+
+            pinnedDestBuffer.Free();
+            pinnedSrcBuffer.Free();
+        }
 
         public static void Copy(byte[] sourceBuffer, byte[] destinationBuffer)
         {
