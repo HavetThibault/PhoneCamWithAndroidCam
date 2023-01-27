@@ -110,6 +110,9 @@ namespace ImageProcessingUtils
         [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void SimdOperationBinary8u(IntPtr a, nint aStride, IntPtr b, nint bStride, nint width, nint height, nint channelCount, IntPtr dst, nint dstStride, nint ESimdOperationBinary8uType);
 
+        [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void SimdSegmentationPropagate2x2(IntPtr parent, nint parentStride, nint width, nint height, IntPtr child, nint childStride, IntPtr difference, nint differenceStride, byte currentIndex, byte invalidIndex, byte emptyIndex, byte differenceThreshold);	
+
         public static void LoadAssembly()
         {
             if (!IsLoaded) m_LibraryPointer = LoadLibrary(SIMD_LIBRARY_FILENAME);

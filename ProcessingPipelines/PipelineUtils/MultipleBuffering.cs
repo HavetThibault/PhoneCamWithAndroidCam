@@ -108,13 +108,7 @@ namespace ProcessingPipelines.PipelineUtils
         {
             if (UnReadBufferNbr < BufferNbr)
             {
-                int bufferWriterPointer;
-                lock (_bufferPointerLock)
-                {
-                    bufferWriterPointer = _bufferWriterPointer++;
-                    if (_bufferWriterPointer == BufferNbr)
-                        _bufferWriterPointer = 0;
-                }
+                int bufferWriterPointer = GetNextWriterPointer();
 
                 BitmapFrame frame = BytesBuffers[bufferWriterPointer];
                 lock (frame)
@@ -134,13 +128,7 @@ namespace ProcessingPipelines.PipelineUtils
         {
             if (UnReadBufferNbr < BufferNbr)
             {
-                int bufferWriterPointer;
-                lock (_bufferPointerLock)
-                {
-                    bufferWriterPointer = _bufferWriterPointer++;
-                    if (_bufferWriterPointer == BufferNbr)
-                        _bufferWriterPointer = 0;
-                }
+                int bufferWriterPointer = GetNextWriterPointer();
 
                 lock (BytesBuffers[bufferWriterPointer])
                 {
@@ -154,6 +142,19 @@ namespace ProcessingPipelines.PipelineUtils
                 return true;
             }
             return false;
+        }
+
+        private int GetNextWriterPointer()
+        {
+            int bufferWriterPointer;
+            lock (_bufferPointerLock)
+            {
+                bufferWriterPointer = _bufferWriterPointer++;
+                if (_bufferWriterPointer == BufferNbr)
+                    _bufferWriterPointer = 0;
+            }
+
+            return bufferWriterPointer;
         }
 
         public void WaitWriteBuffer(byte[] newBuffer, Bitmap associatedBitmap)

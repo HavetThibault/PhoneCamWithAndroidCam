@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace ImageProcessingUtils
 {
@@ -265,6 +266,24 @@ namespace ImageProcessingUtils
             pinnedArray1.Free();
             pinnedArray2.Free();
             pinnedResult.Free();
+        }
+
+        public static void SimdSegmentationPropagate2x2(byte[] parentBuffer, int parentWidth, int parentHeight, int parentStride, byte[] childBuffer, int childWidth, int childHeight, int childStride, byte[] differenceBuffer, int differenceStride)
+        {
+            GCHandle pinnedParent = GCHandle.Alloc(parentBuffer, GCHandleType.Pinned);
+            IntPtr parentPtr = pinnedParent.AddrOfPinnedObject();
+
+            GCHandle pinnedChild = GCHandle.Alloc(childBuffer, GCHandleType.Pinned);
+            IntPtr childPtr = pinnedChild.AddrOfPinnedObject();
+
+            GCHandle pinnedDifference = GCHandle.Alloc(differenceBuffer, GCHandleType.Pinned);
+            IntPtr differencePtr = pinnedDifference.AddrOfPinnedObject();
+
+            SIMD.SimdSegmentationPropagate2x2(parentPtr, parentStride, parentWidth, parentHeight, childPtr, childStride, differencePtr, differenceStride, 0, 0, 0, 0);
+
+            pinnedDifference.Free();
+            pinnedParent.Free();
+            pinnedChild.Free();
         }
     }
 }

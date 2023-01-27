@@ -52,6 +52,11 @@ namespace ProcessingPipelines.ImageProcessingPipeline
             processBitmapsThread.Start(cancellationTokenSource);
         }
 
+        /// <summary>
+        /// Get a raw jpeg frame from the PhoneCamClient and convert it into a raw byte array JPEG.
+        /// Put the result into <see cref="RawJpegBuffering"/>
+        /// </summary>
+        /// <param name="cancellationTokenSourceObj"></param>
         private async void ProcessRawJegStream(object? cancellationTokenSourceObj)
         {
             if (cancellationTokenSourceObj is CancellationTokenSource cancellationTokenSource)
@@ -77,7 +82,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                     waitingReadTimeWatch.Stop();
 
                     processTimeWatch.Start();
-                    var bmpMemoryStream = new MemoryStream(jpegFrame.ToFullBytesImage());
+                    var bmpMemoryStream = new MemoryStream(jpegFrame.GetFullJpeg());
                     processTimeWatch.Stop();
 
                     waitingWriteTimeWatch.Start();
@@ -101,6 +106,12 @@ namespace ProcessingPipelines.ImageProcessingPipeline
             }
         }
 
+        /// <summary>
+        /// <para>Create a Bitmap for each raw JPEG byte from <see cref="RawJpegBuffering"/>.</para>
+        /// <para>Put the result into <see cref="Bitmaps"/>.</para>
+        /// <para>Bitmap is here used for later manipulation of the JPEG, the JPEG is in a compressed format.</para>
+        /// </summary>
+        /// <param name="cancellationTokenSourceObj"></param>
         private void ProcessRawJpeg(object? cancellationTokenSourceObj)
         {
             if (cancellationTokenSourceObj is CancellationTokenSource cancellationTokenSource)
@@ -142,6 +153,10 @@ namespace ProcessingPipelines.ImageProcessingPipeline
             }
         }
 
+        /// <summary>
+        /// Convert the Bitmaps into an JPEG byte array with uncompressed format.
+        /// </summary>
+        /// <param name="cancellationTokenSourceObj"></param>
         private void ProcessBitmaps(object? cancellationTokenSourceObj)
         {
             if (cancellationTokenSourceObj is CancellationTokenSource cancellationTokenSource)

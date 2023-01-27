@@ -7,6 +7,9 @@ using System.Net.WebSockets;
 
 namespace ProcessingPipelines.ImageProcessingPipeline
 {
+    /// <summary>
+    /// Converts the BitmapFrame into a raw JPEG in a byte array 
+    /// </summary>
     public class ConvertToRawJpegThread
     {
         private int _height;
@@ -20,7 +23,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         {
             OutputMultipleBuffering = outputMultipleBuffering;
             InputMultipleBuffering = inputMultipleBuffering;
-            ProcessPerformances = new("ConvertToRawJpeg");
+            ProcessPerformances = new("Convert to raw JPEG");
             _height = inputMultipleBuffering.Height;
             _width = inputMultipleBuffering.Width;
         }

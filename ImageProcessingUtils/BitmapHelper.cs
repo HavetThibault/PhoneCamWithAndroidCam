@@ -34,5 +34,18 @@ namespace ImageProcessingUtils
             destBitmap.UnlockBits(srcData);
             pinnedSrcBuffer.Free();
         }
+
+        public static void FromGrayBufferToBitmap(Bitmap destBitmap, byte[] buffer, int width, int height)
+        {
+            BitmapData srcData = destBitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+            GCHandle pinnedSrcBuffer = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+            IntPtr srcBufferPtr = pinnedSrcBuffer.AddrOfPinnedObject();
+
+            SIMD.SimdGrayToBgra(srcBufferPtr, width, height, width, srcData.Scan0, srcData.Stride);
+
+            destBitmap.UnlockBits(srcData);
+            pinnedSrcBuffer.Free();
+        }
     }
 }

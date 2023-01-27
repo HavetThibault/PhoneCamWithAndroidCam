@@ -17,7 +17,7 @@ namespace AndroidCamClient
 
         public Task<Stream> LaunchStream()
         {
-            return _jpegStreamDecoder.InitMJpegStream(_phoneUrl + "/video?320x240");
+            return _jpegStreamDecoder.InitMJpegStream(_phoneUrl + "/video?640x480");
         }
 
         public static JpegFrame GetStreamFrame(Stream mjpegStream)

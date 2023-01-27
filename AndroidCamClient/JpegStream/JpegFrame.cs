@@ -1,5 +1,8 @@
 ﻿namespace AndroidCamClient.JpegStream
 {
+    /// <summary>
+    /// Byte array with Headers and Scan of a JPEG
+    /// </summary>
     public class JpegFrame
     {
         /// <summary>
@@ -17,7 +20,7 @@
             Scan = scan;
         }
 
-        public byte[] ToFullBytesImage()
+        public byte[] GetFullJpeg()
         {
             byte[] fullBytesImage = new byte[Headers.Length + Scan.Length + 2];
             Buffer.BlockCopy(Headers, 0, fullBytesImage, 0, Headers.Length);

@@ -67,19 +67,19 @@ namespace PhoneCamWithAndroidCam.ViewModels
             _phoneCamClient = new(ipAddress);
             sr.Close();
 
-            _pipelineFeederOutput = new(320, 240, 320 * 4, 10, EBufferPixelsFormat.Bgra32Bits);
+            _pipelineFeederOutput = new(640, 480, 640 * 4, 10, EBufferPixelsFormat.Bgra32Bits);
             ProcessPerformancesViewModel = processPerformancesViewModel;
 
             _duplicateBuffersThread = new(_pipelineFeederOutput);
-            MultipleBuffering outputBuffer1 = _duplicateBuffersThread.AddNewOutputBuffer();
+            //MultipleBuffering outputBuffer1 = _duplicateBuffersThread.AddNewOutputBuffer();
             MultipleBuffering outputBuffer2 = _duplicateBuffersThread.AddNewOutputBuffer();
-            MultipleBuffering outputBuffer3 = _duplicateBuffersThread.AddNewOutputBuffer();
+            //MultipleBuffering outputBuffer3 = _duplicateBuffersThread.AddNewOutputBuffer();
             MultipleBuffering outputBuffer4 = _duplicateBuffersThread.AddNewOutputBuffer();
-            ImageProcessingPipeline cannyImageProcessingPipeline = CannyImageProcessingPipeline.CreateCannyImageProcessingPipeline(outputBuffer1);
+            //ImageProcessingPipeline cannyImageProcessingPipeline = CannyImageProcessingPipeline.CreateCannyImageProcessingPipeline(outputBuffer1);
             ImageProcessingPipeline copyProcessingPipeline = CopyProcessingPipeline.CreateCopyProcessingPipeline(outputBuffer2);
-            ImageProcessingPipeline changingColorPipeline = ChangingColorImageProcessingPipeline.CreateChangingColorImageProcessingPipeline(outputBuffer3);
+            //ImageProcessingPipeline changingColorPipeline = ChangingColorImageProcessingPipeline.CreateChangingColorImageProcessingPipeline(outputBuffer3);
             ImageProcessingPipeline motionDetectionPipeline = MotionDetectionProcessingPipeline.CreateCannyImageProcessingPipeline(outputBuffer4);
-            _streamViews = new() { new(uiDispatcher, copyProcessingPipeline), new(uiDispatcher, cannyImageProcessingPipeline), new (uiDispatcher, changingColorPipeline), new StreamViewModel(uiDispatcher, motionDetectionPipeline) };
+            _streamViews = new() { new(uiDispatcher, copyProcessingPipeline), new(uiDispatcher, motionDetectionPipeline) }; 
         }
 
         public void LaunchStreaming()
@@ -137,6 +137,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
             {
                 streamView.Dispose();
             }
+            _phoneCamClient?.Dispose();
         }
     }
 }
