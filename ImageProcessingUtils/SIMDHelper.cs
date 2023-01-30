@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
 
 namespace ImageProcessingUtils
@@ -99,7 +100,7 @@ namespace ImageProcessingUtils
         /// <param name="src"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        public static void FillUnManagedBorder(byte[] src, int width, int height, int value, int borderThickness)
+        public static void FillUnManagedBorder(byte[] src, int width, int height, byte value, int borderThickness)
         {
             GCHandle pinnedSrc = GCHandle.Alloc(src, GCHandleType.Pinned);
             IntPtr ptrSrc = pinnedSrc.AddrOfPinnedObject();
@@ -125,7 +126,7 @@ namespace ImageProcessingUtils
         /// <param name="src"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        public static void FillUnManagedBorder(short[] src, int width, int height, int value, int borderThickness)
+        public static void FillUnManagedBorder(short[] src, int width, int height, byte value, int borderThickness)
         {
             GCHandle pinnedSrc = GCHandle.Alloc(src, GCHandleType.Pinned);
             IntPtr ptrSrc = pinnedSrc.AddrOfPinnedObject();
@@ -268,7 +269,7 @@ namespace ImageProcessingUtils
             pinnedResult.Free();
         }
 
-        public static void SimdSegmentationPropagate2x2(byte[] parentBuffer, int parentWidth, int parentHeight, int parentStride, byte[] childBuffer, int childWidth, int childHeight, int childStride, byte[] differenceBuffer, int differenceStride)
+        public static void SegmentationPropagate2x2(byte[] parentBuffer, int parentWidth, int parentHeight, int parentStride, byte[] childBuffer, int childWidth, int childHeight, int childStride, byte[] differenceBuffer, int differenceStride)
         {
             GCHandle pinnedParent = GCHandle.Alloc(parentBuffer, GCHandleType.Pinned);
             IntPtr parentPtr = pinnedParent.AddrOfPinnedObject();
@@ -284,6 +285,58 @@ namespace ImageProcessingUtils
             pinnedDifference.Free();
             pinnedParent.Free();
             pinnedChild.Free();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="src">Must bit a 8 bit thresholded picture</param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns>A default rectangle if there is no white points, or the bounding box</returns>
+        public static Rectangle? CalculateBoundingBox(byte[] src, int width, int height)
+        {
+            int minX = width - 1, minY = height - 1, maxX = 0, maxY = 0;
+            int length = width * height;
+            int x, y;
+            for(int i = 0; i < length; i++)
+            {
+                if (src[i] == 255)
+                {
+                    x = i % width;
+                    y = i / width;
+
+                    if (x < minX)
+                        minX = x;
+                    if (x > maxX)
+                        maxX = x;
+
+                    if (y < minY)
+                        minY = y;
+                    if (y > maxY)
+                        maxY = y;
+                }
+            }
+            if (minX == width - 1 && minY == height - 1 && maxX == 0 && maxY == 0 || maxX == minX || maxY == minY)
+                return null;
+            return new(minX, minY, maxX - minX, maxY - minY);
+        }
+
+        public static void DrawRectangleOnBgra32bits(byte[] src, int width, int height, int stride, byte r, byte g, byte b, Rectangle rectangle)
+        {
+            GCHandle pinnedSrc = GCHandle.Alloc(src, GCHandleType.Pinned);
+            IntPtr upperLeft = IntPtr.Add(pinnedSrc.AddrOfPinnedObject(), rectangle.Top * stride + rectangle.Left * 4);
+
+            SIMD.SimdFillBgra(upperLeft, stride, rectangle.Width, 1, b, g, r, 255);
+            SIMD.SimdFillBgra(upperLeft, stride, 1, rectangle.Height, b, g, r, 255);
+
+            IntPtr upperRight = IntPtr.Add(upperLeft, rectangle.Width * 4);
+            SIMD.SimdFillBgra(upperRight, stride, 1, rectangle.Height, b, g, r, 255);
+
+            IntPtr bottomLeft = IntPtr.Add(upperLeft, stride * rectangle.Height);
+            SIMD.SimdFillBgra(bottomLeft, stride, rectangle.Width, 1, b, g, r, 255);
+
+            pinnedSrc.Free();
         }
     }
 }

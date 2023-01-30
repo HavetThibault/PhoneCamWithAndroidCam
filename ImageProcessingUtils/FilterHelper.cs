@@ -84,7 +84,7 @@ namespace ImageProcessingUtils
         /// <param name="src"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        public static void FillUnManagedBorder(byte[] src, int width, int height, int value, int borderThickness)
+        public static void FillUnManagedBorder(byte[] src, int width, int height, byte value, int borderThickness)
         {
             GCHandle pinnedSrc = GCHandle.Alloc(src, GCHandleType.Pinned);
             IntPtr ptrSrc = pinnedSrc.AddrOfPinnedObject();
@@ -156,7 +156,7 @@ namespace ImageProcessingUtils
         /// <param name="src"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        public static void FillUnManagedBorder(byte[] src, int width, int height, int value)
+        public static void FillUnManagedBorder(byte[] src, int width, int height, byte value)
         {
             GCHandle pinnedSrc = GCHandle.Alloc(src, GCHandleType.Pinned);
             IntPtr ptrSrc = pinnedSrc.AddrOfPinnedObject();
@@ -176,7 +176,7 @@ namespace ImageProcessingUtils
             pinnedSrc.Free();
         }
 
-        public static void Fill(int[] src, int width, int height, int value)
+        public static void Fill(int[] src, int width, int height, byte value)
         {
             GCHandle pinnedSrc = GCHandle.Alloc(src, GCHandleType.Pinned);
             IntPtr ptrSrc = pinnedSrc.AddrOfPinnedObject();

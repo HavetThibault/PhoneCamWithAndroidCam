@@ -37,6 +37,8 @@ namespace PhoneCamWithAndroidCamTests
             byte[] grayBuffer = new byte[img.Height * img.Width];
             FilterHelper.CropBgra32BitsAndToGray(dest, canvas, stride, grayBuffer);
 
+            //SIMDHelper.SegmentationPropagate2x2();
+
             BitmapHelper.FromGrayBufferToBitmap(img, grayBuffer, img.Width, img.Height);
             img.Save(@"C:\Users\Thibault\Downloads\Save1.png");
             SIMD.UnloadAssembly();

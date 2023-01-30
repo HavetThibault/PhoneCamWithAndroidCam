@@ -41,24 +41,7 @@ namespace ImageProcessingUtils
 
         [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void SimdGrayToBgr(IntPtr gray, nint width, nint height, nint grayStride, IntPtr bgr, nint bgrStride);
-
-        [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void SimdInterleaveBgr(IntPtr bluePointer, nint blueStride, IntPtr greenPointer, nint greenStride, IntPtr redPointer, nint redStride, nint imageWidth, nint imageHeight,
-            IntPtr imagePointer, nint imageStride);
-
-        [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void SimdInterleaveBgra(IntPtr bluePointer, nint blueStride, IntPtr greenPointer, nint greenStride, IntPtr redPointer, nint redStride, IntPtr alphaPointer, nint alphaStride,
-            nint imageWidth, nint imageHeight, IntPtr imagePointer, nint imageStride);
-
-        [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void SimdYuv420pToBgra(IntPtr yPointer, nint yStride, IntPtr uPointer, nint uStride, IntPtr vPointer, nint vStride, nint width, nint height, IntPtr destPointer, nint destStride, byte alpha);
-
-        [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void SimdDeinterleaveUv(IntPtr uvPointer, nint uvstride, nint width, nint height, IntPtr uDestPointer, nint uStride, IntPtr vDestPointer, nint vStride);
-
-        [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr SimdGaussianBlurInit(int width, int height, int channels, ref float sigma, ref float epsilon);
-
+        
         [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void SimdGaussianBlurRun(IntPtr filter, IntPtr src, int srcStride, IntPtr dst, int dstStride);
 
@@ -102,7 +85,7 @@ namespace ImageProcessingUtils
         public static extern void SimdChangeColors(IntPtr src, int srcStride, int width, int height, IntPtr colors, IntPtr dst, int dstStride);
 
         [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void SimdFill(IntPtr dst, int stride, int width, int height, int pixelSize, int value);
+        public static extern void SimdFill(IntPtr dst, int stride, int width, int height, int pixelSize, byte value);
 
         [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void SimdBinarization(IntPtr src, nint srcStride, nint width, nint height, byte value, byte positive, byte negative, IntPtr dst, nint dstStride, nint ESimdCompareType);
@@ -111,7 +94,10 @@ namespace ImageProcessingUtils
         public static extern void SimdOperationBinary8u(IntPtr a, nint aStride, IntPtr b, nint bStride, nint width, nint height, nint channelCount, IntPtr dst, nint dstStride, nint ESimdOperationBinary8uType);
 
         [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void SimdSegmentationPropagate2x2(IntPtr parent, nint parentStride, nint width, nint height, IntPtr child, nint childStride, IntPtr difference, nint differenceStride, byte currentIndex, byte invalidIndex, byte emptyIndex, byte differenceThreshold);	
+        public static extern void SimdSegmentationPropagate2x2(IntPtr parent, nint parentStride, nint width, nint height, IntPtr child, nint childStride, IntPtr difference, nint differenceStride, byte currentIndex, byte invalidIndex, byte emptyIndex, byte differenceThreshold);
+
+        [DllImport(SIMD_LIBRARY_FILENAME, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void SimdFillBgra(IntPtr dst, nint stride, nint width, nint height, byte blue, byte green, byte red, byte alpha);
 
         public static void LoadAssembly()
         {
