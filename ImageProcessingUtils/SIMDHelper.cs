@@ -294,12 +294,12 @@ namespace ImageProcessingUtils
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <returns>A default rectangle if there is no white points, or the bounding box</returns>
-        public static Rectangle? CalculateBoundingBox(byte[] src, int width, int height)
+        public static Rectangle? CalculateBoundingBox(byte[] src, int width, int height, int beginning)
         {
             int minX = width - 1, minY = height - 1, maxX = 0, maxY = 0;
             int length = width * height;
             int x, y;
-            for(int i = 0; i < length; i++)
+            for(int i = beginning * width; i < length; i++)
             {
                 if (src[i] == 255)
                 {

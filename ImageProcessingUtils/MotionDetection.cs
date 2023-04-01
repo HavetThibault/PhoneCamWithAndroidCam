@@ -34,7 +34,7 @@ public class MotionDetection
         SIMDHelper.Threshold(_grayBuffer1, _grayBuffer2, _width, _height, 50, 255, 0);
         Buffer.BlockCopy(bytesSource, 0, bytesDestination, 0, bytesSource.Length);
 
-        Rectangle? ptrboundingBox = SIMDHelper.CalculateBoundingBox(_grayBuffer2, _width, _height);
+        Rectangle? ptrboundingBox = SIMDHelper.CalculateBoundingBox(_grayBuffer2, _width, _height, 16);
         if (ptrboundingBox is Rectangle boundingBox)
             SIMDHelper.DrawRectangleOnBgra32bits(bytesDestination, _width, _height, _width * 4, 0, 200, 0, boundingBox);
     }
