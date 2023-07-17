@@ -1,13 +1,14 @@
 ﻿using ImageProcessingUtils;
 using PhoneCamWithAndroidCam.ViewModels;
 using System.Windows;
+using Wpf.Common.Controls;
 
 namespace PhoneCamWithAndroidCam
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : BaseWindow
     {
         private MainViewModel _mainViewModel;
 

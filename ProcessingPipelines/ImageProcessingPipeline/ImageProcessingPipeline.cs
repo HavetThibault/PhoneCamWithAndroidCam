@@ -18,7 +18,7 @@ public class ImageProcessingPipeline
         ElementsProcessPerformances = new();
     }
 
-    public void AddPipelineElement(PipelineElement pipelineElement)
+    public void Add(PipelineElement pipelineElement)
     {
         if (_pipelineElements.Count > 0)
         {
@@ -31,7 +31,7 @@ public class ImageProcessingPipeline
         _pipelineElements.Add(pipelineElement);
     }
 
-    public void StartPipeline(CancellationTokenSource cancellationTokenSource)
+    public void Start(CancellationTokenSource cancellationTokenSource)
     {
         ElementsProcessPerformances.Clear();
         foreach (PipelineElement pipelineElement in _pipelineElements)

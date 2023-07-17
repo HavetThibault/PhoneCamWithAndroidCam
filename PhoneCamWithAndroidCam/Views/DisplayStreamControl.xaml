@@ -6,8 +6,7 @@
              xmlns:views="clr-namespace:PhoneCamWithAndroidCam.Views"
              xmlns:viewmodels="clr-namespace:PhoneCamWithAndroidCam.ViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="850"
-             Background="{StaticResource Theme.VeryDarkColor}">
+             d:DesignHeight="450" d:DesignWidth="850">
 
     <UserControl.Resources>
         <DataTemplate DataType = "{x:Type viewmodels:ProcessPerformancesViewModel}">

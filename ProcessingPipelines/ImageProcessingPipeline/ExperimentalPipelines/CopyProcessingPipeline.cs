@@ -9,7 +9,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
         public static ImageProcessingPipeline CreateCopyProcessingPipeline(MultipleBuffering inputBuffer)
         {
             ImageProcessingPipeline imageProcessingPipeline = new(inputBuffer);
-            imageProcessingPipeline.AddPipelineElement(new PipelineElement("Copy", Process, (MultipleBuffering)inputBuffer.Clone()));
+            imageProcessingPipeline.Add(new PipelineElement("Copy", Process, (MultipleBuffering)inputBuffer.Clone()));
             return imageProcessingPipeline;
         }
 

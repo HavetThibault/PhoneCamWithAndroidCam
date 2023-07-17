@@ -9,7 +9,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
         static public ImageProcessingPipeline CreateChangingColorImageProcessingPipeline(MultipleBuffering inputBuffer)
         {
             ImageProcessingPipeline imageProcessingPipeline = new(inputBuffer);
-            imageProcessingPipeline.AddPipelineElement(new PipelineElement("ChangingColor", Process, (MultipleBuffering)inputBuffer.Clone()));
+            imageProcessingPipeline.Add(new PipelineElement("ChangingColor", Process, (MultipleBuffering)inputBuffer.Clone()));
             return imageProcessingPipeline;
         }
 

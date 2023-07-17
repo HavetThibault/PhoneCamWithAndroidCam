@@ -8,10 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\CSharp\SDK\Helper.MVVM\Helper.MVVM.csproj" />
+    <ProjectReference Include="..\..\..\..\CSharp\SDK\Wpf.Common\Wpf.Common.csproj" />
     <ProjectReference Include="..\AndroidCamClient\AndroidCamClient.csproj" />
     <ProjectReference Include="..\ImageProcessingUtils\ImageProcessingUtils.csproj" />
     <ProjectReference Include="..\ProcessingPipelines\ProcessingPipelines.csproj" />
+    <ProjectReference Include="..\SDK\Helper.MVVM\Helper.MVVM.csproj" />
   </ItemGroup>
 
   <ItemGroup>

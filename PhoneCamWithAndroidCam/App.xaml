@@ -6,13 +6,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="./Styles/Themes/DarkTheme.xaml" />
-                <ResourceDictionary Source="./Styles/Button.xaml" />
-                <ResourceDictionary Source="./Styles/Color.xaml" />
-                <ResourceDictionary Source="./Styles/Datagrid.xaml" />
-                <ResourceDictionary Source="./Styles/Label.xaml" />
-                <ResourceDictionary Source="./Styles/TextBox.xaml" />
-                <ResourceDictionary Source="./Styles/ComboBox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Wpf.Common;component/Themes/Dark.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Wpf.Common;component/Common.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

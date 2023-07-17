@@ -12,7 +12,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
         public MedianImageProcessingPipeline(MultipleBuffering inputBuffer)
         {
             _imageProcessingPipeline = new(inputBuffer);
-            _imageProcessingPipeline.AddPipelineElement(new PipelineElement("MedianFiltering", Process, (MultipleBuffering)inputBuffer.Clone()));
+            _imageProcessingPipeline.Add(new PipelineElement("MedianFiltering", Process, (MultipleBuffering)inputBuffer.Clone()));
         }
 
         void Process(MultipleBuffering inputBuffer, MultipleBuffering outputBuffer, CancellationTokenSource cancellationTokenSource, ProcessPerformances processPerf)
@@ -34,7 +34,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
 
         public void Start(CancellationTokenSource cancellationTokenSource)
         {
-            _imageProcessingPipeline.StartPipeline(cancellationTokenSource);
+            _imageProcessingPipeline.Start(cancellationTokenSource);
         }
     }
 }

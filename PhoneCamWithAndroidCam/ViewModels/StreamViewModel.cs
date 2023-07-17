@@ -61,7 +61,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         {
             IsStreaming = true;
             _convertToRawJpegThreads = new(_imageProcessingPipeline.OutputBuffer, _convertToRawJpegOutput);
-            _imageProcessingPipeline.StartPipeline(cancellationTokenSource);
+            _imageProcessingPipeline.Start(cancellationTokenSource);
             _convertToRawJpegThreads.LaunchNewWorker(cancellationTokenSource);
             var refreshMainPicturethread = new Thread(RefreshMainPicture)
             {
