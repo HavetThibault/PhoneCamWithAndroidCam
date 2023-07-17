@@ -7,9 +7,17 @@ namespace AndroidCamClient
         private string _phoneUrl;
         private JpegStreamDecoder _jpegStreamDecoder;
 
+        public string PhoneIp
+        { 
+            set
+            {
+                _phoneUrl = $"http://{value}:4747";
+            }
+        }
+
         public PhoneCamClient(string phoneIp)
         {
-            _phoneUrl = $"http://{phoneIp}:4747";
+            PhoneIp = phoneIp;
             _jpegStreamDecoder = new();
         }
 

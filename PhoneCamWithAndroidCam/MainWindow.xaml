@@ -17,6 +17,6 @@
     </common:BaseWindow.Resources>
 
     <Grid>
-        <ContentControl Content="{Binding BigViewModel}"/>
+        <ContentControl Content="{Binding ActiveViewModel}"/>
     </Grid>
 </common:BaseWindow>

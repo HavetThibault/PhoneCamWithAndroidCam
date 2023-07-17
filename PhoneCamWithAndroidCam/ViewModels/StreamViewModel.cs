@@ -77,27 +77,26 @@ namespace PhoneCamWithAndroidCam.ViewModels
             {
                 Stopwatch watch = new();
                 int framesNbrInASecond = 0;
-                try
+                while (!cancellationTokenSource.IsCancellationRequested)
                 {
-                    while (!cancellationTokenSource.IsCancellationRequested)
+                    watch.Start();
+                    byte[]? frame = _convertToRawJpegOutput.GetRawFrame();
+
+                    if (frame == null)
+                        return;
+
+                    MemoryStream simpleStream = new(frame);
+                    _uiDispatcher.Invoke(UpdateMainPicture, simpleStream);
+
+                    watch.Stop();
+                    framesNbrInASecond++;
+                    if (watch.ElapsedMilliseconds > 1000)
                     {
-                        watch.Start();
-                        byte[] frame = _convertToRawJpegOutput.GetRawFrame();
-
-                        MemoryStream simpleStream = new(frame);
-                        _uiDispatcher.Invoke(UpdateMainPicture, simpleStream);
-
-                        watch.Stop();
-                        framesNbrInASecond++;
-                        if (watch.ElapsedMilliseconds > 1000)
-                        {
-                            watch.Reset();
-                            Fps = framesNbrInASecond;
-                            framesNbrInASecond = 0;
-                        }
+                        watch.Reset();
+                        Fps = framesNbrInASecond;
+                        framesNbrInASecond = 0;
                     }
                 }
-                catch { } // Catch if GetRawFrame throw exception
             }
         }
 

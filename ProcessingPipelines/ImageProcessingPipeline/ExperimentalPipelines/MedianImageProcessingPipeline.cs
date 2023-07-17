@@ -20,7 +20,10 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
             byte[] destBuffer = new byte[inputBuffer.Stride * inputBuffer.Height];
             while (!cancellationTokenSource.IsCancellationRequested)
             {
-                BitmapFrame frame = inputBuffer.WaitNextReaderBuffer();
+                BitmapFrame? frame = inputBuffer.WaitNextReaderBuffer();
+
+                if (frame is null)
+                    return;
                
                 SIMDHelper.MedianFilter(frame.Data, inputBuffer.Width, inputBuffer.Height, inputBuffer.Stride, 4, destBuffer);
 

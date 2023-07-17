@@ -32,10 +32,14 @@ namespace ProcessingPipelines.PipelineUtils
             {
                 _unReadBufferNbr = value;
 
-                if (value == 1)
-                    _canReadBuffer.Set();
-                else if (value == BufferNbr - 1)
-                    _canWriteBuffer.Set();
+                try 
+                { 
+                    if (value == 1)
+                        _canReadBuffer.Set();
+                    else if (value == BufferNbr - 1)
+                        _canWriteBuffer.Set();
+                }
+                catch (ObjectDisposedException) { }
             }
         }
 
@@ -68,7 +72,7 @@ namespace ProcessingPipelines.PipelineUtils
             _canWriteBuffer = new(true);
         }
 
-        public BitmapFrame GetNextReaderBuffer()
+        public BitmapFrame? GetNextReaderBuffer()
         {
             lock (_bufferPointerLock)
             {
@@ -82,19 +86,22 @@ namespace ProcessingPipelines.PipelineUtils
             }
         }
 
-        public BitmapFrame WaitNextReaderBuffer()
+        public BitmapFrame? WaitNextReaderBuffer()
         {
             while (true)
             {
-                BitmapFrame nextReaderBuffer = GetNextReaderBuffer();
+                BitmapFrame? nextReaderBuffer = GetNextReaderBuffer();
 
                 if (nextReaderBuffer != null)
                 {
                     Monitor.Enter(nextReaderBuffer);
                     return nextReaderBuffer;
-                }   
-
-                while (!_canReadBuffer.WaitOne(100)) ;
+                }
+                try
+                {
+                    while (!_canReadBuffer.WaitOne(100)) ;
+                }
+                catch(ObjectDisposedException) { return null; }
             }
         }
 
@@ -163,8 +170,11 @@ namespace ProcessingPipelines.PipelineUtils
             {
                 if (WriteBuffer(newBuffer, associatedBitmap))
                     return;
-
-                while (!_canWriteBuffer.WaitOne(100)) ;
+                try 
+                { 
+                    while (!_canWriteBuffer.WaitOne(100)) ;
+                }
+                catch (ObjectDisposedException) { return; }
             }
         }
 
@@ -175,7 +185,11 @@ namespace ProcessingPipelines.PipelineUtils
                 if (!WriteBuffer(newBuffer))
                     return;
 
-                _canWriteBuffer.WaitOne();
+                try
+                {
+                    _canWriteBuffer.WaitOne();
+                }
+                catch(ObjectDisposedException) { return; }
             }
         }
 

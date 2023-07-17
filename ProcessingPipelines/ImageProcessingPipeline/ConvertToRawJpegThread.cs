@@ -46,8 +46,11 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                     Bitmap bmp;
                     MemoryStream cannyStream;
                     waitingReadTimeWatch.Start();
-                    BitmapFrame bitmapFrame = InputMultipleBuffering.WaitNextReaderBuffer();
+                    BitmapFrame? bitmapFrame = InputMultipleBuffering.WaitNextReaderBuffer();
                     waitingReadTimeWatch.Stop();
+
+                    if (bitmapFrame is null)
+                        return;
 
                     processTimeWatch.Start();
  

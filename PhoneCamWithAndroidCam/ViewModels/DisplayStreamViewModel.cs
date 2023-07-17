@@ -18,6 +18,8 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
     private int _fps = 0;
     private bool _isStreaming = false;
     private PhoneCamClient _phoneCamClient;
+    private string _phoneIp;
+    private bool _isPhoneIpChangeable = true;
     private CancellationTokenSource _pipelineCancellationTokenSource;
     private PipelineFeederPipeline _pipelineFeeder;
     private DuplicateBuffersThread _duplicateBuffersThread;
@@ -42,6 +44,22 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
         set => SetProperty(ref _fps, value);
     }
 
+    public string PhoneIp
+    {
+        get => _phoneIp;
+        set
+        {
+            SetProperty(ref _phoneIp, value);
+            _phoneCamClient.PhoneIp = _phoneIp;
+        }
+    }
+
+    public bool IsPhoneIpChangeable
+    {
+        get => _isPhoneIpChangeable;
+        set => SetProperty(ref _isPhoneIpChangeable, value);
+    }
+
     public bool IsStreaming
     {
         get => _isStreaming;
@@ -61,11 +79,8 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
         CommandLaunchStreaming = new RelayCommand(LaunchStreaming, CanLaunchStreaming);
         CommandStopStreaming = new RelayCommand(StopStreaming, CanStopStreaming);
 
-        FileStream fs = new("./Configuration.txt", FileMode.Open);
-        StreamReader sr = new(fs);
-        string ipAddress = sr.ReadLine();
-        _phoneCamClient = new(ipAddress);
-        sr.Close();
+        _phoneIp = "192.168.0.0";
+        _phoneCamClient = new(_phoneIp);
 
         _pipelineFeederOutput = new(640, 480, 640 * 4, 10, EBufferPixelsFormat.Bgra32Bits);
         ProcessPerformancesViewModel = processPerformancesViewModel;
@@ -90,6 +105,7 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
         _pipelineFeeder.StartFeeding(_pipelineCancellationTokenSource);
         _duplicateBuffersThread.Start(_pipelineCancellationTokenSource);
         _refreshProcessTimer = new Timer(RefreshProcessTime, null, 400, 1000);
+        IsPhoneIpChangeable = false;
         foreach(var streamView in _streamViews)
         {
             streamView.LaunchStreaming(_pipelineCancellationTokenSource);
@@ -106,6 +122,7 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
         IsStreaming = false;
         _pipelineCancellationTokenSource.Cancel();
         _refreshProcessTimer.Dispose();
+        IsPhoneIpChangeable = true;
         foreach (var streamView in _streamViews)
         {
             streamView.StopStreaming();

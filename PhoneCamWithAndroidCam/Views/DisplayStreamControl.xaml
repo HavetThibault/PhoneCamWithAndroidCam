@@ -5,36 +5,74 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:views="clr-namespace:PhoneCamWithAndroidCam.Views"
              xmlns:viewmodels="clr-namespace:PhoneCamWithAndroidCam.ViewModels"
+             xmlns:controls="http://schemas.thibault/dev"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="850">
+             d:DesignHeight="450" d:DesignWidth="850"
+             d:DataContext="{d:DesignInstance viewmodels:DisplayStreamViewModel}">
 
     <UserControl.Resources>
-        <DataTemplate DataType = "{x:Type viewmodels:ProcessPerformancesViewModel}">
-            <views:ProcessPerformancesControl/>
-        </DataTemplate>
-
-        <DataTemplate  DataType = "{x:Type viewmodels:StreamViewModel}">
+        <DataTemplate DataType="{x:Type viewmodels:StreamViewModel}">
             <views:StreamControl/>
         </DataTemplate>
     </UserControl.Resources>
     
     <Grid Background="{Binding}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2.5*"/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
 
-        <ScrollViewer>
-            <ItemsControl Grid.Column="0" ItemsSource="{Binding StreamViews}"/>
-        </ScrollViewer>
-        <StackPanel Grid.Column="1">
-            <Button Command="{Binding CommandLaunchStreaming}" Width="120" Height="40" Content="Launch stream" Margin="5"/>
-            <Button Command="{Binding CommandStopStreaming}" Width="120" Height="40" Content="Stop stream" Margin="5"/>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Frames per seconds"/>
-                <Label Content="{Binding Fps}" Margin="5" VerticalAlignment="Center"/>
-            </StackPanel>
-            <ContentControl Content="{Binding ProcessPerformancesViewModel}"/>
-        </StackPanel>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Menu>
+            <MenuItem Header="Pipelines">
+                <MenuItem 
+                    Command="{Binding CommandLaunchStreaming}"
+                    Header="Start"/>
+                <MenuItem
+                    Command="{Binding CommandStopStreaming}"
+                    Header="Stop"/>
+            </MenuItem>
+        </Menu>
+        
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <controls:ContainerBorder Grid.Column="0">
+                <StackPanel>
+                    <Label Content="Phone stream"/>
+                    <Separator Height="2"/>
+                    <StackPanel
+                        Orientation="Horizontal">
+                        <Label 
+                            Content="Ip:"
+                            VerticalContentAlignment="Center"/>
+                        <controls:ClickSelectTextBox 
+                            Text="{Binding PhoneIp}" 
+                            Margin="5,1,5,0"
+                            Height="25"
+                            Width="100"
+                            IsEnabled="{Binding IsPhoneIpChangeable}"/>
+                    </StackPanel>
+                    <views:ProcessPerformancesControl DataContext="{Binding ProcessPerformancesViewModel}"/>
+                    <StackPanel
+                        Orientation="Horizontal">
+                        <Label 
+                            Content="Fps:"/>
+                        <Label 
+                            Content="{Binding Fps}" 
+                            Margin="5,0,5,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </controls:ContainerBorder>
+
+            <controls:ContainerBorder Grid.Column="1">
+                <ScrollViewer>
+                    <views:StreamControl DataContext="{Binding StreamViews}"/>
+                </ScrollViewer>
+            </controls:ContainerBorder>
+        </Grid>
     </Grid>
 </UserControl>

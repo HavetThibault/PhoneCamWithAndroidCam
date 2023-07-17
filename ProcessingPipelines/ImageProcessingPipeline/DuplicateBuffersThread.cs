@@ -38,7 +38,11 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 while (!cancellationTokenSource.IsCancellationRequested)
                 {
                     BitmapFrame copiedBmpFrame;
-                    BitmapFrame bmpFrame = InputMultipleBuffering.WaitNextReaderBuffer();
+                    BitmapFrame? bmpFrame = InputMultipleBuffering.WaitNextReaderBuffer();
+
+                    if (bmpFrame is null)
+                        return;
+
                     copiedBmpFrame = (BitmapFrame)bmpFrame.Clone();
                     Monitor.Exit(bmpFrame);
 

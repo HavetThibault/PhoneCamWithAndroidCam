@@ -22,8 +22,11 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
             while (!cancellationTokenSource.IsCancellationRequested)
             {
                 waitingReadTimeWatch.Start();
-                BitmapFrame frame = inputBuffer.WaitNextReaderBuffer();
+                BitmapFrame? frame = inputBuffer.WaitNextReaderBuffer();
                 waitingReadTimeWatch.Stop();
+
+                if (frame is null)
+                    return;
 
                 processTimeWatch.Start();
                 

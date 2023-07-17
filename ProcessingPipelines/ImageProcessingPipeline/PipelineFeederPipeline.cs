@@ -119,37 +119,36 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 Stopwatch waitingReadTimeWatch = new();
                 Stopwatch waitingWriteTimeWatch = new();
                 Stopwatch processTimeWatch = new();
-                try
+                while (!cancellationTokenSource.IsCancellationRequested)
                 {
-                    while (!cancellationTokenSource.IsCancellationRequested)
+                    waitingReadTimeWatch.Start();
+                    MemoryStream? jpegMemoryStream = RawJpegBuffering.GetRawFrame();
+                    waitingReadTimeWatch.Stop();
+
+                    if (jpegMemoryStream == null)
+                        return;
+
+                    processTimeWatch.Start();
+                    var bmpFrame = new Bitmap(jpegMemoryStream);
+                    processTimeWatch.Stop();
+
+                    waitingWriteTimeWatch.Start();
+                    Bitmaps.AddRawFrame(bmpFrame);
+                    waitingWriteTimeWatch.Stop();
+
+                    if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                     {
-                        waitingReadTimeWatch.Start();
-                        MemoryStream jpegMemoryStream = RawJpegBuffering.GetRawFrame();
-                        waitingReadTimeWatch.Stop();
-
-                        processTimeWatch.Start();
-                        var bmpFrame = new Bitmap(jpegMemoryStream);
-                        processTimeWatch.Stop();
-
-                        waitingWriteTimeWatch.Start();
-                        Bitmaps.AddRawFrame(bmpFrame);
-                        waitingWriteTimeWatch.Stop();
-
-                        if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
+                        lock (ProcessRawJpegPerf)
                         {
-                            lock (ProcessRawJpegPerf)
-                            {
-                                ProcessRawJpegPerf.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
-                                ProcessRawJpegPerf.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
-                                ProcessRawJpegPerf.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
-                            }
-                            waitingReadTimeWatch.Reset();
-                            processTimeWatch.Reset();
-                            waitingWriteTimeWatch.Reset();
+                            ProcessRawJpegPerf.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
+                            ProcessRawJpegPerf.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
+                            ProcessRawJpegPerf.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
                         }
+                        waitingReadTimeWatch.Reset();
+                        processTimeWatch.Reset();
+                        waitingWriteTimeWatch.Reset();
                     }
                 }
-                catch { } // For 'RawJpegBuffering.GetRawFrame();'
             }
         }
 
@@ -165,38 +164,37 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 Stopwatch waitingReadTimeWatch = new();
                 Stopwatch waitingWriteTimeWatch = new();
                 Stopwatch processTimeWatch = new();
-                try
+                while (!cancellationTokenSource.IsCancellationRequested)
                 {
-                    while (!cancellationTokenSource.IsCancellationRequested)
+                    waitingReadTimeWatch.Start();
+                    Bitmap? bmp = Bitmaps.GetRawFrame();
+                    waitingReadTimeWatch.Stop();
+
+                    if (bmp == null)
+                        return;
+
+                    processTimeWatch.Start();
+                    lock(bmp)
+                        BitmapHelper.ToByteArray(bmp, out _, pixelsBuffer);
+                    processTimeWatch.Stop();
+
+                    waitingWriteTimeWatch.Start();
+                    OutputMultipleBuffering.WaitWriteBuffer(pixelsBuffer, bmp);
+                    waitingWriteTimeWatch.Stop();
+
+                    if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                     {
-                        waitingReadTimeWatch.Start();
-                        Bitmap bmp = Bitmaps.GetRawFrame();
-                        waitingReadTimeWatch.Stop();
-
-                        processTimeWatch.Start();
-                        lock(bmp)
-                            BitmapHelper.ToByteArray(bmp, out _, pixelsBuffer);
-                        processTimeWatch.Stop();
-
-                        waitingWriteTimeWatch.Start();
-                        OutputMultipleBuffering.WaitWriteBuffer(pixelsBuffer, bmp);
-                        waitingWriteTimeWatch.Stop();
-
-                        if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
+                        lock (ProcessBitmapsPerf)
                         {
-                            lock (ProcessBitmapsPerf)
-                            {
-                                ProcessBitmapsPerf.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
-                                ProcessBitmapsPerf.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
-                                ProcessBitmapsPerf.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
-                            }
-                            waitingReadTimeWatch.Reset();
-                            processTimeWatch.Reset();
-                            waitingWriteTimeWatch.Reset();
+                            ProcessBitmapsPerf.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
+                            ProcessBitmapsPerf.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
+                            ProcessBitmapsPerf.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
                         }
+                        waitingReadTimeWatch.Reset();
+                        processTimeWatch.Reset();
+                        waitingWriteTimeWatch.Reset();
                     }
                 }
-                catch { } // For Bitmaps.GetRawFrame();
             }
         }
 

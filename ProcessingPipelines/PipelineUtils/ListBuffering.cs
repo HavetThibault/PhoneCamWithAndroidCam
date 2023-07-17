@@ -18,10 +18,14 @@
             {
                 _unReadElementNbr = value;
 
-                if (value == 1)
-                    _canRetreive.Set();
-                else if (value == ElementsNbr - 1)
-                    _canAdd.Set();
+                try
+                {
+                    if (value == 1)
+                        _canRetreive.Set();
+                    else if (value == ElementsNbr - 1)
+                        _canAdd.Set();
+                }
+                catch (ObjectDisposedException) { }
             }
         }
 
@@ -35,7 +39,6 @@
             _canAdd = new(true);
         }
 
-        /// <exception cref="ObjectDisposedException"/>
         public void AddRawFrame(T frameBuffer)
         {
             bool cancelRequired = false;
@@ -55,28 +58,34 @@
                 {
                     while (!_canAdd.WaitOne(100)) ;
                 }
-                catch { cancelRequired = true; }
+                catch (ObjectDisposedException) { cancelRequired = true; }
             }
         }
 
-        /// <exception cref="ObjectDisposedException"/>
-        public T GetRawFrame()
+        /// <summary>
+        /// Returns the next raw frame, or null if this object has been disposed
+        /// </summary>
+        /// <returns></returns>
+        public T? GetRawFrame()
         {
-            while (true)
+            try
             {
-                lock (_elementsLock)
+                while (true)
                 {
-                    if (_unReadElementNbr > 0)
+                    lock (_elementsLock)
                     {
-                        T oldestBuffer = BytesBuffers.First();
-                        BytesBuffers.Remove(oldestBuffer);
-                        UnReadBufferNbr--;
-                        return oldestBuffer;
+                        if (_unReadElementNbr > 0)
+                        {
+                            T oldestBuffer = BytesBuffers.First();
+                            BytesBuffers.Remove(oldestBuffer);
+                            UnReadBufferNbr--;
+                            return oldestBuffer;
+                        }
                     }
+                    while (!_canRetreive.WaitOne(100)) ;
                 }
-
-                while (!_canRetreive.WaitOne(100)) ;
             }
+            catch (ObjectDisposedException) { return default; }
         }
 
         public void Dispose()
