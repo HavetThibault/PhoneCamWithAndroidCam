@@ -1,5 +1,5 @@
 ﻿using System.Windows.Threading;
-using WpfUtils;
+using Helper.MVVM;
 
 namespace PhoneCamWithAndroidCam.ViewModels
 {

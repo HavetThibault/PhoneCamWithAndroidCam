@@ -1,5 +1,5 @@
 ﻿using ProcessingPipelines.PipelineUtils;
-using WpfUtils;
+using Helper.MVVM;
 
 namespace PhoneCamWithAndroidCam.Models;
 

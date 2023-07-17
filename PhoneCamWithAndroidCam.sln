@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhoneCamWithAndroidCam", "P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AndroidCamClient", "AndroidCamClient\AndroidCamClient.csproj", "{53031269-6655-429A-B424-79F8B5DBABFB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfUtils", "WpfUtils\WpfUtils.csproj", "{67FFC3D8-E2E4-44F1-A1F4-36E95DEF99F6}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImageProcessingUtils", "ImageProcessingUtils\ImageProcessingUtils.csproj", "{639813F9-F2A0-416E-8C1E-71914FCCBACE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhoneCamWithAndroidCamTests", "PhoneCamWithAndroidCamTests\PhoneCamWithAndroidCamTests.csproj", "{3ECB42D3-80CB-4384-866B-783DB61A3CD4}"
@@ -21,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helper.MVVM", "..\..\..\CSharp\SDK\Helper.MVVM\Helper.MVVM.csproj", "{3BD39491-90FB-4059-B839-1CE705BE1E18}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,14 +46,6 @@ Global
 		{53031269-6655-429A-B424-79F8B5DBABFB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{53031269-6655-429A-B424-79F8B5DBABFB}.Release|x64.ActiveCfg = Release|Any CPU
 		{53031269-6655-429A-B424-79F8B5DBABFB}.Release|x64.Build.0 = Release|Any CPU
-		{67FFC3D8-E2E4-44F1-A1F4-36E95DEF99F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{67FFC3D8-E2E4-44F1-A1F4-36E95DEF99F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{67FFC3D8-E2E4-44F1-A1F4-36E95DEF99F6}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{67FFC3D8-E2E4-44F1-A1F4-36E95DEF99F6}.Debug|x64.Build.0 = Debug|Any CPU
-		{67FFC3D8-E2E4-44F1-A1F4-36E95DEF99F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{67FFC3D8-E2E4-44F1-A1F4-36E95DEF99F6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{67FFC3D8-E2E4-44F1-A1F4-36E95DEF99F6}.Release|x64.ActiveCfg = Release|Any CPU
-		{67FFC3D8-E2E4-44F1-A1F4-36E95DEF99F6}.Release|x64.Build.0 = Release|Any CPU
 		{639813F9-F2A0-416E-8C1E-71914FCCBACE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{639813F9-F2A0-416E-8C1E-71914FCCBACE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{639813F9-F2A0-416E-8C1E-71914FCCBACE}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -86,6 +78,14 @@ Global
 		{E4A63805-E3A4-4C1B-9679-CC9B367D1959}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E4A63805-E3A4-4C1B-9679-CC9B367D1959}.Release|x64.ActiveCfg = Release|Any CPU
 		{E4A63805-E3A4-4C1B-9679-CC9B367D1959}.Release|x64.Build.0 = Release|Any CPU
+		{3BD39491-90FB-4059-B839-1CE705BE1E18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BD39491-90FB-4059-B839-1CE705BE1E18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BD39491-90FB-4059-B839-1CE705BE1E18}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3BD39491-90FB-4059-B839-1CE705BE1E18}.Debug|x64.Build.0 = Debug|Any CPU
+		{3BD39491-90FB-4059-B839-1CE705BE1E18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BD39491-90FB-4059-B839-1CE705BE1E18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BD39491-90FB-4059-B839-1CE705BE1E18}.Release|x64.ActiveCfg = Release|Any CPU
+		{3BD39491-90FB-4059-B839-1CE705BE1E18}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

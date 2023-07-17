@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Threading;
-using WpfUtils;
+using Helper.MVVM;
 
 namespace PhoneCamWithAndroidCam.ViewModels
 {
@@ -117,7 +117,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
         private void UpdateMainPicture(MemoryStream memoryStream)
         {
-            MainImageSource = Utils.Convert(memoryStream); 
+            MainImageSource = BitmapExtension.Convert(memoryStream); 
         }
 
         public void Dispose()
