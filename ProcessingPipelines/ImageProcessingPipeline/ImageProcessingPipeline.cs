@@ -40,4 +40,11 @@ public class ImageProcessingPipeline
             pipelineElement.LaunchNewWorker(cancellationTokenSource);
         }
     }
+
+    public void Dispose()
+    {
+        InputBuffer?.Dispose();
+        foreach (var pipelineElement in _pipelineElements)
+            pipelineElement.Dispose();
+    }
 }

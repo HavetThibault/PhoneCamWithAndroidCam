@@ -16,27 +16,21 @@ namespace PhoneCamWithAndroidCam.ViewModels;
 public class DisplayStreamViewModel : BindableClass, IDisposable
 {
     private int _fps = 0;
-    private bool _isStreaming = false;
+    
     private PhoneCamClient _phoneCamClient;
     private string _phoneIp;
+
+    private bool _isStreaming = false;
     private bool _isPhoneIpChangeable = true;
+
     private CancellationTokenSource _pipelineCancellationTokenSource;
-    private PipelineFeederPipeline _pipelineFeeder;
-    private DuplicateBuffersThread _duplicateBuffersThread;
-   
-    private MultipleBuffering _pipelineFeederOutput;
+
+    private FeederPipeline _feederPipeline;
+    private MultipleBuffering _feederPipelineOutput;
 
     private Timer _refreshProcessTimer;
 
-    private List<StreamViewModel> _streamViews;
-
     public ProcessPerformancesViewModel ProcessPerformancesViewModel { get; set; }
-
-    public List<StreamViewModel> StreamViews
-    {
-        get => _streamViews;
-        set => SetProperty(ref _streamViews, value);
-    }
 
     public int Fps
     {
@@ -71,6 +65,8 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
         }
     }
 
+    public StreamsViewModel StreamsViewModel { get; set; }
+
     public RelayCommand CommandLaunchStreaming { get; set; }
     public RelayCommand CommandStopStreaming { get; set; }
 
@@ -82,34 +78,24 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
         _phoneIp = "192.168.0.0";
         _phoneCamClient = new(_phoneIp);
 
-        _pipelineFeederOutput = new(640, 480, 640 * 4, 10, EBufferPixelsFormat.Bgra32Bits);
         ProcessPerformancesViewModel = processPerformancesViewModel;
 
-        _duplicateBuffersThread = new(_pipelineFeederOutput);
-        MultipleBuffering outputBuffer1 = _duplicateBuffersThread.AddNewOutputBuffer();
-        MultipleBuffering outputBuffer2 = _duplicateBuffersThread.AddNewOutputBuffer();
-        //MultipleBuffering outputBuffer3 = _duplicateBuffersThread.AddNewOutputBuffer();
-        MultipleBuffering outputBuffer4 = _duplicateBuffersThread.AddNewOutputBuffer();
-        ImageProcessingPipeline cannyImageProcessingPipeline = CannyImageProcessingPipeline.CreateCannyImageProcessingPipeline(outputBuffer1);
-        ImageProcessingPipeline copyProcessingPipeline = CopyProcessingPipeline.CreateCopyProcessingPipeline(outputBuffer2);
-        //ImageProcessingPipeline changingColorPipeline = ChangingColorImageProcessingPipeline.CreateChangingColorImageProcessingPipeline(outputBuffer3);
-        ImageProcessingPipeline motionDetectionPipeline = MotionDetectionProcessingPipeline.CreateCannyImageProcessingPipeline(outputBuffer4);
-        _streamViews = new() { new(uiDispatcher, copyProcessingPipeline), new (uiDispatcher, cannyImageProcessingPipeline), new(uiDispatcher, motionDetectionPipeline) }; 
+        _feederPipelineOutput = new(640, 480, 640 * 4, 10, EBufferPixelsFormat.Bgra32Bits);
+        StreamsViewModel = new(uiDispatcher, _feederPipelineOutput);
     }
 
     public void LaunchStreaming(object parameter)
     {
         IsStreaming = true;
-        _pipelineFeeder = new PipelineFeederPipeline(_phoneCamClient, _pipelineFeederOutput);
-        _pipelineCancellationTokenSource = new();
-        _pipelineFeeder.StartFeeding(_pipelineCancellationTokenSource);
-        _duplicateBuffersThread.Start(_pipelineCancellationTokenSource);
-        _refreshProcessTimer = new Timer(RefreshProcessTime, null, 400, 1000);
         IsPhoneIpChangeable = false;
-        foreach(var streamView in _streamViews)
-        {
-            streamView.LaunchStreaming(_pipelineCancellationTokenSource);
-        }
+
+        _feederPipeline = new FeederPipeline(_phoneCamClient, _feederPipelineOutput);
+        _pipelineCancellationTokenSource = new();
+        _feederPipeline.StartFeeding(_pipelineCancellationTokenSource);
+
+        StreamsViewModel.LaunchStreaming(_pipelineCancellationTokenSource);
+
+        _refreshProcessTimer = new Timer(RefreshProcessTime, null, 400, 1000);
     }
 
     public bool CanLaunchStreaming(object parameter)
@@ -120,13 +106,11 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
     public void StopStreaming(object parameter)
     {
         IsStreaming = false;
+        IsPhoneIpChangeable = true;
+
         _pipelineCancellationTokenSource.Cancel();
         _refreshProcessTimer.Dispose();
-        IsPhoneIpChangeable = true;
-        foreach (var streamView in _streamViews)
-        {
-            streamView.StopStreaming();
-        }
+        StreamsViewModel.StopStreaming();
     }
 
     public bool CanStopStreaming(object parameter)
@@ -138,9 +122,9 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
     {
         List<ProcessPerformances> perfsList = new()
         {
-            _pipelineFeeder.ProcessRawJpegPerf,
-            _pipelineFeeder.ProcessRawJpegStreamPerf,
-            _pipelineFeeder.ProcessBitmapsPerf
+            _feederPipeline.ProcessRawJpegPerf,
+            _feederPipeline.ProcessRawJpegStreamPerf,
+            _feederPipeline.ProcessBitmapsPerf
         };
 
         ProcessPerformancesViewModel.UpdatePerformances(perfsList);
@@ -148,12 +132,9 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
 
     public void Dispose()
     {
-        _pipelineFeeder?.Dispose();
-        _pipelineFeederOutput?.Dispose();
-        foreach (var streamView in _streamViews)
-        {
-            streamView.Dispose();
-        }
+        _feederPipeline?.Dispose();
+        _feederPipelineOutput?.Dispose();
+        StreamsViewModel.Dispose();
         _phoneCamClient?.Dispose();
     }
 }

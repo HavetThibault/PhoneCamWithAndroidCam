@@ -43,4 +43,10 @@ public class PipelineElement
             _process.Invoke(InputMultipleBuffering, OutputMultipleBuffering, cancellationTokenSource, ProcessPerformances);
         }
     }
+
+    public void Dispose()
+    {
+        InputMultipleBuffering?.Dispose();
+        OutputMultipleBuffering?.Dispose();
+    }
 }

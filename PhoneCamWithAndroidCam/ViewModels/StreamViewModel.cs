@@ -121,8 +121,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
         public void Dispose()
         {
-            _imageProcessingPipeline.InputBuffer?.Dispose();
-            _imageProcessingPipeline.OutputBuffer?.Dispose();
+            _imageProcessingPipeline?.Dispose();
             _convertToRawJpegOutput?.Dispose();
         }
     }

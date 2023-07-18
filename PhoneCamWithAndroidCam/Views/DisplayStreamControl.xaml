@@ -12,12 +12,11 @@
 
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type viewmodels:StreamViewModel}">
-            <views:StreamControl/>
+            <views:StreamsView/>
         </DataTemplate>
     </UserControl.Resources>
-    
-    <Grid Background="{Binding}">
 
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
             <RowDefinition Height="*"/>
@@ -69,9 +68,8 @@
             </controls:ContainerBorder>
 
             <controls:ContainerBorder Grid.Column="1">
-                <ScrollViewer>
-                    <views:StreamControl DataContext="{Binding StreamViews}"/>
-                </ScrollViewer>
+                <views:StreamsView 
+                        DataContext="{Binding StreamsViewModel}"/>
             </controls:ContainerBorder>
         </Grid>
     </Grid>
