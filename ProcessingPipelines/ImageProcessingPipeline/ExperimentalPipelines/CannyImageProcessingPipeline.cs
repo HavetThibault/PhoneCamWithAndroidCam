@@ -6,21 +6,22 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
 {
     public static class CannyImageProcessingPipeline
     {
-        public static ImageProcessingPipeline CreateCannyImageProcessingPipeline(MultipleBuffering inputBuffer)
+        public static ImageProcessingPipeline GetInstance(ProducerConsumerBuffers inputBuffer)
         {
             ImageProcessingPipeline imageProcessingPipeline = new(inputBuffer);
-            imageProcessingPipeline.Add(new PipelineElement("CannyEdgeDetection", Process, (MultipleBuffering)inputBuffer.Clone()));
+            imageProcessingPipeline.Add(new PipelineElement("CannyEdgeDetection", Process, (ProducerConsumerBuffers)inputBuffer.Clone()));
             return imageProcessingPipeline;
         }
 
-        static void Process(MultipleBuffering inputBuffer, MultipleBuffering outputBuffer, CancellationTokenSource cancellationTokenSource, ProcessPerformances processPerf)
+        static void Process(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer, 
+            CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken, ProcessPerformances processPerf)
         {
             byte[] destBuffer = new byte[inputBuffer.Stride * inputBuffer.Height];
             CannyEdgeDetection cannyEdgeDetection = new(inputBuffer.Width, inputBuffer.Height);
             Stopwatch waitingReadTimeWatch = new();
             Stopwatch waitingWriteTimeWatch = new();
             Stopwatch processTimeWatch = new();
-            while (!cancellationTokenSource.IsCancellationRequested)
+            while (!globalCancellationToken.IsCancellationRequested && !specificCancellationToken.IsCancellationRequested)
             {
                 waitingReadTimeWatch.Start();
                 BitmapFrame? frame = inputBuffer.WaitNextReaderBuffer();

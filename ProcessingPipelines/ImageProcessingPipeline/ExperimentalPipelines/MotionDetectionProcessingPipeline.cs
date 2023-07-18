@@ -6,14 +6,15 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
 {
     public class MotionDetectionProcessingPipeline
     {
-        public static ImageProcessingPipeline CreateCannyImageProcessingPipeline(MultipleBuffering inputBuffer)
+        public static ImageProcessingPipeline GetInstance(ProducerConsumerBuffers inputBuffer)
         {
             ImageProcessingPipeline imageProcessingPipeline = new(inputBuffer);
-            imageProcessingPipeline.Add(new PipelineElement("Motion detection", Process, (MultipleBuffering)inputBuffer.Clone()));
+            imageProcessingPipeline.Add(new PipelineElement("Motion detection", Process, (ProducerConsumerBuffers)inputBuffer.Clone()));
             return imageProcessingPipeline;
         }
 
-        static void Process(MultipleBuffering inputBuffer, MultipleBuffering outputBuffer, CancellationTokenSource cancellationTokenSource, ProcessPerformances processPerf)
+        static void Process(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer, 
+            CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken, ProcessPerformances processPerf)
         {
             byte[] destBuffer = new byte[inputBuffer.Stride * inputBuffer.Height];
             byte[] lastFrameBuffer = new byte[inputBuffer.Stride * inputBuffer.Height];
@@ -21,7 +22,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
             Stopwatch waitingReadTimeWatch = new();
             Stopwatch waitingWriteTimeWatch = new();
             Stopwatch processTimeWatch = new();
-            while (!cancellationTokenSource.IsCancellationRequested)
+            while (!globalCancellationToken.IsCancellationRequested && !specificCancellationToken.IsCancellationRequested)
             {
                 waitingReadTimeWatch.Start();
                 BitmapFrame? frame = inputBuffer.WaitNextReaderBuffer();

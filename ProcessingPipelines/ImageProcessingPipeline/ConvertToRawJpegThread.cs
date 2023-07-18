@@ -15,11 +15,11 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         private int _height;
         private int _width;
 
-        public MultipleBuffering InputMultipleBuffering { get; set; }
-        public ListBuffering<byte[]> OutputMultipleBuffering { get; set; }
+        public ProducerConsumerBuffers InputMultipleBuffering { get; set; }
+        public ProducerConsumerBuffers<byte[]> OutputMultipleBuffering { get; set; }
         public ProcessPerformances ProcessPerformances { get; set; }
 
-        public ConvertToRawJpegThread(MultipleBuffering inputMultipleBuffering, ListBuffering<byte[]> outputMultipleBuffering)
+        public ConvertToRawJpegThread(ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers<byte[]> outputMultipleBuffering)
         {
             OutputMultipleBuffering = outputMultipleBuffering;
             InputMultipleBuffering = inputMultipleBuffering;

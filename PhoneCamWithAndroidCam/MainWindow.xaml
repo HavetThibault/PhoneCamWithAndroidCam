@@ -7,6 +7,7 @@
         xmlns:viewModels="clr-namespace:PhoneCamWithAndroidCam.ViewModels"
         xmlns:common="http://schemas.thibault/dev"
         mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
         Title="Image processing project" Height="700" Width="1100"
         d:DataContext="{d:DesignInstance viewModels:MainViewModel}">
 

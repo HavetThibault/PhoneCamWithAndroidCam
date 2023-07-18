@@ -23,11 +23,12 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private ImageSource _mainImageSource;
         private Dispatcher _uiDispatcher;
         private ConvertToRawJpegThread _convertToRawJpegThreads;
-        private ListBuffering<byte[]> _convertToRawJpegOutput;
+        private ProducerConsumerBuffers<byte[]> _convertToRawJpegOutput;
         private ImageProcessingPipeline _imageProcessingPipeline;
         private Timer _refreshPipelinePerfs;
         private int _fps;
         private bool _isStreaming;
+        private bool _isDisposed = false;
 
         public int Fps
         {
@@ -57,17 +58,17 @@ namespace PhoneCamWithAndroidCam.ViewModels
             ProcessPerformancesViewModel = new(uiDispatcher);
         }
 
-        public void LaunchStreaming(CancellationTokenSource cancellationTokenSource)
+        public void PlayStreaming(CancellationTokenSource globalCancellationToken)
         {
             IsStreaming = true;
             _convertToRawJpegThreads = new(_imageProcessingPipeline.OutputBuffer, _convertToRawJpegOutput);
-            _imageProcessingPipeline.Start(cancellationTokenSource);
-            _convertToRawJpegThreads.LaunchNewWorker(cancellationTokenSource);
+            _imageProcessingPipeline.Start(globalCancellationToken);
+            _convertToRawJpegThreads.LaunchNewWorker(globalCancellationToken);
             var refreshMainPicturethread = new Thread(RefreshMainPicture)
             {
                 Name = nameof(RefreshMainPicture)
             };
-            refreshMainPicturethread.Start(cancellationTokenSource);
+            refreshMainPicturethread.Start(globalCancellationToken);
             _refreshPipelinePerfs = new(RefreshImageProcessingPipelinePerfs, null, 400, 1000);
         }
 
@@ -77,7 +78,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
             {
                 Stopwatch watch = new();
                 int framesNbrInASecond = 0;
-                while (!cancellationTokenSource.IsCancellationRequested)
+                while (!cancellationTokenSource.IsCancellationRequested && !_isDisposed)
                 {
                     watch.Start();
                     byte[]? frame = _convertToRawJpegOutput.GetRawFrame();
@@ -100,7 +101,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
             }
         }
 
-        public void StopStreaming()
+        public void PauseStreaming()
         {
             _refreshPipelinePerfs.Dispose();
         }
@@ -118,9 +119,11 @@ namespace PhoneCamWithAndroidCam.ViewModels
         {
             MainImageSource = BitmapExtension.Convert(memoryStream); 
         }
-
+ 
         public void Dispose()
         {
+            _isDisposed = true;
+            _refreshPipelinePerfs?.Dispose();
             _imageProcessingPipeline?.Dispose();
             _convertToRawJpegOutput?.Dispose();
         }

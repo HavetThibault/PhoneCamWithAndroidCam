@@ -5,10 +5,10 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 {
     public class DuplicateBuffersThread
     {
-        public MultipleBuffering InputMultipleBuffering { get; set; }
-        public List<MultipleBuffering> OutputMultipleBuffers { get; set; }
+        public ProducerConsumerBuffers InputMultipleBuffering { get; set; }
+        public List<ProducerConsumerBuffers> OutputMultipleBuffers { get; set; }
 
-        public DuplicateBuffersThread(MultipleBuffering inputMultipleBuffering)
+        public DuplicateBuffersThread(ProducerConsumerBuffers inputMultipleBuffering)
         {
             OutputMultipleBuffers = new();
             InputMultipleBuffering = inputMultipleBuffering;
@@ -23,9 +23,9 @@ namespace ProcessingPipelines.ImageProcessingPipeline
             processThread.Start(cancellationTokenSource);
         }
 
-        public MultipleBuffering AddNewOutputBuffer()
+        public ProducerConsumerBuffers AddNewOutputBuffer()
         {
-            MultipleBuffering copiedInputMultipleBufferin = (MultipleBuffering)InputMultipleBuffering.Clone();
+            ProducerConsumerBuffers copiedInputMultipleBufferin = (ProducerConsumerBuffers)InputMultipleBuffering.Clone();
             lock (OutputMultipleBuffers)
                 OutputMultipleBuffers.Add(copiedInputMultipleBufferin);
             return copiedInputMultipleBufferin;
@@ -50,7 +50,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                     lock (OutputMultipleBuffers)
                     {
-                        foreach (MultipleBuffering buffer in OutputMultipleBuffers)
+                        foreach (ProducerConsumerBuffers buffer in OutputMultipleBuffers)
                         {
                             buffer.WriteBuffer(copiedBmpFrame.Data, (Bitmap)copiedBmpFrame.Bitmap.Clone()); // Not synchronizing to not penalize the other streams
                         }

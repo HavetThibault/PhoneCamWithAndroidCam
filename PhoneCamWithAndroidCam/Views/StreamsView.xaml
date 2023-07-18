@@ -15,22 +15,36 @@
         <converters:FpsConverter x:Key="FpsConverter"/>
     </UserControl.Resources>
 
-    <StackPanel>
+    <Grid
+        x:Name="MainGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
         <StackPanel
+            Grid.Row="0"
             Orientation="Horizontal"
             FlowDirection="RightToLeft">
             <common:SymbolButton 
                 Glyph="Plus"
                 Command="{Binding AddPipelineCommand}"/>
         </StackPanel>
-        <ScrollViewer>
+        <Separator 
+            Grid.Row="1" 
+            Height="2"/>
+        <ScrollViewer
+            Grid.Row="2">
             <ItemsControl ItemsSource="{Binding StreamViews}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type viewmodels:StreamViewModel}">
-                        <Grid>
+                        <Grid
+                            x:Name="StreamViewModelGrid">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*"/>
                                 <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
                             <Image 
@@ -52,10 +66,38 @@
                                     Grid.Row="1"
                                     DataContext="{Binding ProcessPerformancesViewModel}"/>
                             </Grid>
+                            <Grid 
+                                DataContext="{Binding ElementName=MainGrid, Path=DataContext}"
+                                Grid.Column="2"
+                                VerticalAlignment="Top">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <common:SymbolButton
+                                    Glyph="ArrowUp8"
+                                    Grid.Row="0"
+                                    Command="{Binding MoveUpCommand}"
+                                    CommandParameter="{Binding ElementName=StreamViewModelGrid, 
+                                        Path=DataContext}"/>
+                                <common:SymbolButton 
+                                    Glyph="ArrowDown8"
+                                    Grid.Row="1"
+                                    Command="{Binding MoveDownCommand}"
+                                    CommandParameter="{Binding ElementName=StreamViewModelGrid, 
+                                        Path=DataContext}"/>
+                                <common:SymbolButton 
+                                    Glyph="Delete"
+                                    Grid.Row="2"
+                                    Command="{Binding DeleteCommand}"
+                                    CommandParameter="{Binding ElementName=StreamViewModelGrid, 
+                                        Path=DataContext}"/>
+                            </Grid>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
-    </StackPanel>
+    </Grid>
 </UserControl>

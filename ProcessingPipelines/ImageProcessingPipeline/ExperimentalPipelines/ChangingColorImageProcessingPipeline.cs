@@ -6,14 +6,15 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
 {
     public class ChangingColorImageProcessingPipeline
     {
-        static public ImageProcessingPipeline CreateChangingColorImageProcessingPipeline(MultipleBuffering inputBuffer)
+        static public ImageProcessingPipeline GetInstance(ProducerConsumerBuffers inputBuffer)
         {
             ImageProcessingPipeline imageProcessingPipeline = new(inputBuffer);
-            imageProcessingPipeline.Add(new PipelineElement("ChangingColor", Process, (MultipleBuffering)inputBuffer.Clone()));
+            imageProcessingPipeline.Add(new PipelineElement("ChangingColor", Process, (ProducerConsumerBuffers)inputBuffer.Clone()));
             return imageProcessingPipeline;
         }
 
-        static void Process(MultipleBuffering inputBuffer, MultipleBuffering outputBuffer, CancellationTokenSource cancellationTokenSource, ProcessPerformances processPerf)
+        static void Process(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer,
+            CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken, ProcessPerformances processPerf)
         {
             byte[] destBuffer = new byte[inputBuffer.Height * inputBuffer.Stride];
             byte[] tempGrayBuffer = new byte[inputBuffer.Width * inputBuffer.Height];
@@ -21,7 +22,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
             Stopwatch waitingWriteTimeWatch = new();
             Stopwatch processTimeWatch = new();
             ColorBuffer colorBuffer = new();
-            while (!cancellationTokenSource.IsCancellationRequested)
+            while (!globalCancellationToken.IsCancellationRequested && !specificCancellationToken.IsCancellationRequested)
             {
                 waitingReadTimeWatch.Start();
                 BitmapFrame? frame = inputBuffer.WaitNextReaderBuffer();

@@ -3,22 +3,19 @@ using ProcessingPipelines.PipelineUtils;
 
 namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
 {
-    public class MedianImageProcessingPipeline
+    public static class MedianImageProcessingPipeline
     {
-        private ImageProcessingPipeline _imageProcessingPipeline;
-
-        public MultipleBuffering OutputBuffer => _imageProcessingPipeline.OutputBuffer;
-
-        public MedianImageProcessingPipeline(MultipleBuffering inputBuffer)
+        public static ImageProcessingPipeline GetInstance(ProducerConsumerBuffers inputBuffer)
         {
-            _imageProcessingPipeline = new(inputBuffer);
-            _imageProcessingPipeline.Add(new PipelineElement("MedianFiltering", Process, (MultipleBuffering)inputBuffer.Clone()));
+            var imageProcessingPipeline = new ImageProcessingPipeline(inputBuffer);
+            imageProcessingPipeline.Add(new PipelineElement("Median filter", Process, (ProducerConsumerBuffers)inputBuffer.Clone()));
+            return imageProcessingPipeline;
         }
 
-        void Process(MultipleBuffering inputBuffer, MultipleBuffering outputBuffer, CancellationTokenSource cancellationTokenSource, ProcessPerformances processPerf)
+        static void Process(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer, CancellationTokenSource globalCancellationToken, CancellationTokenSource specifiCancellationToken, ProcessPerformances processPerf)
         {
             byte[] destBuffer = new byte[inputBuffer.Stride * inputBuffer.Height];
-            while (!cancellationTokenSource.IsCancellationRequested)
+            while (!globalCancellationToken.IsCancellationRequested && !specifiCancellationToken.IsCancellationRequested)
             {
                 BitmapFrame? frame = inputBuffer.WaitNextReaderBuffer();
 
@@ -33,11 +30,6 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
 
                 outputBuffer.WaitWriteBuffer(destBuffer, frame.Bitmap);
             }
-        }
-
-        public void Start(CancellationTokenSource cancellationTokenSource)
-        {
-            _imageProcessingPipeline.Start(cancellationTokenSource);
         }
     }
 }

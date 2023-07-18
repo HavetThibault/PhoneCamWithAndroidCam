@@ -23,12 +23,12 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
     private bool _isStreaming = false;
     private bool _isPhoneIpChangeable = true;
 
-    private CancellationTokenSource _pipelineCancellationTokenSource;
-
     private FeederPipeline _feederPipeline;
-    private MultipleBuffering _feederPipelineOutput;
+    private ProducerConsumerBuffers _feederPipelineOutput;
 
     private Timer _refreshProcessTimer;
+
+    public CancellationTokenSource PipelineCancellationToken { get; private set; }
 
     public ProcessPerformancesViewModel ProcessPerformancesViewModel { get; set; }
 
@@ -81,7 +81,7 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
         ProcessPerformancesViewModel = processPerformancesViewModel;
 
         _feederPipelineOutput = new(640, 480, 640 * 4, 10, EBufferPixelsFormat.Bgra32Bits);
-        StreamsViewModel = new(uiDispatcher, _feederPipelineOutput);
+        StreamsViewModel = new(this, uiDispatcher, _feederPipelineOutput);
     }
 
     public void LaunchStreaming(object parameter)
@@ -90,10 +90,10 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
         IsPhoneIpChangeable = false;
 
         _feederPipeline = new FeederPipeline(_phoneCamClient, _feederPipelineOutput);
-        _pipelineCancellationTokenSource = new();
-        _feederPipeline.StartFeeding(_pipelineCancellationTokenSource);
+        PipelineCancellationToken = new();
+        _feederPipeline.StartFeeding(PipelineCancellationToken);
 
-        StreamsViewModel.LaunchStreaming(_pipelineCancellationTokenSource);
+        StreamsViewModel.PlayStreaming(PipelineCancellationToken);
 
         _refreshProcessTimer = new Timer(RefreshProcessTime, null, 400, 1000);
     }
@@ -108,7 +108,7 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
         IsStreaming = false;
         IsPhoneIpChangeable = true;
 
-        _pipelineCancellationTokenSource.Cancel();
+        PipelineCancellationToken.Cancel();
         _refreshProcessTimer.Dispose();
         StreamsViewModel.StopStreaming();
     }

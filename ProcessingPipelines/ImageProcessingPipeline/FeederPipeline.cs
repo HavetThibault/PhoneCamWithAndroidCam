@@ -11,15 +11,15 @@ namespace ProcessingPipelines.ImageProcessingPipeline
     {
         private PhoneCamClient _phoneCamClient;
 
-        public ListBuffering<MemoryStream> RawJpegBuffering;
-        public ListBuffering<Bitmap> Bitmaps;
-        public MultipleBuffering OutputMultipleBuffering;
+        public ProducerConsumerBuffers<MemoryStream> RawJpegBuffering;
+        public ProducerConsumerBuffers<Bitmap> Bitmaps;
+        public ProducerConsumerBuffers OutputMultipleBuffering;
 
         public ProcessPerformances ProcessRawJpegStreamPerf { get; set; }
         public ProcessPerformances ProcessRawJpegPerf { get; set; }
         public ProcessPerformances ProcessBitmapsPerf { get; set; }
 
-        public FeederPipeline(PhoneCamClient phoneCamClient, MultipleBuffering outputMultipleBuffering)
+        public FeederPipeline(PhoneCamClient phoneCamClient, ProducerConsumerBuffers outputMultipleBuffering)
         {
             _phoneCamClient = phoneCamClient;
             OutputMultipleBuffering = outputMultipleBuffering;
