@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AndroidCamClient\AndroidCamClient.csproj" />
     <ProjectReference Include="..\ImageProcessingUtils\ImageProcessingUtils.csproj" />
+    <ProjectReference Include="..\SDK\Helper.Collection\Helper.Collection.csproj" />
   </ItemGroup>
 
 </Project>
