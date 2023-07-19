@@ -36,7 +36,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
             _uiDispatcher = uiDispatcher;
             _duplicateBuffersThread = new(pipelineInput);
             ProducerConsumerBuffers outputBuffer = _duplicateBuffersThread.AddNewOutputBuffer();
-            ImageProcessingPipeline cannyImageProcessingPipeline = CannyImageProcessingPipeline.GetInstance(outputBuffer);
+            ImageProcessingPipeline cannyImageProcessingPipeline = CannyPipeline.GetInstance(outputBuffer);
             StreamViews = new() { new(uiDispatcher, cannyImageProcessingPipeline) };
 
             AddPipelineCommand = new(AddPipeline);

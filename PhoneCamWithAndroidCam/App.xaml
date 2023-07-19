@@ -8,6 +8,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Wpf.Common;component/Themes/Dark.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Wpf.Common;component/Common.xaml" />
+                <ResourceDictionary Source="Views/PhoneCamStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

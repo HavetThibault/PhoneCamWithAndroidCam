@@ -1,0 +1,25 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:common="http://schemas.thibault/dev">
+    <Style x:Key="Style.DeleteSymboButton" TargetType="{x:Type common:SymbolButton}">
+        <Setter Property="Glyph" Value="Delete"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#FFE81123" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="Style.PlaySymbolButton" TargetType="{x:Type common:SymbolButton}">
+        <Setter Property="Glyph" Value="Play"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="LimeGreen" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="Style.PauseSymbolButton" TargetType="{x:Type common:SymbolButton}">
+        <Setter Property="Glyph" Value="Pause"/>
+    </Style>
+</ResourceDictionary>

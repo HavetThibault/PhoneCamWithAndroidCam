@@ -17,7 +17,7 @@ public class CannyEdgeDetection
     private const int MIN_GRADIENT_MAGNITUDE = 160;
     private const double MIN_GRADIENT_MAGNITUDE_SCALE = 0.1;
     private const double MAX_GRADIENT_MAGNITUDE_SCALE = 0.3;
-    private const int MIN_CONTRAST = 15;
+    // private const int MIN_CONTRAST = 15;
     private const float SIGMA_BLUR = 1.5f;
 
     private int _width;

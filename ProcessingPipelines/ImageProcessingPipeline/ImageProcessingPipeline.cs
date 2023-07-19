@@ -10,10 +10,11 @@ public class ImageProcessingPipeline
     {
         var dictionary = new Dictionary<string, string>
         {
-            { nameof(CannyImageProcessingPipeline), "Canny" },
-            { nameof(ChangingColorImageProcessingPipeline), "Gray changing color" },
-            { nameof(MedianImageProcessingPipeline), "Median" },
-            { nameof(MotionDetectionProcessingPipeline), "Motion detection" },
+            { nameof(CannyPipeline), "Canny" },
+            { nameof(ChangingColorPipeline), "Gray changing color" },
+            { nameof(MedianPipeline), "Median" },
+            { nameof(MotionDetectionPipeline), "Motion detection" },
+            { nameof(WeirdlyChangeColorPipeline), "Weird color change" },
         };
         return dictionary;
     }
@@ -23,14 +24,16 @@ public class ImageProcessingPipeline
         var className = GetAllPipelineNames().GetKeyMatchingValue(name);
         switch (className)
         {
-            case nameof(CannyImageProcessingPipeline):
-                return CannyImageProcessingPipeline.GetInstance(inputBuffer);
-            case nameof(ChangingColorImageProcessingPipeline):
-                return ChangingColorImageProcessingPipeline.GetInstance(inputBuffer);
-            case nameof(MedianImageProcessingPipeline):
-                return MedianImageProcessingPipeline.GetInstance(inputBuffer);
-            case nameof(MotionDetectionProcessingPipeline):
-                return MotionDetectionProcessingPipeline.GetInstance(inputBuffer);
+            case nameof(CannyPipeline):
+                return CannyPipeline.GetInstance(inputBuffer);
+            case nameof(ChangingColorPipeline):
+                return ChangingColorPipeline.GetInstance(inputBuffer);
+            case nameof(MedianPipeline):
+                return MedianPipeline.GetInstance(inputBuffer);
+            case nameof(MotionDetectionPipeline):
+                return MotionDetectionPipeline.GetInstance(inputBuffer);
+            case nameof(WeirdlyChangeColorPipeline):
+                return WeirdlyChangeColorPipeline.GetInstance(inputBuffer);
             default:
                 throw new ArgumentException("No pipeline with this name.");
         }

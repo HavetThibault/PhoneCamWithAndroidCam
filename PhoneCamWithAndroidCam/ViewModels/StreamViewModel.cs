@@ -28,7 +28,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private Timer _refreshPipelinePerfs;
         private int _fps;
         private bool _isStreaming;
-        private bool _isDisposed = false;
+        private volatile bool _isDisposed = false;
 
         public int Fps
         {

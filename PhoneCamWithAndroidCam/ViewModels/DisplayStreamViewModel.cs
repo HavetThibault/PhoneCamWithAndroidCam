@@ -75,12 +75,13 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
         CommandLaunchStreaming = new RelayCommand(LaunchStreaming, CanLaunchStreaming);
         CommandStopStreaming = new RelayCommand(StopStreaming, CanStopStreaming);
 
-        _phoneIp = "192.168.0.0";
+        _phoneIp = "192.168.1.14";
         _phoneCamClient = new(_phoneIp);
 
         ProcessPerformancesViewModel = processPerformancesViewModel;
 
         _feederPipelineOutput = new(640, 480, 640 * 4, 10, EBufferPixelsFormat.Bgra32Bits);
+        _feederPipeline = new FeederPipeline(_phoneCamClient, _feederPipelineOutput);
         StreamsViewModel = new(this, uiDispatcher, _feederPipelineOutput);
     }
 
@@ -89,12 +90,9 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
         IsStreaming = true;
         IsPhoneIpChangeable = false;
 
-        _feederPipeline = new FeederPipeline(_phoneCamClient, _feederPipelineOutput);
         PipelineCancellationToken = new();
         _feederPipeline.StartFeeding(PipelineCancellationToken);
-
         StreamsViewModel.PlayStreaming(PipelineCancellationToken);
-
         _refreshProcessTimer = new Timer(RefreshProcessTime, null, 400, 1000);
     }
 

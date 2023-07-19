@@ -204,5 +204,11 @@ namespace ProcessingPipelines.ImageProcessingPipeline
             Bitmaps.Dispose();
             OutputMultipleBuffering.Dispose();
         }
+
+        public void DisposeExceptOutputBuffer()
+        {
+            RawJpegBuffering.Dispose();
+            Bitmaps.Dispose();
+        }
     }
 }
