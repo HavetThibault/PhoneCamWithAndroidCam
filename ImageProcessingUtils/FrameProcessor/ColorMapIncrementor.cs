@@ -5,20 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ImageProcessingUtils
+namespace ImageProcessingUtils.FrameProcessor
 {
-    public class ColorMapIncrementor
+    public class ColorMapIncrementor : FrameProcessor
     {
-        private int _width;
-        private int _height;
-        private int _stride;
-
         private byte[] _colorMap;
         private int[] _upOrDownColorMapIncrement;
 
-        public ColorMapIncrementor(int width, int height, int stride)
+        public ColorMapIncrementor(int width, int height, int stride) : base(width, height, stride)
         {
-            _width = width; _height = height;
             _colorMap = new byte[256];
             _upOrDownColorMapIncrement = new int[256];
             _stride = stride;
@@ -38,7 +33,7 @@ namespace ImageProcessingUtils
             }
         }
 
-        public void ApplyFilter(byte[] srcBuffer, byte[] dstBuffer)
+        public override void ProcessFrame(byte[] srcBuffer, byte[] dstBuffer)
         {
             int lineOffset;
             int byteWidth = 4 * _width;

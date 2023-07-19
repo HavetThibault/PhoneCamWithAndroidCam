@@ -5,19 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ImageProcessingUtils
+namespace ImageProcessingUtils.FrameProcessor
 {
-    public class ColorMapSaturator
+    public class ColorMapSaturator : FrameProcessor
     {
-        private int _width;
-        private int _height;
-        private int _stride;
-
         private byte[] _colorMap;
 
-        public ColorMapSaturator(int width, int height, int stride)
+        public ColorMapSaturator(int width, int height, int stride) : base(width, height, stride) 
         {
-            _width = width; _height = height;
             _colorMap = new byte[256];
             _stride = stride;
             InitColorMap();
@@ -25,17 +20,17 @@ namespace ImageProcessingUtils
 
         private void InitColorMap()
         {
-            for(int i = 0; i < _colorMap.Length; i++)
-                _colorMap[i] = (byte)(i/2.0 + 128);
+            for (int i = 0; i < _colorMap.Length; i++)
+                _colorMap[i] = (byte)(i / 2.0 + 128);
         }
 
-        public void ApplyFilter(byte[] srcBuffer, byte[] dstBuffer)
+        public override void ProcessFrame(byte[] srcBuffer, byte[] dstBuffer)
         {
             int lineOffset;
             int byteWidth = 4 * _width;
             for (int y = 0; y < _height; y++)
             {
-                for(int x = 0; x < byteWidth; x += 4)
+                for (int x = 0; x < byteWidth; x += 4)
                 {
                     lineOffset = y * _stride + x;
                     dstBuffer[lineOffset] = _colorMap[srcBuffer[lineOffset]];

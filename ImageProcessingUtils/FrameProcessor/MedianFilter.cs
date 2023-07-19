@@ -11,11 +11,8 @@ namespace ImageProcessingUtils.FrameProcessor
     /// </summary>
     public class MedianFilter : FrameProcessor
     {
-        protected int _inputBufferStride;
-
-        public MedianFilter(int width, int height, int inputBufferStride) : base(width, height)
+        public MedianFilter(int width, int height, int inputBufferStride) : base(width, height, inputBufferStride)
         { 
-            _inputBufferStride = inputBufferStride;
         }
 
         /// <summary>
@@ -23,7 +20,7 @@ namespace ImageProcessingUtils.FrameProcessor
         /// </summary>
         public override void ProcessFrame(byte[] srcFrame, byte[] dstFrame)
         {
-            SIMDHelper.MedianFilter(srcFrame, _width, _height, _inputBufferStride, 4, dstFrame);
+            SIMDHelper.MedianFilter(srcFrame, _width, _height, _stride, 4, dstFrame);
         }
     }
 }

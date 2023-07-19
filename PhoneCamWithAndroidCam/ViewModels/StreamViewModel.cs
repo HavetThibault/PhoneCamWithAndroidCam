@@ -1,7 +1,6 @@
 ﻿using AndroidCamClient;
 using PhoneCamWithAndroidCam.Models;
 using ProcessingPipelines.ImageProcessingPipeline;
-using ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines;
 using ProcessingPipelines.PipelineUtils;
 using System;
 using System.Collections.Generic;

@@ -8,17 +8,14 @@ namespace ImageProcessingUtils.FrameProcessor
 {
     public class GrayColorMapIncrementor : FrameProcessor
     {
-        private int _inputBufferStride;
-
         private byte[] _tempGrayBuffer;
 
         private byte[] _colorMap;
         private int[] _upOrDownColorMapIncrement;
 
-        public GrayColorMapIncrementor(int inputBufferWidth, int inputBufferHeight, int inputBufferStride) : 
-            base(inputBufferWidth, inputBufferHeight)
+        public GrayColorMapIncrementor(int width, int height, int stride) : 
+            base(width, height, stride)
         {
-            _inputBufferStride = inputBufferStride;
             _colorMap = new byte[256];
             _upOrDownColorMapIncrement = new int[256];
             _tempGrayBuffer = new byte[_width * _height];
@@ -40,8 +37,8 @@ namespace ImageProcessingUtils.FrameProcessor
 
         public override void ProcessFrame(byte[] srcFrame, byte[] dstFrame)
         {
-            SIMDHelper.BgraToGrayAndChangeColorAndToBgra(srcFrame, _width, _height, _inputBufferStride, 
-                _colorMap, dstFrame, _inputBufferStride, _tempGrayBuffer);
+            SIMDHelper.BgraToGrayAndChangeColorAndToBgra(srcFrame, _width, _height, _stride, 
+                _colorMap, dstFrame, _stride, _tempGrayBuffer);
             IncrementColorMap();
         }
 

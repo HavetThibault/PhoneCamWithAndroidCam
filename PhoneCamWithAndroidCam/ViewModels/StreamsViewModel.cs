@@ -1,5 +1,4 @@
 ﻿using Helper.MVVM;
-using ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines;
 using ProcessingPipelines.ImageProcessingPipeline;
 using ProcessingPipelines.PipelineUtils;
 using System;
@@ -36,7 +35,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
             _uiDispatcher = uiDispatcher;
             _duplicateBuffersThread = new(pipelineInput);
             ProducerConsumerBuffers outputBuffer = _duplicateBuffersThread.AddNewOutputBuffer();
-            ImageProcessingPipeline cannyImageProcessingPipeline = CannyPipeline.GetInstance(outputBuffer);
+            ImageProcessingPipeline cannyImageProcessingPipeline = PipelineInstantiator.GetInstance(PipelineInstantiator.COPY, outputBuffer);
             StreamViews = new() { new(uiDispatcher, cannyImageProcessingPipeline) };
 
             AddPipelineCommand = new(AddPipeline);
@@ -91,7 +90,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private void AddPipeline(object parameter)
         {
             var pipelineChooserViewModel = new PipelineChooserViewModel(
-                ImageProcessingPipeline.GetSortedPipelineNames());
+                PipelineInstantiator.GetAllPipelineNames());
             var pipelineChooserView = new PipelineChooserView(pipelineChooserViewModel);
             var dialogWindow = new DialogWindow(pipelineChooserView, pipelineChooserViewModel);
             dialogWindow.ShowDialog();
@@ -101,7 +100,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
                 return;
 
             var outputBuffer = _duplicateBuffersThread.AddNewOutputBuffer();
-            var newPipeline = ImageProcessingPipeline.GetPipelineFromName(selectedPipeline, outputBuffer);
+            var newPipeline = PipelineInstantiator.GetInstance(selectedPipeline, outputBuffer);
             var streamViewModel = new StreamViewModel(_uiDispatcher, newPipeline);
             StreamViews.Add(streamViewModel);
 

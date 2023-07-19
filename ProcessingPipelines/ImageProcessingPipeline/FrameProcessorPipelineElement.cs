@@ -6,14 +6,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace ProcessingPipelines.ImageProcessingPipeline
 {
     internal class FrameProcessorPipelineElement : PipelineElement
     {
-        private FrameProcessor _frameProcessor;
+        private IFrameProcessor _frameProcessor;
 
-        public FrameProcessorPipelineElement(string name, FrameProcessor frameProcessor, ProducerConsumerBuffers outputMultipleBuffering) : base(name, this, outputMultipleBuffering)
+        public FrameProcessorPipelineElement(string name, IFrameProcessor frameProcessor, ProducerConsumerBuffers outputMultipleBuffering) : base(name, outputMultipleBuffering)
         {
             _frameProcessor = frameProcessor;
         }
