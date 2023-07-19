@@ -1,4 +1,5 @@
 ﻿using Helper.Collection;
+using ImageProcessingUtils;
 using ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines;
 using ProcessingPipelines.PipelineUtils;
 
@@ -10,13 +11,20 @@ public class ImageProcessingPipeline
     {
         var dictionary = new Dictionary<string, string>
         {
-            { nameof(CannyPipeline), "Canny" },
-            { nameof(ChangingColorPipeline), "Gray changing color" },
-            { nameof(MedianPipeline), "Median" },
+            { nameof(CannyPipeline), "Canny edge detection" },
+            { nameof(ChangingColorPipeline), "Gray color map change" },
+            { nameof(MedianPipeline), "Median convolution" },
             { nameof(MotionDetectionPipeline), "Motion detection" },
-            { nameof(WeirdlyChangeColorPipeline), "Weird color change" },
+            { nameof(ColorMapIncrementorPipeline), "Color map change" },
+            { nameof(ColorMapSaturator), "Color map saturator" },
+            { nameof(ColorMapThreshold), "Color map threshold" },
         };
         return dictionary;
+    }
+
+    public static IEnumerable<string> GetSortedPipelineNames()
+    {
+        return GetAllPipelineNames().Values.OrderBy(x => x);
     }
 
     public static ImageProcessingPipeline GetPipelineFromName(string name, ProducerConsumerBuffers inputBuffer)
@@ -32,8 +40,12 @@ public class ImageProcessingPipeline
                 return MedianPipeline.GetInstance(inputBuffer);
             case nameof(MotionDetectionPipeline):
                 return MotionDetectionPipeline.GetInstance(inputBuffer);
-            case nameof(WeirdlyChangeColorPipeline):
-                return WeirdlyChangeColorPipeline.GetInstance(inputBuffer);
+            case nameof(ColorMapIncrementorPipeline):
+                return ColorMapIncrementorPipeline.GetInstance(inputBuffer);
+            case nameof(ColorMapSaturator):
+                return ColorMapSaturatorPipeline.GetInstance(inputBuffer);
+            case nameof(ColorMapThreshold):
+                return ColorMapThresholdPipeline.GetInstance(inputBuffer);
             default:
                 throw new ArgumentException("No pipeline with this name.");
         }

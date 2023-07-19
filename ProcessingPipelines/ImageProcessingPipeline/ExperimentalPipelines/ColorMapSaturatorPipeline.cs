@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
 {
-    public class WeirdlyChangeColorPipeline
+    internal class ColorMapSaturatorPipeline
     {
         public static ImageProcessingPipeline GetInstance(ProducerConsumerBuffers inputBuffer)
         {
             ImageProcessingPipeline imageProcessingPipeline = new(inputBuffer);
-            imageProcessingPipeline.Add(new PipelineElement("WeirdlyChangingColors", Process, (ProducerConsumerBuffers)inputBuffer.Clone()));
+            imageProcessingPipeline.Add(new PipelineElement("ColorMapSaturator", Process, (ProducerConsumerBuffers)inputBuffer.Clone()));
             return imageProcessingPipeline;
         }
 
@@ -22,7 +22,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
             CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken, ProcessPerformances processPerf)
         {
             byte[] destBuffer = new byte[inputBuffer.Stride * inputBuffer.Height];
-            WeirdlyChangeColor weirdlyChangingColor = new(inputBuffer.Width, inputBuffer.Height, inputBuffer.Stride);
+            ColorMapSaturator colorMapSaturator = new(inputBuffer.Width, inputBuffer.Height, inputBuffer.Stride);
             Stopwatch waitingReadTimeWatch = new();
             Stopwatch waitingWriteTimeWatch = new();
             Stopwatch processTimeWatch = new();
@@ -37,7 +37,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
 
                 processTimeWatch.Start();
 
-                weirdlyChangingColor.ApplyFilter(frame.Data, destBuffer);
+                colorMapSaturator.ApplyFilter(frame.Data, destBuffer);
 
                 Monitor.Exit(frame);
 

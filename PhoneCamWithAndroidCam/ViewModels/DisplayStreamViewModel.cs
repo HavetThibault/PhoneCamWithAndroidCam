@@ -16,7 +16,8 @@ namespace PhoneCamWithAndroidCam.ViewModels;
 public class DisplayStreamViewModel : BindableClass, IDisposable
 {
     private int _fps = 0;
-    
+    private Dispatcher _uiDispatcher;
+
     private PhoneCamClient _phoneCamClient;
     private string _phoneIp;
 
@@ -75,6 +76,8 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
         CommandLaunchStreaming = new RelayCommand(LaunchStreaming, CanLaunchStreaming);
         CommandStopStreaming = new RelayCommand(StopStreaming, CanStopStreaming);
 
+        _uiDispatcher = uiDispatcher;
+
         _phoneIp = "192.168.1.14";
         _phoneCamClient = new(_phoneIp);
 
@@ -125,6 +128,7 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
             _feederPipeline.ProcessBitmapsPerf
         };
 
+        _uiDispatcher.BeginInvoke(new Action(() => { Fps = _feederPipeline.Fps; }));
         ProcessPerformancesViewModel.UpdatePerformances(perfsList);
     }
 

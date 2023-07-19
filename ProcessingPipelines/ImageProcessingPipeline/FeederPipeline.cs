@@ -9,6 +9,8 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 {
     public class FeederPipeline
     {
+        private int _lastSecondProducedFrame = 0;
+
         private PhoneCamClient _phoneCamClient;
 
         public ProducerConsumerBuffers<MemoryStream> RawJpegBuffering;
@@ -18,6 +20,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         public ProcessPerformances ProcessRawJpegStreamPerf { get; set; }
         public ProcessPerformances ProcessRawJpegPerf { get; set; }
         public ProcessPerformances ProcessBitmapsPerf { get; set; }
+        public int Fps { get; private set; } = 0;
 
         public FeederPipeline(PhoneCamClient phoneCamClient, ProducerConsumerBuffers outputMultipleBuffering)
         {
@@ -88,6 +91,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                     waitingWriteTimeWatch.Start();
                     RawJpegBuffering.AddRawFrame(bmpMemoryStream);
                     waitingWriteTimeWatch.Stop();
+                    _lastSecondProducedFrame++;
 
                     if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                     {
@@ -100,6 +104,9 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                         waitingReadTimeWatch.Reset();
                         processTimeWatch.Reset();
                         waitingWriteTimeWatch.Reset();
+
+                        Fps = _lastSecondProducedFrame;
+                        _lastSecondProducedFrame = 0;
                     }
                 }
                 _rawJpegStream.Close();
@@ -135,6 +142,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                     waitingWriteTimeWatch.Start();
                     Bitmaps.AddRawFrame(bmpFrame);
                     waitingWriteTimeWatch.Stop();
+
 
                     if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                     {

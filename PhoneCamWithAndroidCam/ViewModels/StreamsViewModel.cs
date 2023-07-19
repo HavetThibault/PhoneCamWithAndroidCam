@@ -90,7 +90,8 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
         private void AddPipeline(object parameter)
         {
-            var pipelineChooserViewModel = new PipelineChooserViewModel(ImageProcessingPipeline.GetAllPipelineNames().Values);
+            var pipelineChooserViewModel = new PipelineChooserViewModel(
+                ImageProcessingPipeline.GetSortedPipelineNames());
             var pipelineChooserView = new PipelineChooserView(pipelineChooserViewModel);
             var dialogWindow = new DialogWindow(pipelineChooserView, pipelineChooserViewModel);
             dialogWindow.ShowDialog();
