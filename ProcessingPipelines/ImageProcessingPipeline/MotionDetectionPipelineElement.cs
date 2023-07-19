@@ -1,19 +1,22 @@
-﻿using ImageProcessingUtils;
+﻿using ImageProcessingUtils.SpecificFrameProcessor;
 using ProcessingPipelines.PipelineUtils;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace ProcessingPipelines.ImageProcessingPipeline.ExperimentalPipelines
+namespace ProcessingPipelines.ImageProcessingPipeline
 {
-    public class MotionDetectionPipeline
+    internal class MotionDetectionPipelineElement : PipelineElement
     {
-        public static ImageProcessingPipeline GetInstance(ProducerConsumerBuffers inputBuffer)
+        public MotionDetectionPipelineElement(string name, ProducerConsumerBuffers outputMultipleBuffering) : 
+            base(name, outputMultipleBuffering)
         {
-            ImageProcessingPipeline imageProcessingPipeline = new(inputBuffer);
-            imageProcessingPipeline.Add(new PipelineElement("Motion detection", Process, (ProducerConsumerBuffers)inputBuffer.Clone()));
-            return imageProcessingPipeline;
         }
 
-        static void Process(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer, 
+        public override void Process(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer,
             CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken, ProcessPerformances processPerf)
         {
             byte[] destBuffer = new byte[inputBuffer.Stride * inputBuffer.Height];
