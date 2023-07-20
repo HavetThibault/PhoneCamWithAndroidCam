@@ -38,20 +38,23 @@
             Grid.Row="2">
             <ItemsControl ItemsSource="{Binding StreamViews}">
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type viewmodels:StreamViewModel}">
+                    <DataTemplate 
+                        DataType="{x:Type viewmodels:StreamViewModel}">
                         <Grid
+                            Background="Transparent"
                             x:Name="StreamViewModelGrid">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <Image 
+                            <Image
+                                Margin="3"
                                 Grid.Column="0" 
                                 Source="{Binding MainImageSource}"
                                 VerticalAlignment="Top"/>
-                            <Grid 
+                            <Grid
+                                Margin="3"
                                 Grid.Column="1"
                                 VerticalAlignment="Top">
                                 <Grid.RowDefinitions>
@@ -66,34 +69,38 @@
                                     Grid.Row="1"
                                     DataContext="{Binding ProcessPerformancesViewModel}"/>
                             </Grid>
-                            <Grid 
-                                DataContext="{Binding ElementName=MainGrid, Path=DataContext}"
-                                Grid.Column="2"
-                                VerticalAlignment="Top">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <common:SymbolButton
-                                    Glyph="ArrowUp8"
-                                    Grid.Row="0"
-                                    Command="{Binding MoveUpCommand}"
-                                    CommandParameter="{Binding ElementName=StreamViewModelGrid, 
-                                        Path=DataContext}"/>
-                                <common:SymbolButton 
-                                    Glyph="ArrowDown8"
-                                    Grid.Row="1"
-                                    Command="{Binding MoveDownCommand}"
-                                    CommandParameter="{Binding ElementName=StreamViewModelGrid, 
-                                        Path=DataContext}"/>
-                                <common:SymbolButton 
-                                    Style="{StaticResource Style.DeleteSymboButton}"
-                                    Grid.Row="2"
-                                    Command="{Binding DeleteCommand}"
-                                    CommandParameter="{Binding ElementName=StreamViewModelGrid, 
-                                        Path=DataContext}"/>
-                            </Grid>
+                            <common:ContainerBorder
+                                Style="{StaticResource Style.OptionsPopupContainerBorder}"
+                                Grid.Column="1"
+                                Visibility="{Binding ElementName=StreamViewModelGrid, Path=IsMouseOver, 
+                                        Converter={StaticResource Converter.BoolToVisible}}">
+                                <Grid
+                                    DataContext="{Binding ElementName=MainGrid, Path=DataContext}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <common:SymbolButton
+                                        Glyph="ArrowUp8"
+                                        Grid.Column="0"
+                                        Command="{Binding MoveUpCommand}"
+                                        CommandParameter="{Binding ElementName=StreamViewModelGrid, 
+                                            Path=DataContext}"/>
+                                    <common:SymbolButton 
+                                        Glyph="ArrowDown8"
+                                        Grid.Column="1"
+                                        Command="{Binding MoveDownCommand}"
+                                        CommandParameter="{Binding ElementName=StreamViewModelGrid, 
+                                            Path=DataContext}"/>
+                                    <common:SymbolButton 
+                                        Style="{StaticResource Style.DeleteSymboButton}"
+                                        Grid.Column="2"
+                                        Command="{Binding DeleteCommand}"
+                                        CommandParameter="{Binding ElementName=StreamViewModelGrid, 
+                                            Path=DataContext}"/>
+                                </Grid>
+                            </common:ContainerBorder>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

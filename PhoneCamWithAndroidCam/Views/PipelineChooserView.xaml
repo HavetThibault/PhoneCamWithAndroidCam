@@ -12,6 +12,7 @@
     <Grid>
         <ListBox
             ItemsSource="{Binding PipelinesName}"
-            SelectedItem="{Binding SelectedPipeline}"/>
+            SelectedItem="{Binding SelectedPipeline}">
+        </ListBox>
     </Grid>
 </UserControl>

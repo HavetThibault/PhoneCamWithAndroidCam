@@ -22,4 +22,11 @@
     <Style x:Key="Style.PauseSymbolButton" TargetType="{x:Type common:SymbolButton}">
         <Setter Property="Glyph" Value="Pause"/>
     </Style>
+
+    <Style x:Key="Style.OptionsPopupContainerBorder" TargetType="{x:Type common:ContainerBorder}">
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Margin" Value="0,0,5,0"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="Background" Value="{StaticResource Theme.Control.Selected.Foreground}"/>
+    </Style>
 </ResourceDictionary>
