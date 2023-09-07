@@ -67,11 +67,12 @@ public class ImageProcessingPipeline
                 
             PipelineElements.Insert(0, newElement);
         }
-        else if(index == PipelineElements.Count())
+        else if(index == PipelineElements.Count)
         {
             previousElement = PipelineElements.Last();
-            previousElement.OutputMultipleBuffering = (ProducerConsumerBuffers)OutputBuffer.Clone();
-            newElement = PipelineElementBuilder.Build(elementName, OutputBuffer);
+            newElement = PipelineElementBuilder.Build(
+                elementName, 
+                (ProducerConsumerBuffers)previousElement.OutputMultipleBuffering.Clone());
             newElement.InputMultipleBuffering = previousElement.OutputMultipleBuffering;
             PipelineElements.Add(newElement);
         }

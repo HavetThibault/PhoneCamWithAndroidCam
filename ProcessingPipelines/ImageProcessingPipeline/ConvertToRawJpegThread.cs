@@ -43,8 +43,6 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 Stopwatch processTimeWatch = new();
                 while (!cancellationTokenSource.IsCancellationRequested)
                 {
-                    Bitmap bmp;
-                    MemoryStream cannyStream;
                     waitingReadTimeWatch.Start();
                     BitmapFrame? bitmapFrame = InputMultipleBuffering.WaitNextReaderBuffer();
                     waitingReadTimeWatch.Stop();
@@ -54,7 +52,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                     processTimeWatch.Start();
  
-                    bmp = bitmapFrame.Bitmap;
+                    var bmp = bitmapFrame.Bitmap;
                     bitmapFrame.Bitmap = null;
                     try
                     {
@@ -68,10 +66,10 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                         bmp.Dispose();
                         continue;
                     }
-                        
-                    cannyStream = new();
+
+                    MemoryStream displayJpegStream = new();
                     lock(bmp)
-                        bmp.Save(cannyStream, ImageFormat.Jpeg);
+                        bmp.Save(displayJpegStream, ImageFormat.Jpeg);
 
                     Monitor.Exit(bitmapFrame);
 
@@ -80,7 +78,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                     processTimeWatch.Stop();
 
                     waitingWriteTimeWatch.Start();
-                    OutputMultipleBuffering.AddRawFrame(cannyStream.ToArray());
+                    OutputMultipleBuffering.AddRawFrame(displayJpegStream.ToArray());
                     waitingWriteTimeWatch.Stop();
 
                     if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)

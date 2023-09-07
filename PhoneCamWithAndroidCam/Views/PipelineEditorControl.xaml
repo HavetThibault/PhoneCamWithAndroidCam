@@ -10,7 +10,7 @@
              d:DataContext="{d:DesignInstance local:PipelineEditorViewModel}">
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type local:VerticalLine}">
-            <controls:SymbolIcon Glyph="LineDisplay"/>
+            <controls:SymbolIcon Glyph="IBeamOutline" Margin="0,2,0,2"/>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type local:AddPipelineButtonViewModel}">
