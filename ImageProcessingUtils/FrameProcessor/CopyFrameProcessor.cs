@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ImageProcessingUtils.FrameProcessor
 {
-    public class Copy : IFrameProcessor
+    public class CopyFrameProcessor : IFrameProcessor
     {
-        public Copy() { }
+        public CopyFrameProcessor() { }
 
         public void ProcessFrame(byte[] srcFrame, byte[] dstFrame)
         {

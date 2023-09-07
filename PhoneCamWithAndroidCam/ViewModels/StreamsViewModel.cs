@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using PropertyTools.Wpf;
 using System.Windows;
 using Wpf.Common.Controls;
+using PhoneCamWithAndroidCam.ViewModels.PipelineEditor;
 
 namespace PhoneCamWithAndroidCam.ViewModels
 {
@@ -89,18 +90,20 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
         private void AddPipeline(object parameter)
         {
-            var pipelineChooserViewModel = new PipelineChooserViewModel(
-                PipelineInstantiator.GetAllPipelineNames());
-            var pipelineChooserView = new PipelineChooserView(pipelineChooserViewModel);
-            var dialogWindow = new DialogWindow(pipelineChooserView, pipelineChooserViewModel);
-            dialogWindow.ShowDialog();
-
-            string selectedPipeline = pipelineChooserViewModel.SelectedPipeline;
-            if (!pipelineChooserViewModel.DialogResult || selectedPipeline is null)
-                return;
-
             var outputBuffer = _duplicateBuffersThread.AddNewOutputBuffer();
-            var newPipeline = PipelineInstantiator.GetInstance(selectedPipeline, outputBuffer);
+
+            var pipelineEditorViewModel = new PipelineEditorViewModel(outputBuffer);
+            var pipelineEditorControl = new PipelineEditorControl(pipelineEditorViewModel);
+            var dialogWindowViewModel = new DialogWindowViewModel("Create new pipeline");
+            new DialogWindow(pipelineEditorControl, dialogWindowViewModel).ShowDialog();
+
+            if (dialogWindowViewModel.DialogResult is false)
+            {
+                _duplicateBuffersThread.DeleteOutputBuffer(outputBuffer);
+                return;
+            }
+                
+            var newPipeline = pipelineEditorViewModel.Pipeline;
             var streamViewModel = new StreamViewModel(_uiDispatcher, newPipeline);
             StreamViews.Add(streamViewModel);
 

@@ -64,8 +64,8 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         private static ImageProcessingPipeline GetCopyPipeline(ProducerConsumerBuffers inputBuffer)
         {
             var pipeline = new ImageProcessingPipeline(inputBuffer);
-            var copyFrameProcessor = new Copy();
-            pipeline.Add(new FrameProcessorPipelineElement(CANNY_EDGE_DETECTION, copyFrameProcessor, (ProducerConsumerBuffers)inputBuffer.Clone()));
+            var copyFrameProcessor = new CopyFrameProcessor();
+            pipeline.Add(new FrameProcessorPipelineElement(COPY, copyFrameProcessor, (ProducerConsumerBuffers)inputBuffer.Clone()));
             return pipeline;
         }
 
@@ -104,7 +104,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         {
             var pipeline = new ImageProcessingPipeline(inputBuffer);
             var colorMapFrameProcessor = new ColorMapIncrementor(inputBuffer.Width, inputBuffer.Height, inputBuffer.Stride);
-            pipeline.Add(new FrameProcessorPipelineElement(MOTION_DETECTION, colorMapFrameProcessor, (ProducerConsumerBuffers)inputBuffer.Clone()));
+            pipeline.Add(new FrameProcessorPipelineElement(COLOR_MAP_INCREMENTOR, colorMapFrameProcessor, (ProducerConsumerBuffers)inputBuffer.Clone()));
             return pipeline;
         }
 
@@ -112,7 +112,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         {
             var pipeline = new ImageProcessingPipeline(inputBuffer);
             var colorMapFrameProcessor = new ColorMapSaturator(inputBuffer.Width, inputBuffer.Height, inputBuffer.Stride);
-            pipeline.Add(new FrameProcessorPipelineElement(MOTION_DETECTION, colorMapFrameProcessor, (ProducerConsumerBuffers)inputBuffer.Clone()));
+            pipeline.Add(new FrameProcessorPipelineElement(COLOR_MAP_SATURATOR, colorMapFrameProcessor, (ProducerConsumerBuffers)inputBuffer.Clone()));
             return pipeline;
         }
 
@@ -120,7 +120,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         {
             var pipeline = new ImageProcessingPipeline(inputBuffer);
             var colorMapFrameProcessor = new ColorMapThreshold(inputBuffer.Width, inputBuffer.Height, inputBuffer.Stride, 5);
-            pipeline.Add(new FrameProcessorPipelineElement(MOTION_DETECTION, colorMapFrameProcessor, (ProducerConsumerBuffers)inputBuffer.Clone()));
+            pipeline.Add(new FrameProcessorPipelineElement(COLOR_MAP_THRESHOLD, colorMapFrameProcessor, (ProducerConsumerBuffers)inputBuffer.Clone()));
             return pipeline;
         }
     }

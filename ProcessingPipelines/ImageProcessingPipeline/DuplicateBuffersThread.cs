@@ -59,5 +59,10 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 }
             }
         }
+
+        public void DeleteOutputBuffer(ProducerConsumerBuffers outputBuffer)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
