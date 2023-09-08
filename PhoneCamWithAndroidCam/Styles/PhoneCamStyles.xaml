@@ -5,7 +5,7 @@
         <Setter Property="Glyph" Value="Delete"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#FFE81123" />
+                <Setter Property="Background" Value="{StaticResource Theme.Color.Error}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -14,7 +14,7 @@
         <Setter Property="Glyph" Value="Play"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="LimeGreen" />
+                <Setter Property="Background" Value="{StaticResource Theme.Color.Ok}" />
             </Trigger>
         </Style.Triggers>
     </Style>

@@ -51,7 +51,7 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
         {
             int offset = index * 4 + 1; 
             Items.Insert(offset++, new VerticalLine());
-            Items.Insert(offset++, new PipelineElementViewModel(elementName));
+            Items.Insert(offset++, new PipelineElementViewModel(elementName, DeleteElement));
             Items.Insert(offset++, new VerticalLine());
             Items.Insert(offset, new AddPipelineButtonViewModel(1, AddPipelineElement));
 
@@ -63,22 +63,22 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
             return (Items.IndexOf(pipelineElement) - 2) / 4;
         }
 
-        internal int GetPipelineElementsNumber()
-        {
-            return (Items.Count - 1) / 4;
-        }
-
-        internal int GetPipelineAddButtonIndex(AddPipelineButtonViewModel addButton)
-        {
-            return Items.IndexOf(addButton) / 4;
-        }
-
         internal void ChangePipelineElementsPlace(int previousIndex, int index)
         {
             Pipeline.ChangePipelineElementsPlace(previousIndex, index);
             int inListPreviousIndex = previousIndex * 4 + 2;
             int inListNewIndex = index * 4 + 2;
             (Items[inListNewIndex], Items[inListPreviousIndex]) = (Items[inListPreviousIndex], Items[inListNewIndex]);
+        }
+
+        private void DeleteElement(object element)
+        {
+            var pipelineElement = (PipelineElementViewModel)element;
+            int index = GetPipelineElementIndex(pipelineElement);
+            Pipeline.RemoveAt(index);
+            int inListIndex = Items.IndexOf(pipelineElement);
+            for (int i = 0; i < 4; i++)
+                Items.RemoveAt(inListIndex - 1);
         }
     }
 }

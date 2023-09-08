@@ -29,37 +29,39 @@
             <Grid
                 MouseEnter="Border_MouseEnter"
                 MouseLeave="Border_MouseLeave"
-                Background="Transparent">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+                Background="Transparent"
+                HorizontalAlignment="Center"
+                AllowDrop="True"
+                Drop="DropPipelineElement"
+                MouseMove="PipelineElementMouseMove">
+
+                <controls:SymbolButton
+                    x:Name="DeleteButton"
+                    Style="{StaticResource Style.SymbolButton.DeletePipelineElement}"             
+                    Glyph="Delete"
+                    Width="30"
+                    Height="{Binding Path=ActualHeight, ElementName=PipelineElementName}" 
+                    HorizontalAlignment="Right"
+                    Command="{Binding DeleteCommand}">
+                    <controls:SymbolButton.RenderTransform>
+                        <TranslateTransform x:Name="Haha"/>
+                    </controls:SymbolButton.RenderTransform>
+                </controls:SymbolButton>
 
                 <Border
+                    x:Name="PipelineElementName"
+                    Background="{DynamicResource Theme.Window.Title.Control.Background}"
                     BorderBrush="{DynamicResource Theme.Control.Hover.BorderBrush}"
                     BorderThickness="2"
                     CornerRadius="3"
                     Margin="0,3,0,3"
-                    Width="100"
-                    AllowDrop="True"
-                    Drop="DropPipelineElement">
+                    Width="100">
                     <TextBlock
                         Margin="0,3,0,3"
                         TextAlignment="Center"
                         TextWrapping="Wrap"
                         Text="{Binding Name}"/>
                 </Border>
-
-                <Button x:Name="DeleteButton" 
-                        Grid.Column="1" 
-                        Width="50" 
-                        Content="Button" 
-                        Visibility="Collapsed">
-                    <Button.RenderTransform>
-                        <TranslateTransform X="-20" Y="0" />
-                        <!-- Initially, position it below the TextBlock -->
-                    </Button.RenderTransform>
-                </Button>
             </Grid>
         </DataTemplate>
     </UserControl.Resources>

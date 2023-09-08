@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Helper.MVVM;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,11 +9,21 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
 {
     public class PipelineElementViewModel
     {
-        public string Name { get; }
+        private Action<object> _deleteAction;
 
-        public PipelineElementViewModel(string name)
+        public string Name { get; }
+        public RelayCommand DeleteCommand { get; }
+
+        public PipelineElementViewModel(string name, Action<object> deleteAction)
         {
+            _deleteAction = deleteAction;
             Name = name;
+            DeleteCommand = new(Delete);
+        }
+
+        private void Delete(object parameter)
+        {
+            _deleteAction(this);
         }
     }
 }

@@ -125,4 +125,9 @@ public class ImageProcessingPipeline
         else
             PipelineElements.Insert(index, pipelineElement);
     }
+
+    public void RemoveAt(int index)
+    {
+        throw new NotImplementedException();
+    }
 }

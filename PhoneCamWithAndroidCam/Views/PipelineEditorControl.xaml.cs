@@ -41,7 +41,7 @@ namespace PhoneCamWithAndroidCam.Views
 
         private void DropPipelineElement(object sender, DragEventArgs e)
         {
-            int newIndex = _viewModel.GetPipelineElementIndex((PipelineElementViewModel)((Border)sender).DataContext);
+            int newIndex = _viewModel.GetPipelineElementIndex((PipelineElementViewModel)((FrameworkElement)sender).DataContext);
             int previousIndex = _viewModel.GetPipelineElementIndex((PipelineElementViewModel)e.Data.GetData(typeof(PipelineElementViewModel)));
             if(newIndex != previousIndex)
                 _viewModel.ChangePipelineElementsPlace(previousIndex, newIndex);
@@ -49,20 +49,29 @@ namespace PhoneCamWithAndroidCam.Views
 
         private void Border_MouseEnter(object sender, MouseEventArgs e)
         {
-            var deleteButton = ((Grid)sender).GetChild("DeleteButton");
-            deleteButton.Visibility = Visibility.Visible;
-            deleteButton.BeginAnimation(
-                OpacityProperty,
-                new DoubleAnimation(0d, 1d, TimeSpan.FromSeconds(1)));
+            var deleteButton = ((Grid)sender).FindChild<SymbolButton>("DeleteButton");
+            var animation = new DoubleAnimation
+            {
+                To = deleteButton.ActualWidth - 4, // Move the button back below the TextBlock
+                Duration = TimeSpan.FromSeconds(0.3),
+            };
+            deleteButton.RenderTransform.BeginAnimation(
+                TranslateTransform.XProperty,
+                animation);
         }
 
         private void Border_MouseLeave(object sender, MouseEventArgs e)
         {
-            var deleteButton = ((Grid)sender).GetChild("DeleteButton");
-            deleteButton.BeginAnimation(
-                OpacityProperty,
-                new DoubleAnimation(1d, 0d, TimeSpan.FromSeconds(1)));
-            deleteButton.Visibility = Visibility.Collapsed;
+            var animation = new DoubleAnimation
+            {
+                To = 0, // Move the button back below the TextBlock
+                Duration = TimeSpan.FromSeconds(0.3)
+            };
+
+            var deleteButton = ((Grid)sender).FindChild<SymbolButton>("DeleteButton");
+            deleteButton.RenderTransform.BeginAnimation(
+                TranslateTransform.XProperty,
+                animation);
         }
     }
 }
