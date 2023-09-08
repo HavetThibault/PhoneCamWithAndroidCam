@@ -57,5 +57,28 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
 
             Pipeline.Insert(index, elementName);
         }
+
+        internal int GetPipelineElementIndex(PipelineElementViewModel pipelineElement)
+        {
+            return (Items.IndexOf(pipelineElement) - 2) / 4;
+        }
+
+        internal int GetPipelineElementsNumber()
+        {
+            return (Items.Count - 1) / 4;
+        }
+
+        internal int GetPipelineAddButtonIndex(AddPipelineButtonViewModel addButton)
+        {
+            return Items.IndexOf(addButton) / 4;
+        }
+
+        internal void ChangePipelineElementsPlace(int previousIndex, int index)
+        {
+            Pipeline.ChangePipelineElementsPlace(previousIndex, index);
+            int inListPreviousIndex = previousIndex * 4 + 2;
+            int inListNewIndex = index * 4 + 2;
+            (Items[inListNewIndex], Items[inListPreviousIndex]) = (Items[inListPreviousIndex], Items[inListNewIndex]);
+        }
     }
 }

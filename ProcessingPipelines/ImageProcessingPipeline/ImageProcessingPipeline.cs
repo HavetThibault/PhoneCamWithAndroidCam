@@ -115,4 +115,14 @@ public class ImageProcessingPipeline
         foreach (var pipelineElement in PipelineElements)
             pipelineElement.Dispose();
     }
+
+    public void ChangePipelineElementsPlace(int previousIndex, int index)
+    {
+        var pipelineElement = PipelineElements[previousIndex];
+        PipelineElements.RemoveAt(previousIndex);
+        if(index > previousIndex)
+            PipelineElements.Insert(index - 1, pipelineElement);
+        else
+            PipelineElements.Insert(index, pipelineElement);
+    }
 }
