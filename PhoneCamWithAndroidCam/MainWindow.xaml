@@ -13,7 +13,7 @@
 
     <common:BaseWindow.Resources>
         <DataTemplate DataType="{x:Type viewModels:DisplayStreamViewModel}">
-            <views:DisplayStreamControl/>
+            <views:StreamsAndStatsControl/>
         </DataTemplate>
     </common:BaseWindow.Resources>
 

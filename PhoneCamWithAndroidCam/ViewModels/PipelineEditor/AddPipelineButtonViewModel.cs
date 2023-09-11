@@ -1,8 +1,10 @@
 ﻿using Helper.MVVM;
 using PhoneCamWithAndroidCam.Views;
 using ProcessingPipelines.ImageProcessingPipeline;
+using PropertyTools.Wpf;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,15 +15,16 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
     internal class AddPipelineButtonViewModel : BindableClass
     {
         public delegate void AddPipelineElementDelegate(int place, string pipelineElementName);
-
-        private int _place;
+        
         private AddPipelineElementDelegate _addPipelineElement;
 
+        public int Place => Container.IndexOf(this) / 4;
         public RelayCommand AddPipelineElementCommand { get; }
+        public Collection<object> Container { get; set; }
 
-        public AddPipelineButtonViewModel(int place, AddPipelineElementDelegate addPipelineElementCommand)
+        public AddPipelineButtonViewModel(AddPipelineElementDelegate addPipelineElementCommand, Collection<object> container)
         {
-            _place = place;
+            Container = container;
             _addPipelineElement = addPipelineElementCommand;
             AddPipelineElementCommand = new RelayCommand(AddPipelineElement);
         }
@@ -29,7 +32,7 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
         private void AddPipelineElement(object param)
         {
             var pipelineChooserViewModel = new PipelineChooserViewModel(
-                PipelineInstantiator.GetAllPipelineNames());
+                PipelineElementBuilder.GetAllPipelineElementNames());
             var pipelineChooserView = new PipelineChooserView(pipelineChooserViewModel);
             var dialogWindow = new DialogWindow(pipelineChooserView, pipelineChooserViewModel);
             dialogWindow.ShowDialog();
@@ -38,7 +41,7 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
             if (!pipelineChooserViewModel.DialogResult || selectedPipeline is null)
                 return;
 
-            _addPipelineElement(_place, selectedPipeline);
+            _addPipelineElement(Place, selectedPipeline);
         }
     }
 }

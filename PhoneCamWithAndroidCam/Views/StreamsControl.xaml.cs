@@ -18,9 +18,9 @@ namespace PhoneCamWithAndroidCam.Views
     /// <summary>
     /// Logique d'interaction pour StreamControl.xaml
     /// </summary>
-    public partial class StreamsView : UserControl
+    public partial class StreamsControl : UserControl
     {
-        public StreamsView()
+        public StreamsControl()
         {
             InitializeComponent();
         }

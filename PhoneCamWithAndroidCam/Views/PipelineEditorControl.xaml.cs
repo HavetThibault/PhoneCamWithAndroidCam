@@ -3,6 +3,7 @@ using PhoneCamWithAndroidCam.ViewModels.PipelineEditor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -45,6 +46,7 @@ namespace PhoneCamWithAndroidCam.Views
             int previousIndex = _viewModel.GetPipelineElementIndex((PipelineElementViewModel)e.Data.GetData(typeof(PipelineElementViewModel)));
             if(newIndex != previousIndex)
                 _viewModel.ChangePipelineElementsPlace(previousIndex, newIndex);
+            SetPipelineElementColor((Grid)sender, (Color)Application.Current.Resources["Dark.GreyDarker"]);
         }
 
         private void Border_MouseEnter(object sender, MouseEventArgs e)
@@ -72,6 +74,22 @@ namespace PhoneCamWithAndroidCam.Views
             deleteButton.RenderTransform.BeginAnimation(
                 TranslateTransform.XProperty,
                 animation);
+        }
+
+        private void DragElementEnter(object sender, DragEventArgs e)
+        {
+            SetPipelineElementColor((Grid)sender, (Color)Application.Current.Resources["Dark.Grey.Brighter"]);
+        }
+
+        private void DragElementLeave(object sender, DragEventArgs e)
+        {
+            SetPipelineElementColor((Grid)sender, (Color)Application.Current.Resources["Dark.GreyDarker"]);
+        }
+
+        private void SetPipelineElementColor(Grid grid, Color color)
+        {
+            var pipelineElement = grid.FindChild<Border>("PipelineElementName");
+            pipelineElement.Background = new SolidColorBrush(color);
         }
     }
 }

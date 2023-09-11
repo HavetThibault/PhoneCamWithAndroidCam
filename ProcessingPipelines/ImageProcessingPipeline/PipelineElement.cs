@@ -40,7 +40,6 @@ public abstract class PipelineElement
 
     public void Dispose()
     {
-        InputMultipleBuffering?.Dispose();
         OutputMultipleBuffering?.Dispose();
     }
 

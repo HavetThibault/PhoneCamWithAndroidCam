@@ -62,7 +62,9 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
         public void DeleteOutputBuffer(ProducerConsumerBuffers outputBuffer)
         {
-            throw new NotImplementedException();
+            lock (OutputMultipleBuffers)
+                OutputMultipleBuffers.Remove(outputBuffer);
+            outputBuffer.Dispose();
         }
     }
 }

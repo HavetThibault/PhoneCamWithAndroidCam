@@ -33,14 +33,16 @@
                 HorizontalAlignment="Center"
                 AllowDrop="True"
                 Drop="DropPipelineElement"
-                MouseMove="PipelineElementMouseMove">
+                MouseMove="PipelineElementMouseMove"
+                DragEnter="DragElementEnter"
+                DragLeave="DragElementLeave">
 
                 <controls:SymbolButton
                     x:Name="DeleteButton"
                     Style="{StaticResource Style.SymbolButton.DeletePipelineElement}"             
                     Glyph="Delete"
                     Width="30"
-                    Height="{Binding Path=ActualHeight, ElementName=PipelineElementName}" 
+                    Height="25" 
                     HorizontalAlignment="Right"
                     Command="{Binding DeleteCommand}">
                     <controls:SymbolButton.RenderTransform>

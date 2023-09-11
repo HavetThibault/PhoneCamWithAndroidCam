@@ -20,42 +20,35 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
         public string Name
         {
             get => Pipeline.Name;
-            set
-            {
-                Pipeline.Name = value;
-            }
+            set => Pipeline.Name = value;
         }
 
         public PipelineEditorViewModel(ProducerConsumerBuffers inputBuffer) : base("Create pipeline")
         {
-            Items = new()
-            {
-                new AddPipelineButtonViewModel(0, AddPipelineElement)
-            };
+            Items = new();
+            Items.Add(new AddPipelineButtonViewModel(AddPipelineElement, Items));
             Pipeline = new ImageProcessingPipeline(inputBuffer);
         }
 
         public PipelineEditorViewModel(ImageProcessingPipeline pipeline) : base($"Edit '{pipeline.Name}'")
         {
             Pipeline = pipeline;
-            Items = new()
-            {
-                new AddPipelineButtonViewModel(0, AddPipelineElement)
-            };
+            Items = new();
+            Items.Add(new AddPipelineButtonViewModel(AddPipelineElement, Items));
             int i = 0;
             foreach(var element in pipeline.PipelineElements)
                 AddPipelineElement(i++, element.Name);
         }
 
-        private void AddPipelineElement(int index, string elementName)
+        private void AddPipelineElement(int index, string elementType)
         {
-            int offset = index * 4 + 1; 
-            Items.Insert(offset++, new VerticalLine());
-            Items.Insert(offset++, new PipelineElementViewModel(elementName, DeleteElement));
-            Items.Insert(offset++, new VerticalLine());
-            Items.Insert(offset, new AddPipelineButtonViewModel(1, AddPipelineElement));
+            var newElement = Pipeline.InstantiateAndInsert(index, elementType);
 
-            Pipeline.Insert(index, elementName);
+            int offset = index * 4 + 1;
+            Items.Insert(offset++, new VerticalLine());
+            Items.Insert(offset++, new PipelineElementViewModel(newElement.Name, DeleteElement));
+            Items.Insert(offset++, new VerticalLine());
+            Items.Insert(offset, new AddPipelineButtonViewModel(AddPipelineElement, Items));
         }
 
         internal int GetPipelineElementIndex(PipelineElementViewModel pipelineElement)

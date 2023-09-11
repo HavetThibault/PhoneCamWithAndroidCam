@@ -48,20 +48,35 @@ public class ImageProcessingPipeline
         PipelineElements.Add(pipelineElement);
     }
 
-    public void Insert(int index, string elementName)
+    private string GetNextAvailableElementName(string name)
     {
+        if (PipelineElements.Exists(elem => elem.Name.Equals(name)))
+        {
+            var newName = name + " 1";
+
+            for (int i = 2; PipelineElements.Exists(elem => elem.Name.Equals(newName)); i++)
+                newName = name + $" {i}";
+            return newName;
+        }
+        return name;
+    }
+
+    public PipelineElement InstantiateAndInsert(int index, string elementType)
+    {
+        string name = GetNextAvailableElementName(elementType);
         PipelineElement previousElement;
         PipelineElement nextElement;
         PipelineElement newElement;
         if (index == 0)
         {
             if (InputBuffer is null)
-                newElement = PipelineElementBuilder.Build(elementName, null);
+                newElement = PipelineElementBuilder.Build(elementType, null, name);
             else
             {
                 newElement = PipelineElementBuilder.Build(
-                    elementName,
-                    (ProducerConsumerBuffers)InputBuffer.Clone());
+                    elementType,
+                    (ProducerConsumerBuffers)InputBuffer.Clone(),
+                    name);
                 newElement.InputMultipleBuffering = InputBuffer;
             }
                 
@@ -71,8 +86,10 @@ public class ImageProcessingPipeline
         {
             previousElement = PipelineElements.Last();
             newElement = PipelineElementBuilder.Build(
-                elementName, 
-                (ProducerConsumerBuffers)previousElement.OutputMultipleBuffering.Clone());
+                elementType, 
+                (ProducerConsumerBuffers)previousElement.OutputMultipleBuffering.Clone(),
+                name);
+
             newElement.InputMultipleBuffering = previousElement.OutputMultipleBuffering;
             PipelineElements.Add(newElement);
         }
@@ -82,10 +99,15 @@ public class ImageProcessingPipeline
             previousElement.OutputMultipleBuffering = 
                 (ProducerConsumerBuffers)previousElement.OutputMultipleBuffering.Clone();
             nextElement = PipelineElements.ElementAt(index);
-            newElement = PipelineElementBuilder.Build(elementName, nextElement.InputMultipleBuffering);
+            newElement = PipelineElementBuilder.Build(
+                elementType,
+                nextElement.InputMultipleBuffering,
+                name);
             newElement.InputMultipleBuffering = previousElement.OutputMultipleBuffering;
+
             PipelineElements.Insert(index, newElement);
         }
+        return newElement;
     }
 
     public void Start(CancellationTokenSource globalCancellationToken)
@@ -128,6 +150,9 @@ public class ImageProcessingPipeline
 
     public void RemoveAt(int index)
     {
-        throw new NotImplementedException();
+        if(index != PipelineElements.Count - 1)
+            PipelineElements[index + 1].InputMultipleBuffering = PipelineElements[index].InputMultipleBuffering;
+        PipelineElements[index].OutputMultipleBuffering.Dispose();
+        PipelineElements.RemoveAt(index);
     }
 }
