@@ -60,13 +60,17 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
                                     <RowDefinition/>
+                                    <RowDefinition/>
                                 </Grid.RowDefinitions>
 
                                 <Label
                                     Grid.Row="0"
+                                    Content="{Binding PipelineName}"/>
+                                <Label
+                                    Grid.Row="1"
                                     Content="{Binding Fps, Converter={StaticResource FpsConverter}}"/>
                                 <local:ProcessPerformancesControl
-                                    Grid.Row="1"
+                                    Grid.Row="2"
                                     DataContext="{Binding ProcessPerformancesViewModel}"/>
                             </Grid>
                             <common:ContainerBorder

@@ -10,12 +10,6 @@
              d:DesignHeight="450" d:DesignWidth="850"
              d:DataContext="{d:DesignInstance viewmodels:DisplayStreamViewModel}">
 
-    <UserControl.Resources>
-        <DataTemplate DataType="{x:Type viewmodels:StreamViewModel}">
-            <views:StreamsControl/>
-        </DataTemplate>
-    </UserControl.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>

@@ -29,6 +29,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private int _fps;
         private bool _isStreaming;
         private volatile bool _isDisposed = false;
+        private string _pipelineName;
 
         public int Fps
         {
@@ -47,6 +48,8 @@ namespace PhoneCamWithAndroidCam.ViewModels
             get => _isStreaming;
             set => SetProperty(ref _isStreaming, value);
         }
+
+        public string PipelineName => _imageProcessingPipeline.Name;
 
         public ProcessPerformancesViewModel ProcessPerformancesViewModel { get; set; }
 
