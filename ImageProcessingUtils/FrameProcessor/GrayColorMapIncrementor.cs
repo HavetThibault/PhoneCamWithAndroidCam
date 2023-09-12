@@ -22,6 +22,10 @@ namespace ImageProcessingUtils.FrameProcessor
             InitColorMapAndCo();
         }
 
+        public GrayColorMapIncrementor(GrayColorMapIncrementor grayColorMapIncrementor)
+            : this(grayColorMapIncrementor._width, grayColorMapIncrementor._height, grayColorMapIncrementor._stride)
+        { }
+
         private void InitColorMapAndCo()
         {
             for (int i = 0; i < _colorMap.Length; i++)
@@ -55,6 +59,11 @@ namespace ImageProcessingUtils.FrameProcessor
                 else if (_colorMap[i] == 0)
                     _upOrDownColorMapIncrement[i] = 1;
             }
+        }
+
+        public override IFrameProcessor Clone()
+        {
+            return new GrayColorMapIncrementor(this);
         }
     }
 }

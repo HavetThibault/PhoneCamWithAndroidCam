@@ -9,5 +9,6 @@ namespace ImageProcessingUtils.FrameProcessor
     public interface IFrameProcessor
     {
         public abstract void ProcessFrame(byte[] srcFrame, byte[] dstFrame);
+        public abstract IFrameProcessor Clone();
     }
 }

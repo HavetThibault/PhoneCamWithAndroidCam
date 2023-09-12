@@ -21,6 +21,14 @@ public abstract class PipelineElement
         ProcessPerformances = new(name);
     }
 
+    public PipelineElement(ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering, PipelineElement element)
+    {
+        InputMultipleBuffering = inputMultipleBuffering;
+        OutputMultipleBuffering = outputMultipleBuffering;
+        Name = element.Name;
+        ProcessPerformances = element.ProcessPerformances.Clone();
+    }
+
     public void LaunchNewWorker(CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken)
     {
         var processThread = new Thread(RunProcess)

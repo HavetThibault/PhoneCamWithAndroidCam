@@ -39,6 +39,11 @@ public class ImageProcessingPipeline
         _specificCancellationToken = new();
     }
 
+    public ImageProcessingPipeline(ImageProcessingPipeline pipeline)
+    {
+
+    }
+
     public void Add(PipelineElement pipelineElement)
     {
         if (PipelineElements.Count > 0)

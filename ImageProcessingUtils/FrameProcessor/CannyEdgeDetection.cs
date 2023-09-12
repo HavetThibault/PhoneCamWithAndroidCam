@@ -36,6 +36,10 @@ public class CannyEdgeDetection : FrameProcessor
         _sobelDyBuffer = new short[width * height];
     }
 
+    public CannyEdgeDetection(CannyEdgeDetection cannyEdgeDetection) 
+        : this(cannyEdgeDetection._width, cannyEdgeDetection._height) 
+    { }
+
     public override void ProcessFrame(byte[] bytesSource, byte[] bytesDestination)
     {
         FilterHelper.CropBgra32BitsAndToGray(bytesSource, _pictureArea, _width * 4, _grayBuffer1);
@@ -56,5 +60,10 @@ public class CannyEdgeDetection : FrameProcessor
         FilterHelper.Hysteresis(_grayBuffer2, _width, _height, _grayBuffer1, WEAK_PIXEL);
 
         SIMDHelper.SimdGrayToBgra(_grayBuffer1, _width, _height, _width, bytesDestination, _width * 4);
+    }
+
+    public override IFrameProcessor Clone()
+    {
+        return new CannyEdgeDetection(this);
     }
 }

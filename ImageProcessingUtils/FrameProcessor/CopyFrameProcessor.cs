@@ -14,5 +14,10 @@ namespace ImageProcessingUtils.FrameProcessor
         {
             Buffer.BlockCopy(srcFrame, 0, dstFrame, 0, dstFrame.Length);
         }
+
+        public IFrameProcessor Clone()
+        {
+            return new CopyFrameProcessor();
+        }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ImageProcessingUtils.FrameProcessor
 {
-    public class ColorMapThreshold: FrameProcessor
+    public class ColorMapThreshold : FrameProcessor
     {
         private int _intervalNbr;
 
@@ -22,6 +22,10 @@ namespace ImageProcessingUtils.FrameProcessor
             _intervalNbr = intervalNbr;
             InitColorMap();
         }
+
+        public ColorMapThreshold(ColorMapThreshold colorMapThreshold) 
+            : this(colorMapThreshold._width, colorMapThreshold._height, colorMapThreshold._stride, colorMapThreshold._intervalNbr)
+        { }
 
         private void InitColorMap()
         {
@@ -70,6 +74,11 @@ namespace ImageProcessingUtils.FrameProcessor
                 else if (_colorMap[i] == 0)
                     _upOrDownColorMapIncrement[i] = 1;
             }
+        }
+
+        public override IFrameProcessor Clone()
+        {
+            return new ColorMapThreshold(this);
         }
     }
 }

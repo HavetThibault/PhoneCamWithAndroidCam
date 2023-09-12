@@ -18,6 +18,10 @@ namespace ImageProcessingUtils.FrameProcessor
             InitColorMap();
         }
 
+        public ColorMapSaturator(ColorMapSaturator colorMapSaturator) 
+            : this(colorMapSaturator._width, colorMapSaturator._height, colorMapSaturator._stride) 
+        { }
+
         private void InitColorMap()
         {
             for (int i = 0; i < _colorMap.Length; i++)
@@ -39,6 +43,11 @@ namespace ImageProcessingUtils.FrameProcessor
                     dstBuffer[lineOffset + 3] = 255;
                 }
             }
+        }
+
+        public override IFrameProcessor Clone()
+        {
+            return new ColorMapSaturator(this);
         }
     }
 }

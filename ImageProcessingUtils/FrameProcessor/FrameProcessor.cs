@@ -26,6 +26,8 @@ namespace ImageProcessingUtils.FrameProcessor
             _stride = stride;
         }
 
+        public abstract IFrameProcessor Clone();
+
         public abstract void ProcessFrame(byte[] srcFrame, byte[] dstFrame);
     }
 }

@@ -19,6 +19,11 @@ namespace ProcessingPipelines.ImageProcessingPipeline
             _frameProcessor = frameProcessor;
         }
 
+        public FrameProcessorPipelineElement(FrameProcessorPipelineElement element, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering) : base(inputMultipleBuffering, outputMultipleBuffering, element)
+        {
+            _frameProcessor = element._frameProcessor.Clone();
+        }
+
         public override void Process(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer, 
             CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken, 
             ProcessPerformances processPerformances)
