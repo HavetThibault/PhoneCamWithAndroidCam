@@ -1,52 +1,43 @@
-﻿using PhoneCamWithAndroidCam.Models;
+﻿using Helper.MVVM;
+using ProcessingPipelines.ImageProcessingPipeline;
 using ProcessingPipelines.PipelineUtils;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Threading;
+using System.Text;
+using System.Threading.Tasks;
+using Theraot.Collections;
 
 namespace PhoneCamWithAndroidCam.ViewModels
 {
-    public class ProcessPerformancesViewModel
+    public class ProcessPerformancesViewModel : BindableClass
     {
-        private Dispatcher _uiDispatcher;
-
         public ObservableCollection<ProcessPerformancesModel> ProcessPerformances { get; set; }
 
-        public ProcessPerformancesViewModel(Dispatcher uiDispatcher)
+        public ProcessPerformancesViewModel()
         {
             ProcessPerformances = new();
-            _uiDispatcher = uiDispatcher;
         }
 
-        public void UpdatePerformances(List<ProcessPerformances> processPerformances)
+        public ProcessPerformancesViewModel(ImageProcessingPipeline pipeline)
         {
-            foreach (ProcessPerformances processPerformance in processPerformances)
-            {
-                if (ProcessPerformances.Where(p => p.ProcessName.Equals(processPerformance.ProcessName)).FirstOrDefault() is ProcessPerformancesModel matchingProcessPerf)
-                {
-                    _uiDispatcher.BeginInvoke(UpdatePerformance, matchingProcessPerf, processPerformance);
-                }
-                else
-                {
-                    ProcessPerformances perf;
-                    lock (processPerformance)
-                        perf = processPerformance.Clone();
-
-                    _uiDispatcher.BeginInvoke(AddPerformanceStat, perf);
-                }
-            }
+            ProcessPerformances = new();
+            foreach (var element in pipeline.PipelineElements)
+                ProcessPerformances.Add(element.ProcessPerformances);
         }
 
-        private void AddPerformanceStat(ProcessPerformances perf)
+        public ProcessPerformancesViewModel(IEnumerable<ProcessPerformancesModel> processPerformances)
         {
-            ProcessPerformances.Add(new(perf));
+            ProcessPerformances = new(processPerformances);
         }
 
-        private void UpdatePerformance(ProcessPerformancesModel perfsModel, ProcessPerformances perf)
+        public void RefreshProcessPerformances(ImageProcessingPipeline pipeline, ProcessPerformancesModel rawJpegConversionPerf)
         {
-            lock (perf)
-                perfsModel.Copy(perf);
+            ProcessPerformances.Clear();
+            ProcessPerformances.Add(rawJpegConversionPerf);
+            foreach(var element in pipeline.PipelineElements)
+                ProcessPerformances.Add(element.ProcessPerformances);
         }
     }
 }

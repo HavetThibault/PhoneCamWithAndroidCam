@@ -4,6 +4,8 @@ using ImageProcessingUtils;
 using ProcessingPipelines.PipelineUtils;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Windows.Threading;
 
 namespace ProcessingPipelines.ImageProcessingPipeline
 {
@@ -12,18 +14,19 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         private int _lastSecondProducedFrame = 0;
 
         private PhoneCamClient _phoneCamClient;
+        private Dispatcher _uiDispatcher;
 
         public ProducerConsumerBuffers<MemoryStream> RawJpegBuffering;
         public ProducerConsumerBuffers<Bitmap> Bitmaps;
         public ProducerConsumerBuffers OutputMultipleBuffering;
 
-        public ProcessPerformances ProcessRawJpegStreamPerf { get; set; }
-        public ProcessPerformances ProcessRawJpegPerf { get; set; }
-        public ProcessPerformances ProcessBitmapsPerf { get; set; }
-        public int Fps { get; private set; } = 0;
+        public ProcessPerformancesModel ProcessRawJpegStreamPerf { get; set; }
+        public ProcessPerformancesModel ProcessRawJpegPerf { get; set; }
+        public ProcessPerformancesModel ProcessBitmapsPerf { get; set; }
 
-        public FeederPipeline(PhoneCamClient phoneCamClient, ProducerConsumerBuffers outputMultipleBuffering)
+        public FeederPipeline(Dispatcher uiDispatcher, PhoneCamClient phoneCamClient, ProducerConsumerBuffers outputMultipleBuffering)
         {
+            _uiDispatcher = uiDispatcher;
             _phoneCamClient = phoneCamClient;
             OutputMultipleBuffering = outputMultipleBuffering;
             Bitmaps = new(10);
@@ -95,17 +98,17 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                     if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                     {
-                        lock (ProcessRawJpegStreamPerf)
+                        await _uiDispatcher.BeginInvoke(new Action(() =>
                         {
                             ProcessRawJpegStreamPerf.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
                             ProcessRawJpegStreamPerf.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
                             ProcessRawJpegStreamPerf.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
-                        }
+                            ProcessRawJpegStreamPerf.Fps = _lastSecondProducedFrame;
+                        }));
                         waitingReadTimeWatch.Reset();
                         processTimeWatch.Reset();
                         waitingWriteTimeWatch.Reset();
 
-                        Fps = _lastSecondProducedFrame;
                         _lastSecondProducedFrame = 0;
                     }
                 }
@@ -119,7 +122,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         /// <para>Bitmap is here used for later manipulation of the JPEG, the JPEG is in a compressed format.</para>
         /// </summary>
         /// <param name="cancellationTokenSourceObj"></param>
-        private void ProcessRawJpeg(object? cancellationTokenSourceObj)
+        private async void ProcessRawJpeg(object? cancellationTokenSourceObj)
         {
             if (cancellationTokenSourceObj is CancellationTokenSource cancellationTokenSource)
             {
@@ -146,12 +149,12 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                     if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                     {
-                        lock (ProcessRawJpegPerf)
+                        await _uiDispatcher.BeginInvoke(new Action(() =>
                         {
                             ProcessRawJpegPerf.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
                             ProcessRawJpegPerf.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
                             ProcessRawJpegPerf.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
-                        }
+                        }));
                         waitingReadTimeWatch.Reset();
                         processTimeWatch.Reset();
                         waitingWriteTimeWatch.Reset();

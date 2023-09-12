@@ -1,6 +1,7 @@
 ﻿using Helper.Collection;
 using ImageProcessingUtils;
 using ProcessingPipelines.PipelineUtils;
+using System.Windows.Threading;
 
 namespace ProcessingPipelines.ImageProcessingPipeline;
 
@@ -10,6 +11,7 @@ public class ImageProcessingPipeline
     private CancellationTokenSource _specificCancellationToken;
     private bool _isStreaming = false;
     private ProducerConsumerBuffers _inputBuffer;
+    private Dispatcher _uiDispatcher;
 
     public ProducerConsumerBuffers InputBuffer
     {
@@ -29,7 +31,7 @@ public class ImageProcessingPipeline
 
     public ProducerConsumerBuffers OutputBuffer => PipelineElements.Last().OutputBuffers;
 
-    public List<ProcessPerformances> ElementsProcessPerformances { get; set; }
+    public List<ProcessPerformancesModel> ElementsProcessPerformances { get; set; }
 
     public ImageProcessingPipeline(ProducerConsumerBuffers inputBuffer)
     {
@@ -79,7 +81,8 @@ public class ImageProcessingPipeline
             newElement = PipelineElementFactory.GetInstance(
                 elementType,
                 (ProducerConsumerBuffers)InputBuffer.Clone(),
-                name);
+                name,
+                _uiDispatcher);
             newElement.InputBuffers = InputBuffer;
                 
             PipelineElements.Insert(0, newElement);
@@ -90,7 +93,8 @@ public class ImageProcessingPipeline
             newElement = PipelineElementFactory.GetInstance(
                 elementType, 
                 (ProducerConsumerBuffers)previousElement.OutputBuffers.Clone(),
-                name);
+                name,
+                _uiDispatcher);
 
             newElement.InputBuffers = previousElement.OutputBuffers;
             PipelineElements.Add(newElement);
@@ -104,7 +108,8 @@ public class ImageProcessingPipeline
             newElement = PipelineElementFactory.GetInstance(
                 elementType,
                 nextElement.InputBuffers,
-                name);
+                name,
+                _uiDispatcher);
             newElement.InputBuffers = previousElement.OutputBuffers;
 
             PipelineElements.Insert(index, newElement);

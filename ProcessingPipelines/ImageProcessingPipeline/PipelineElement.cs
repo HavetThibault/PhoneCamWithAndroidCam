@@ -1,21 +1,24 @@
 ﻿using ProcessingPipelines.PipelineUtils;
-
+using System.Windows.Threading;
 
 namespace ProcessingPipelines.ImageProcessingPipeline;
 
 public abstract class PipelineElement
 {
+    protected Dispatcher _uiDispatcher;
+
     public ProducerConsumerBuffers InputBuffers { get; set; }
     public ProducerConsumerBuffers OutputBuffers { get; set; }
-    public ProcessPerformances ProcessPerformances { get; set; }
+    public ProcessPerformancesModel ProcessPerformances { get; set; }
     public string Name { get; set; }
 
-    public PipelineElement(string name, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering)
+    public PipelineElement(Dispatcher uiDispatcher, string name, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering)
     {
         OutputBuffers = outputMultipleBuffering;
         InputBuffers = inputMultipleBuffering;
         Name = name;
         ProcessPerformances = new(name);
+        _uiDispatcher = uiDispatcher;
     }
 
     public PipelineElement(PipelineElement element, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering)
@@ -23,7 +26,8 @@ public abstract class PipelineElement
         InputBuffers = inputMultipleBuffering;
         OutputBuffers = outputMultipleBuffering;
         Name = element.Name;
-        ProcessPerformances = element.ProcessPerformances.Clone();
+        ProcessPerformances = new(element.ProcessPerformances.ProcessName);
+        _uiDispatcher = element._uiDispatcher;
     }
 
     public void LaunchNewWorker(CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken)
@@ -39,7 +43,7 @@ public abstract class PipelineElement
     {
         if (cancellationTokens is (CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken))
         {
-            Process(InputBuffers, OutputBuffers, globalCancellationToken, specificCancellationToken, ProcessPerformances);
+            Process(InputBuffers, OutputBuffers, globalCancellationToken, specificCancellationToken);
         }
     }
 
@@ -49,7 +53,7 @@ public abstract class PipelineElement
     }
 
     public abstract void Process(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer,
-        CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken, ProcessPerformances processPerformances);
+        CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken);
 
     public abstract PipelineElement Clone(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer);
 }

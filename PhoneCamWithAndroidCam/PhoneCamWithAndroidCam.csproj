@@ -5,6 +5,10 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	<XamlDebuggingInformation>True</XamlDebuggingInformation>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	<LangVersion>Latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +16,10 @@
     <ProjectReference Include="..\ImageProcessingUtils\ImageProcessingUtils.csproj" />
     <ProjectReference Include="..\ProcessingPipelines\ProcessingPipelines.csproj" />
     <ProjectReference Include="..\SDK\Wpf.Common\Wpf.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<SupportedPlatform Include="windows" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace ProcessingPipelines.ImageProcessingPipeline
 {
@@ -35,13 +36,14 @@ namespace ProcessingPipelines.ImageProcessingPipeline
             return pipelineNames.OrderBy(x => x);
         }
 
-        public static PipelineElement GetInstance(string elementType, ProducerConsumerBuffers outputBuffer, string name)
+        public static PipelineElement GetInstance(string elementType, ProducerConsumerBuffers outputBuffer, string name, Dispatcher uiDispatcher)
         {
             switch (elementType)
             {
                 case COPY:
                     var copyFrameProcessor = new CopyFrameProcessor();
                     return new FrameProcessorPipelineElement(
+                        uiDispatcher,
                         name, 
                         copyFrameProcessor,
                         null,
@@ -50,6 +52,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 case CANNY_EDGE_DETECTION:
                     var cannyFrameProcessor = new CannyEdgeDetection(outputBuffer.Width, outputBuffer.Height);
                     return new FrameProcessorPipelineElement(
+                        uiDispatcher,
                         name, 
                         cannyFrameProcessor,
                         null,
@@ -58,6 +61,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 case GRAY_COLOR_MAP_INCREMENTOR:
                     GrayColorMapIncrementor grayColorMapFrameProcessor = new (outputBuffer.Width, outputBuffer.Height, outputBuffer.Stride);
                     return new FrameProcessorPipelineElement(
+                        uiDispatcher,
                         name,
                         grayColorMapFrameProcessor,
                         null, 
@@ -66,6 +70,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 case MEDIAN_FILTER:
                     grayColorMapFrameProcessor = new (outputBuffer.Width, outputBuffer.Height, outputBuffer.Stride);
                     return new FrameProcessorPipelineElement(
+                        uiDispatcher,
                         name, 
                         grayColorMapFrameProcessor,
                         null, 
@@ -73,6 +78,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                 case MOTION_DETECTION:
                     return new MotionDetectionPipelineElement(
+                        uiDispatcher,
                         name,
                         null,
                         outputBuffer);
@@ -80,6 +86,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 case COLOR_MAP_INCREMENTOR:
                     var colorMapIncrementor = new ColorMapIncrementor(outputBuffer.Width, outputBuffer.Height, outputBuffer.Stride);
                     return new FrameProcessorPipelineElement(
+                        uiDispatcher,
                         name,
                         colorMapIncrementor,
                         null, 
@@ -88,6 +95,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 case COLOR_MAP_SATURATOR:
                     var colorMapSaturator = new ColorMapSaturator(outputBuffer.Width, outputBuffer.Height, outputBuffer.Stride);
                     return new FrameProcessorPipelineElement(
+                        uiDispatcher,
                         name, 
                         colorMapSaturator,
                         null, 
@@ -96,6 +104,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 case COLOR_MAP_THRESHOLD:
                     var colorMapFrameProcessor = new ColorMapThreshold(outputBuffer.Width, outputBuffer.Height, outputBuffer.Stride, 5);
                     return new FrameProcessorPipelineElement(
+                        uiDispatcher,
                         name, 
                         colorMapFrameProcessor,
                         null, 

@@ -95,11 +95,11 @@ namespace PhoneCamWithAndroidCam.ViewModels
                 return;
 
             var newPipeline = new ImageProcessingPipeline(
-                _duplicateBuffersThread.AddNewOutputBuffer(),
+                editedViewModel.Pipeline.InputBuffer,
                 pipelineEditorViewModel.Pipeline);
             editedViewModel.Pipeline.Dispose();
             editedViewModel.Pipeline = newPipeline;
-            if(!_lastGlobalCancellationToken.IsCancellationRequested)
+            if (!_lastGlobalCancellationToken.IsCancellationRequested)
                 editedViewModel.PlayStreaming(_lastGlobalCancellationToken);
         }
 

@@ -9,6 +9,7 @@ using System.Threading;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Helper.MVVM;
+using System.Collections.ObjectModel;
 
 namespace PhoneCamWithAndroidCam.ViewModels;
 
@@ -25,8 +26,6 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
 
     private FeederPipeline _feederPipeline;
     private ProducerConsumerBuffers _feederPipelineOutput;
-
-    private Timer _refreshProcessTimer;
 
     public CancellationTokenSource PipelineCancellationToken { get; private set; }
 
@@ -70,20 +69,25 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
     public RelayCommand CommandLaunchStreaming { get; set; }
     public RelayCommand CommandStopStreaming { get; set; }
 
-    public DisplayStreamViewModel(Dispatcher uiDispatcher, ProcessPerformancesViewModel processPerformancesViewModel)
+    public DisplayStreamViewModel(Dispatcher uiDispatcher)
     {
         CommandLaunchStreaming = new RelayCommand(LaunchStreaming, CanLaunchStreaming);
         CommandStopStreaming = new RelayCommand(StopStreaming, CanStopStreaming);
 
         _uiDispatcher = uiDispatcher;
 
-        _phoneIp = "192.168.1.14";
+        _phoneIp = "192.168.115.245";
         _phoneCamClient = new(_phoneIp);
 
-        ProcessPerformancesViewModel = processPerformancesViewModel;
+        ProcessPerformancesViewModel = new();
 
         _feederPipelineOutput = new(640, 480, 640 * 4, 10, EBufferPixelsFormat.Bgra32Bits);
-        _feederPipeline = new FeederPipeline(_phoneCamClient, _feederPipelineOutput);
+        _feederPipeline = new FeederPipeline(uiDispatcher, _phoneCamClient, _feederPipelineOutput);
+
+        ProcessPerformancesViewModel.ProcessPerformances.Add(_feederPipeline.ProcessRawJpegStreamPerf);
+        ProcessPerformancesViewModel.ProcessPerformances.Add(_feederPipeline.ProcessRawJpegPerf);
+        ProcessPerformancesViewModel.ProcessPerformances.Add(_feederPipeline.ProcessBitmapsPerf);
+
         StreamsViewModel = new(this, uiDispatcher, _feederPipelineOutput);
     }
 
@@ -95,7 +99,6 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
         PipelineCancellationToken = new();
         _feederPipeline.StartFeeding(PipelineCancellationToken);
         StreamsViewModel.PlayStreaming(PipelineCancellationToken);
-        _refreshProcessTimer = new Timer(RefreshProcessTime, null, 400, 1000);
     }
 
     public bool CanLaunchStreaming(object parameter)
@@ -109,25 +112,11 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
         IsPhoneIpChangeable = true;
 
         PipelineCancellationToken.Cancel();
-        _refreshProcessTimer.Dispose();
     }
 
     public bool CanStopStreaming(object parameter)
     {
         return IsStreaming;
-    }
-
-    public void RefreshProcessTime(object? arg)
-    {
-        List<ProcessPerformances> perfsList = new()
-        {
-            _feederPipeline.ProcessRawJpegPerf,
-            _feederPipeline.ProcessRawJpegStreamPerf,
-            _feederPipeline.ProcessBitmapsPerf
-        };
-
-        _uiDispatcher.BeginInvoke(new Action(() => { Fps = _feederPipeline.Fps; }));
-        ProcessPerformancesViewModel.UpdatePerformances(perfsList);
     }
 
     public void Dispose()

@@ -15,7 +15,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
         public MainViewModel(Dispatcher uiDispatcher)
         {
-            _displayStreamViewModel = new DisplayStreamViewModel(uiDispatcher, new(uiDispatcher));
+            _displayStreamViewModel = new DisplayStreamViewModel(uiDispatcher);
         }
 
         public void Dispose()

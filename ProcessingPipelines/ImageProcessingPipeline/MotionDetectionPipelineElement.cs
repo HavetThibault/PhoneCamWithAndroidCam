@@ -6,14 +6,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace ProcessingPipelines.ImageProcessingPipeline
 {
     internal class MotionDetectionPipelineElement : PipelineElement
     {
-        public MotionDetectionPipelineElement(string name, ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer) : 
-            base(name, inputBuffer, outputBuffer)
-        {
+        public MotionDetectionPipelineElement(Dispatcher uiDispatcher, string name, ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer) : 
+            base(uiDispatcher, name, inputBuffer, outputBuffer)
+        { 
         }
 
         public MotionDetectionPipelineElement(MotionDetectionPipelineElement element, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering) 
@@ -26,7 +27,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         }
 
         public override void Process(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer,
-            CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken, ProcessPerformances processPerf)
+            CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken)
         {
             byte[] destBuffer = new byte[inputBuffer.Stride * inputBuffer.Height];
             byte[] lastFrameBuffer = new byte[inputBuffer.Stride * inputBuffer.Height];
@@ -59,12 +60,12 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                 if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                 {
-                    lock (processPerf)
+                    _uiDispatcher.BeginInvoke(new Action(() =>
                     {
-                        processPerf.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
-                        processPerf.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
-                        processPerf.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
-                    }
+                        ProcessPerformances.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
+                        ProcessPerformances.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
+                        ProcessPerformances.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
+                    }));
                     waitingReadTimeWatch.Reset();
                     processTimeWatch.Reset();
                     waitingWriteTimeWatch.Reset();

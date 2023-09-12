@@ -1,5 +1,4 @@
 ﻿using AndroidCamClient;
-using PhoneCamWithAndroidCam.Models;
 using ProcessingPipelines.ImageProcessingPipeline;
 using ProcessingPipelines.PipelineUtils;
 using System;
@@ -21,16 +20,15 @@ namespace PhoneCamWithAndroidCam.ViewModels
 {
     public class StreamViewModel : BindableClass
     {
-        private ImageSource _mainImageSource;
+        private ImageSource _mainImageSource = null;
         private Dispatcher _uiDispatcher;
         private ConvertToRawJpegThread _convertToRawJpegThreads;
         private ProducerConsumerBuffers<byte[]> _convertToRawJpegOutput;
-        private Timer _refreshPipelinePerfs;
         private CancellationTokenSource _globalCancellationToken;
         private int _fps;
         private bool _isStreaming;
         private volatile bool _isDisposed = false;
-        private string _pipelineName;
+        private ImageProcessingPipeline _pipeline;
 
         public int Fps
         {
@@ -50,25 +48,37 @@ namespace PhoneCamWithAndroidCam.ViewModels
             set => SetProperty(ref _isStreaming, value);
         }
 
-        public ImageProcessingPipeline Pipeline { get; set; }
+        public ImageProcessingPipeline Pipeline 
+        {
+            get => _pipeline;
+            set
+            {
+                _pipeline = value;
+                ProcessPerformancesViewmodel.RefreshProcessPerformances(
+                    value, 
+                    _convertToRawJpegThreads.ProcessPerformances);
+            }
+        }
 
         public string PipelineName => Pipeline.Name;
 
-        public ProcessPerformancesViewModel ProcessPerformancesViewModel { get; set; }
+        public ProcessPerformancesViewModel ProcessPerformancesViewmodel { get; set; }
 
         public StreamViewModel(Dispatcher uiDispatcher, ImageProcessingPipeline imageProcessingPipeline)
         {
             _uiDispatcher = uiDispatcher;
+            _isStreaming = false;
             _convertToRawJpegOutput = new(10);
             Pipeline = imageProcessingPipeline;
-            ProcessPerformancesViewModel = new(uiDispatcher);
+            ProcessPerformancesViewmodel = new(imageProcessingPipeline);
+            _convertToRawJpegThreads = new(_uiDispatcher, Pipeline.OutputBuffer, _convertToRawJpegOutput);
         }
 
         public void PlayStreaming(CancellationTokenSource globalCancellationToken)
         {
             _globalCancellationToken = globalCancellationToken;
-            IsStreaming = true;
-            _convertToRawJpegThreads = new(Pipeline.OutputBuffer, _convertToRawJpegOutput);
+            _isStreaming = true;
+            
             Pipeline.Start(globalCancellationToken);
             _convertToRawJpegThreads.LaunchNewWorker(globalCancellationToken);
             var refreshMainPicturethread = new Thread(RefreshMainPicture)
@@ -76,7 +86,6 @@ namespace PhoneCamWithAndroidCam.ViewModels
                 Name = nameof(RefreshMainPicture)
             };
             refreshMainPicturethread.Start(globalCancellationToken);
-            _refreshPipelinePerfs = new(RefreshImageProcessingPipelinePerfs, null, 400, 1000);
         }
 
         private void RefreshMainPicture(object? cancellationTokenSourceObj)
@@ -108,20 +117,6 @@ namespace PhoneCamWithAndroidCam.ViewModels
             }
         }
 
-        private void RefreshImageProcessingPipelinePerfs(object? arg)
-        {
-            if(!_globalCancellationToken.IsCancellationRequested)
-            {
-                List<ProcessPerformances> perfs = new(Pipeline.ElementsProcessPerformances)
-                {
-                    _convertToRawJpegThreads.ProcessPerformances
-                };
-                ProcessPerformancesViewModel.UpdatePerformances(perfs);
-            }
-            else
-                _refreshPipelinePerfs.Dispose();
-        }
-
         private void UpdateMainPicture(MemoryStream memoryStream)
         {
             MainImageSource = BitmapExtension.Convert(memoryStream); 
@@ -130,7 +125,6 @@ namespace PhoneCamWithAndroidCam.ViewModels
         public void Dispose()
         {
             _isDisposed = true;
-            _refreshPipelinePerfs?.Dispose();
             Pipeline?.Dispose();
             _convertToRawJpegOutput?.Dispose();
         }

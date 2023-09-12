@@ -3,7 +3,9 @@ using ProcessingPipelines.PipelineUtils;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Net.WebSockets;
+using System.Windows.Threading;
 
 namespace ProcessingPipelines.ImageProcessingPipeline
 {
@@ -14,13 +16,15 @@ namespace ProcessingPipelines.ImageProcessingPipeline
     {
         private int _height;
         private int _width;
+        private Dispatcher _uiDispatcher;
 
         public ProducerConsumerBuffers InputMultipleBuffering { get; set; }
         public ProducerConsumerBuffers<byte[]> OutputMultipleBuffering { get; set; }
-        public ProcessPerformances ProcessPerformances { get; set; }
+        public ProcessPerformancesModel ProcessPerformances { get; set; }
 
-        public ConvertToRawJpegThread(ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers<byte[]> outputMultipleBuffering)
+        public ConvertToRawJpegThread(Dispatcher uiDispatcher, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers<byte[]> outputMultipleBuffering)
         {
+            _uiDispatcher = uiDispatcher;
             OutputMultipleBuffering = outputMultipleBuffering;
             InputMultipleBuffering = inputMultipleBuffering;
             ProcessPerformances = new("Convert to raw JPEG");
@@ -83,12 +87,11 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                     if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                     {
-                        lock (ProcessPerformances)
-                        {
+                        _uiDispatcher.BeginInvoke(new Action(() => {
                             ProcessPerformances.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
                             ProcessPerformances.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
                             ProcessPerformances.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
-                        }
+                        }));
                         waitingReadTimeWatch.Reset();
                         processTimeWatch.Reset();
                         waitingWriteTimeWatch.Reset();

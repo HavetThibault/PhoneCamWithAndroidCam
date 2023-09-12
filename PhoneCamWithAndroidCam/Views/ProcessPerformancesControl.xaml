@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PhoneCamWithAndroidCam.Views"
-             xmlns:models="clr-namespace:PhoneCamWithAndroidCam.Models"
+             xmlns:models="clr-namespace:ProcessingPipelines.PipelineUtils;assembly=ProcessingPipelines"
              xmlns:viewmodels="clr-namespace:PhoneCamWithAndroidCam.ViewModels"
              xmlns:views="clr-namespace:PhoneCamWithAndroidCam.Views"
              xmlns:converters="clr-namespace:PhoneCamWithAndroidCam.Converters"
