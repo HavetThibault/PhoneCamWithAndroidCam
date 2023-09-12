@@ -22,6 +22,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private DuplicateBuffersThread _duplicateBuffersThread;
         private Dispatcher _uiDispatcher;
         private DisplayStreamViewModel _parent;
+        private CancellationTokenSource _lastGlobalCancellationToken;
 
         public ObservableCollection<StreamViewModel> StreamViews { get; set; }
 
@@ -93,17 +94,21 @@ namespace PhoneCamWithAndroidCam.ViewModels
             if (dialogWindowViewModel.DialogResult is false)
                 return;
 
-            int index = StreamViews.IndexOf(editedViewModel);
-            DeleteAndDispose(editedViewModel);
-            InsertPipelineFromPipelineEditorViewModel(index, pipelineEditorViewModel);
+            var newPipeline = new ImageProcessingPipeline(
+                _duplicateBuffersThread.AddNewOutputBuffer(),
+                pipelineEditorViewModel.Pipeline);
+            editedViewModel.Pipeline.Dispose();
+            editedViewModel.Pipeline = newPipeline;
+            if(!_lastGlobalCancellationToken.IsCancellationRequested)
+                editedViewModel.PlayStreaming(_lastGlobalCancellationToken);
         }
 
         private void DeleteAndDispose(object sender)
         {
             var deletedViewModel = (StreamViewModel)sender;
             StreamViews.Remove(deletedViewModel);
-            deletedViewModel.Dispose();
             _duplicateBuffersThread.DeleteOutputBuffer(deletedViewModel.Pipeline.InputBuffer);
+            deletedViewModel.Dispose();
         }
 
         private void AddPipeline(object parameter)
@@ -133,20 +138,9 @@ namespace PhoneCamWithAndroidCam.ViewModels
                 streamViewModel.PlayStreaming(_parent.PipelineCancellationToken);
         }
 
-        private void InsertPipelineFromPipelineEditorViewModel(int index, PipelineEditorViewModel pipelineEditorViewModel)
-        {
-            var newPipeline = new ImageProcessingPipeline(
-                pipelineEditorViewModel.Pipeline.InputBuffer, 
-                pipelineEditorViewModel.Pipeline);
-            var streamViewModel = new StreamViewModel(_uiDispatcher, newPipeline);
-            StreamViews.Insert(index, streamViewModel);
-
-            if (_parent.IsStreaming)
-                streamViewModel.PlayStreaming(_parent.PipelineCancellationToken);
-        }
-
         internal void PlayStreaming(CancellationTokenSource cancellationToken)
         {
+            _lastGlobalCancellationToken = cancellationToken;
             _duplicateBuffersThread.Start(cancellationToken);
             foreach(var streamView in StreamViews)
                 streamView.PlayStreaming(cancellationToken);
