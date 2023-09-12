@@ -30,23 +30,28 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
             Pipeline = new ImageProcessingPipeline(inputBuffer);
         }
 
-        public PipelineEditorViewModel(ImageProcessingPipeline pipeline) : base($"Edit '{pipeline.Name}'")
+        public PipelineEditorViewModel(ImageProcessingPipeline pipeline, ProducerConsumerBuffers inputBuffer) : base($"Edit '{pipeline.Name}'")
         {
-            Pipeline = pipeline;
+            Pipeline = new ImageProcessingPipeline(inputBuffer, pipeline);
             Items = new();
             Items.Add(new AddPipelineButtonViewModel(AddPipelineElement, Items));
             int i = 0;
-            foreach(var element in pipeline.PipelineElements)
-                AddPipelineElement(i++, element.Name);
+            foreach(var element in Pipeline.PipelineElements)
+                AddItemsForNewPipelineElements(i++, element.Name);
         }
 
         private void AddPipelineElement(int index, string elementType)
         {
             var newElement = Pipeline.InstantiateAndInsert(index, elementType);
 
+            AddItemsForNewPipelineElements(index, newElement.Name);
+        }
+
+        private void AddItemsForNewPipelineElements(int index, string elementName)
+        {
             int offset = index * 4 + 1;
             Items.Insert(offset++, new VerticalLine());
-            Items.Insert(offset++, new PipelineElementViewModel(newElement.Name, DeleteElement));
+            Items.Insert(offset++, new PipelineElementViewModel(elementName, DeleteElement));
             Items.Insert(offset++, new VerticalLine());
             Items.Insert(offset, new AddPipelineButtonViewModel(AddPipelineElement, Items));
         }

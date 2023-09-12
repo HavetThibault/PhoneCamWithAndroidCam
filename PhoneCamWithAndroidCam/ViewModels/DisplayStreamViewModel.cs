@@ -110,7 +110,6 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
 
         PipelineCancellationToken.Cancel();
         _refreshProcessTimer.Dispose();
-        StreamsViewModel.StopStreaming();
     }
 
     public bool CanStopStreaming(object parameter)

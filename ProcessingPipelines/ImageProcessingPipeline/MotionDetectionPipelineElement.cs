@@ -11,9 +11,18 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 {
     internal class MotionDetectionPipelineElement : PipelineElement
     {
-        public MotionDetectionPipelineElement(string name, ProducerConsumerBuffers outputMultipleBuffering) : 
-            base(name, outputMultipleBuffering)
+        public MotionDetectionPipelineElement(string name, ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer) : 
+            base(name, inputBuffer, outputBuffer)
         {
+        }
+
+        public MotionDetectionPipelineElement(MotionDetectionPipelineElement element, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering) 
+            : base(element, inputMultipleBuffering, outputMultipleBuffering)
+        { }
+
+        public override PipelineElement Clone(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer)
+        {
+            return new MotionDetectionPipelineElement(this, inputBuffer, outputBuffer);
         }
 
         public override void Process(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer,

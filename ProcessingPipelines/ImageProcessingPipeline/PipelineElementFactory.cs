@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ProcessingPipelines.ImageProcessingPipeline
 {
-    public static class PipelineElementBuilder
+    public static class PipelineElementFactory
     {
         public const string COPY = "Copy";
         public const string CANNY_EDGE_DETECTION = "Canny edge detection";
@@ -35,7 +35,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
             return pipelineNames.OrderBy(x => x);
         }
 
-        public static PipelineElement Build(string elementType, ProducerConsumerBuffers outputBuffer, string name)
+        public static PipelineElement GetInstance(string elementType, ProducerConsumerBuffers outputBuffer, string name)
         {
             switch (elementType)
             {
@@ -43,7 +43,8 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                     var copyFrameProcessor = new CopyFrameProcessor();
                     return new FrameProcessorPipelineElement(
                         name, 
-                        copyFrameProcessor, 
+                        copyFrameProcessor,
+                        null,
                         outputBuffer);
 
                 case CANNY_EDGE_DETECTION:
@@ -51,45 +52,53 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                     return new FrameProcessorPipelineElement(
                         name, 
                         cannyFrameProcessor,
+                        null,
                         outputBuffer);
 
                 case GRAY_COLOR_MAP_INCREMENTOR:
                     GrayColorMapIncrementor grayColorMapFrameProcessor = new (outputBuffer.Width, outputBuffer.Height, outputBuffer.Stride);
                     return new FrameProcessorPipelineElement(
                         name,
-                        grayColorMapFrameProcessor, 
+                        grayColorMapFrameProcessor,
+                        null, 
                         outputBuffer);
 
                 case MEDIAN_FILTER:
                     grayColorMapFrameProcessor = new (outputBuffer.Width, outputBuffer.Height, outputBuffer.Stride);
                     return new FrameProcessorPipelineElement(
                         name, 
-                        grayColorMapFrameProcessor, 
+                        grayColorMapFrameProcessor,
+                        null, 
                         outputBuffer);
 
                 case MOTION_DETECTION:
                     return new MotionDetectionPipelineElement(
                         name,
+                        null,
                         outputBuffer);
 
                 case COLOR_MAP_INCREMENTOR:
                     var colorMapIncrementor = new ColorMapIncrementor(outputBuffer.Width, outputBuffer.Height, outputBuffer.Stride);
                     return new FrameProcessorPipelineElement(
                         name,
-                        colorMapIncrementor, 
+                        colorMapIncrementor,
+                        null, 
                         outputBuffer);
 
                 case COLOR_MAP_SATURATOR:
                     var colorMapSaturator = new ColorMapSaturator(outputBuffer.Width, outputBuffer.Height, outputBuffer.Stride);
                     return new FrameProcessorPipelineElement(
                         name, 
-                        colorMapSaturator, 
+                        colorMapSaturator,
+                        null, 
                         outputBuffer);
 
                 case COLOR_MAP_THRESHOLD:
                     var colorMapFrameProcessor = new ColorMapThreshold(outputBuffer.Width, outputBuffer.Height, outputBuffer.Stride, 5);
                     return new FrameProcessorPipelineElement(
-                        name, colorMapFrameProcessor, 
+                        name, 
+                        colorMapFrameProcessor,
+                        null, 
                         outputBuffer);
 
                 default:

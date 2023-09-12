@@ -28,6 +28,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         public RelayCommand AddPipelineCommand { get; set; }
         public RelayCommand MoveUpCommand { get; set; }
         public RelayCommand MoveDownCommand { get; set; }
+        public RelayCommand EditCommand { get; set; }
         public RelayCommand DeleteCommand { get; set; }
 
         public StreamsViewModel(DisplayStreamViewModel parent, Dispatcher uiDispatcher, ProducerConsumerBuffers pipelineInput)
@@ -40,7 +41,8 @@ namespace PhoneCamWithAndroidCam.ViewModels
             AddPipelineCommand = new(AddPipeline);
             MoveUpCommand = new(MoveUp);
             MoveDownCommand = new(MoveDown);
-            DeleteCommand = new(Delete);
+            EditCommand = new(Edit);
+            DeleteCommand = new(DeleteAndDispose);
         }
 
         private void MoveUp(object sender)
@@ -79,31 +81,65 @@ namespace PhoneCamWithAndroidCam.ViewModels
             StreamViews.Move(senderViewModelIndex, senderViewModelIndex + 1);
         }
 
-        private void Delete(object sender)
+        private void Edit(object sender)
         {
-            var deletedViewModel = sender as StreamViewModel;
+            var inputBuffer = _duplicateBuffersThread.AddNewOutputBuffer();
+            var editedViewModel = (StreamViewModel)sender;
+            var pipelineEditorViewModel = new PipelineEditorViewModel(editedViewModel.Pipeline, inputBuffer);
+            var pipelineEditorControl = new PipelineEditorControl(pipelineEditorViewModel);
+            var dialogWindowViewModel = new DialogWindowViewModel("Create new pipeline");
+            new DialogWindow(pipelineEditorControl, dialogWindowViewModel).ShowDialog();
+
+            if (dialogWindowViewModel.DialogResult is false)
+                return;
+
+            int index = StreamViews.IndexOf(editedViewModel);
+            DeleteAndDispose(editedViewModel);
+            InsertPipelineFromPipelineEditorViewModel(index, pipelineEditorViewModel);
+        }
+
+        private void DeleteAndDispose(object sender)
+        {
+            var deletedViewModel = (StreamViewModel)sender;
             StreamViews.Remove(deletedViewModel);
             deletedViewModel.Dispose();
+            _duplicateBuffersThread.DeleteOutputBuffer(deletedViewModel.Pipeline.InputBuffer);
         }
 
         private void AddPipeline(object parameter)
         {
-            var outputBuffer = _duplicateBuffersThread.AddNewOutputBuffer();
+            var inputBuffer = _duplicateBuffersThread.AddNewOutputBuffer();
 
-            var pipelineEditorViewModel = new PipelineEditorViewModel(outputBuffer);
+            var pipelineEditorViewModel = new PipelineEditorViewModel(inputBuffer);
             var pipelineEditorControl = new PipelineEditorControl(pipelineEditorViewModel);
             var dialogWindowViewModel = new DialogWindowViewModel("Create new pipeline");
             new DialogWindow(pipelineEditorControl, dialogWindowViewModel).ShowDialog();
 
             if (dialogWindowViewModel.DialogResult is false)
             {
-                _duplicateBuffersThread.DeleteOutputBuffer(outputBuffer);
+                _duplicateBuffersThread.DeleteOutputBuffer(inputBuffer);
                 return;
             }
-                
+            AddPipelineFromPipelineEditorViewModel(pipelineEditorViewModel);
+        }
+
+        private void AddPipelineFromPipelineEditorViewModel(PipelineEditorViewModel pipelineEditorViewModel)
+        {
             var newPipeline = pipelineEditorViewModel.Pipeline;
             var streamViewModel = new StreamViewModel(_uiDispatcher, newPipeline);
             StreamViews.Add(streamViewModel);
+
+            if (_parent.IsStreaming)
+                streamViewModel.PlayStreaming(_parent.PipelineCancellationToken);
+        }
+
+        private void InsertPipelineFromPipelineEditorViewModel(int index, PipelineEditorViewModel pipelineEditorViewModel)
+        {
+            var newPipeline = new ImageProcessingPipeline(
+                pipelineEditorViewModel.Pipeline.InputBuffer, 
+                pipelineEditorViewModel.Pipeline);
+            var streamViewModel = new StreamViewModel(_uiDispatcher, newPipeline);
+            StreamViews.Insert(index, streamViewModel);
 
             if (_parent.IsStreaming)
                 streamViewModel.PlayStreaming(_parent.PipelineCancellationToken);
@@ -114,12 +150,6 @@ namespace PhoneCamWithAndroidCam.ViewModels
             _duplicateBuffersThread.Start(cancellationToken);
             foreach(var streamView in StreamViews)
                 streamView.PlayStreaming(cancellationToken);
-        }
-
-        public void StopStreaming()
-        {
-            foreach (var streamView in StreamViews)
-                streamView.PauseStreaming();
         }
 
         internal void Dispose()

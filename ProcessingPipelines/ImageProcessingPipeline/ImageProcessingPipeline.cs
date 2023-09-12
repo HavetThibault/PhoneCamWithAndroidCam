@@ -19,7 +19,7 @@ public class ImageProcessingPipeline
             _inputBuffer = value;
             var firstElement = PipelineElements.First() ?? 
                 throw new AggregateException("You should first assign pipeline elements to the pipeline before setting the InputBuffer.");
-            firstElement.InputMultipleBuffering = value;
+            firstElement.InputBuffers = value;
         }
     }
 
@@ -27,7 +27,7 @@ public class ImageProcessingPipeline
 
     public List<PipelineElement> PipelineElements { get; set; }
 
-    public ProducerConsumerBuffers OutputBuffer => PipelineElements.Last().OutputMultipleBuffering;
+    public ProducerConsumerBuffers OutputBuffer => PipelineElements.Last().OutputBuffers;
 
     public List<ProcessPerformances> ElementsProcessPerformances { get; set; }
 
@@ -39,18 +39,20 @@ public class ImageProcessingPipeline
         _specificCancellationToken = new();
     }
 
-    public ImageProcessingPipeline(ImageProcessingPipeline pipeline)
+    public ImageProcessingPipeline(ProducerConsumerBuffers inputBuffer, ImageProcessingPipeline pipeline) : this(inputBuffer)
     {
-
-    }
-
-    public void Add(PipelineElement pipelineElement)
-    {
-        if (PipelineElements.Count > 0)
-            pipelineElement.InputMultipleBuffering = PipelineElements.Last().OutputMultipleBuffering;
-        else
-            pipelineElement.InputMultipleBuffering = InputBuffer;
-        PipelineElements.Add(pipelineElement);
+        int i = 0;
+        ProducerConsumerBuffers previousElementOutput = null;
+        foreach (var element in pipeline.PipelineElements)
+        {
+            PipelineElement copiedElement;
+            if(i == 0)
+                PipelineElements.Add(copiedElement = element.Clone(InputBuffer, (ProducerConsumerBuffers)element.OutputBuffers.Clone()));
+            else
+                PipelineElements.Add(copiedElement = element.Clone(previousElementOutput, (ProducerConsumerBuffers)element.OutputBuffers.Clone()));
+            previousElementOutput = copiedElement.OutputBuffers;
+            i = 1;
+        }
     }
 
     private string GetNextAvailableElementName(string name)
@@ -74,41 +76,36 @@ public class ImageProcessingPipeline
         PipelineElement newElement;
         if (index == 0)
         {
-            if (InputBuffer is null)
-                newElement = PipelineElementBuilder.Build(elementType, null, name);
-            else
-            {
-                newElement = PipelineElementBuilder.Build(
-                    elementType,
-                    (ProducerConsumerBuffers)InputBuffer.Clone(),
-                    name);
-                newElement.InputMultipleBuffering = InputBuffer;
-            }
+            newElement = PipelineElementFactory.GetInstance(
+                elementType,
+                (ProducerConsumerBuffers)InputBuffer.Clone(),
+                name);
+            newElement.InputBuffers = InputBuffer;
                 
             PipelineElements.Insert(0, newElement);
         }
         else if(index == PipelineElements.Count)
         {
             previousElement = PipelineElements.Last();
-            newElement = PipelineElementBuilder.Build(
+            newElement = PipelineElementFactory.GetInstance(
                 elementType, 
-                (ProducerConsumerBuffers)previousElement.OutputMultipleBuffering.Clone(),
+                (ProducerConsumerBuffers)previousElement.OutputBuffers.Clone(),
                 name);
 
-            newElement.InputMultipleBuffering = previousElement.OutputMultipleBuffering;
+            newElement.InputBuffers = previousElement.OutputBuffers;
             PipelineElements.Add(newElement);
         }
         else
         {
             previousElement = PipelineElements.ElementAt(index - 1);
-            previousElement.OutputMultipleBuffering = 
-                (ProducerConsumerBuffers)previousElement.OutputMultipleBuffering.Clone();
+            previousElement.OutputBuffers = 
+                (ProducerConsumerBuffers)previousElement.OutputBuffers.Clone();
             nextElement = PipelineElements.ElementAt(index);
-            newElement = PipelineElementBuilder.Build(
+            newElement = PipelineElementFactory.GetInstance(
                 elementType,
-                nextElement.InputMultipleBuffering,
+                nextElement.InputBuffers,
                 name);
-            newElement.InputMultipleBuffering = previousElement.OutputMultipleBuffering;
+            newElement.InputBuffers = previousElement.OutputBuffers;
 
             PipelineElements.Insert(index, newElement);
         }
@@ -156,8 +153,8 @@ public class ImageProcessingPipeline
     public void RemoveAt(int index)
     {
         if(index != PipelineElements.Count - 1)
-            PipelineElements[index + 1].InputMultipleBuffering = PipelineElements[index].InputMultipleBuffering;
-        PipelineElements[index].OutputMultipleBuffering.Dispose();
+            PipelineElements[index + 1].InputBuffers = PipelineElements[index].InputBuffers;
+        PipelineElements[index].OutputBuffers.Dispose();
         PipelineElements.RemoveAt(index);
     }
 }

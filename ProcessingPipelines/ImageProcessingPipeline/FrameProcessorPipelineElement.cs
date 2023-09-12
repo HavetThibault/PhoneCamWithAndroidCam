@@ -14,14 +14,21 @@ namespace ProcessingPipelines.ImageProcessingPipeline
     {
         private IFrameProcessor _frameProcessor;
 
-        public FrameProcessorPipelineElement(string name, IFrameProcessor frameProcessor, ProducerConsumerBuffers outputMultipleBuffering) : base(name, outputMultipleBuffering)
+        public FrameProcessorPipelineElement(string name, IFrameProcessor frameProcessor, ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer) 
+            : base(name, inputBuffer, outputBuffer)
         {
             _frameProcessor = frameProcessor;
         }
 
-        public FrameProcessorPipelineElement(FrameProcessorPipelineElement element, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering) : base(inputMultipleBuffering, outputMultipleBuffering, element)
+        public FrameProcessorPipelineElement(FrameProcessorPipelineElement element, ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer) 
+            : base(element, inputBuffer, outputBuffer)
         {
             _frameProcessor = element._frameProcessor.Clone();
+        }
+
+        public override PipelineElement Clone(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer)
+        {
+            return new FrameProcessorPipelineElement(this, inputBuffer, outputBuffer);
         }
 
         public override void Process(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer, 

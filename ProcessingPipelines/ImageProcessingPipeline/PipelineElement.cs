@@ -5,26 +5,23 @@ namespace ProcessingPipelines.ImageProcessingPipeline;
 
 public abstract class PipelineElement
 {
-    public ProducerConsumerBuffers InputMultipleBuffering { get; set; }
-    public ProducerConsumerBuffers OutputMultipleBuffering { get; set; }
+    public ProducerConsumerBuffers InputBuffers { get; set; }
+    public ProducerConsumerBuffers OutputBuffers { get; set; }
     public ProcessPerformances ProcessPerformances { get; set; }
     public string Name { get; set; }
 
-    public PipelineElement(string name, ProducerConsumerBuffers outputMultipleBuffering)
-        : this(name, null, outputMultipleBuffering) { }
-
     public PipelineElement(string name, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering)
     {
-        OutputMultipleBuffering = outputMultipleBuffering;
-        InputMultipleBuffering = inputMultipleBuffering;
+        OutputBuffers = outputMultipleBuffering;
+        InputBuffers = inputMultipleBuffering;
         Name = name;
         ProcessPerformances = new(name);
     }
 
-    public PipelineElement(ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering, PipelineElement element)
+    public PipelineElement(PipelineElement element, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering)
     {
-        InputMultipleBuffering = inputMultipleBuffering;
-        OutputMultipleBuffering = outputMultipleBuffering;
+        InputBuffers = inputMultipleBuffering;
+        OutputBuffers = outputMultipleBuffering;
         Name = element.Name;
         ProcessPerformances = element.ProcessPerformances.Clone();
     }
@@ -42,16 +39,17 @@ public abstract class PipelineElement
     {
         if (cancellationTokens is (CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken))
         {
-            Process(InputMultipleBuffering, OutputMultipleBuffering, globalCancellationToken, specificCancellationToken, ProcessPerformances);
+            Process(InputBuffers, OutputBuffers, globalCancellationToken, specificCancellationToken, ProcessPerformances);
         }
     }
 
     public void Dispose()
     {
-        OutputMultipleBuffering?.Dispose();
+        OutputBuffers?.Dispose();
     }
 
     public abstract void Process(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer,
         CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken, ProcessPerformances processPerformances);
 
+    public abstract PipelineElement Clone(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer);
 }

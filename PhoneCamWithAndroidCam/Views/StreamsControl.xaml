@@ -84,6 +84,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <common:SymbolButton
                                         Glyph="ArrowUp8"
@@ -98,8 +99,14 @@
                                         CommandParameter="{Binding ElementName=StreamViewModelGrid, 
                                             Path=DataContext}"/>
                                     <common:SymbolButton 
-                                        Style="{StaticResource Style.DeleteSymboButton}"
+                                        Glyph="Edit"
                                         Grid.Column="2"
+                                        Command="{Binding EditCommand}"
+                                        CommandParameter="{Binding ElementName=StreamViewModelGrid, 
+                                            Path=DataContext}"/>
+                                    <common:SymbolButton 
+                                        Style="{StaticResource Style.DeleteSymboButton}"
+                                        Grid.Column="3"
                                         Command="{Binding DeleteCommand}"
                                         CommandParameter="{Binding ElementName=StreamViewModelGrid, 
                                             Path=DataContext}"/>
