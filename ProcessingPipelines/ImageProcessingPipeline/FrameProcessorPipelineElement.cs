@@ -17,7 +17,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         private IFrameProcessor _frameProcessor;
 
         public FrameProcessorPipelineElement(Dispatcher uiDispatcher, string name, IFrameProcessor frameProcessor, ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer) 
-            : base(uiDispatcher, name, inputBuffer, outputBuffer)
+            : base(uiDispatcher, name, frameProcessor.ElementTypeName, inputBuffer, outputBuffer)
         {
             _frameProcessor = frameProcessor;
         }

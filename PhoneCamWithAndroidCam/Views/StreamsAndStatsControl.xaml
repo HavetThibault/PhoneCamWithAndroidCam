@@ -46,7 +46,7 @@
                             Text="{Binding PhoneIp}" 
                             Margin="5,1,5,0"
                             Height="25"
-                            Width="100"
+                            Width="130"
                             IsEnabled="{Binding IsPhoneIpChangeable}"/>
                     </StackPanel>
                     <views:ProcessPerformancesControl DataContext="{Binding ProcessPerformancesViewModel}"/>

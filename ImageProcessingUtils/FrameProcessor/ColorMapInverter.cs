@@ -7,28 +7,28 @@ using System.Threading.Tasks;
 
 namespace ImageProcessingUtils.FrameProcessor
 {
-    public class ColorMapSaturator : FrameProcessor
+    public class ColorMapInverter : FrameProcessor
     {
-        public const string ELEMENT_TYPE_NAME = "Color map saturator";
+        public const string ELEMENT_TYPE_NAME = "Color map inverter";
 
         private byte[] _colorMap;
 
-        public ColorMapSaturator(int width, int height, int stride) : base(width, height, stride) 
+        public ColorMapInverter(int width, int height, int stride) : base(width, height, stride)
         {
             ElementTypeName = ELEMENT_TYPE_NAME;
             _colorMap = new byte[256];
             _stride = stride;
-            InitColorMap();
+            InitColorMapAndCo();
         }
 
-        public ColorMapSaturator(ColorMapSaturator colorMapSaturator) 
-            : this(colorMapSaturator._width, colorMapSaturator._height, colorMapSaturator._stride) 
+        public ColorMapInverter(ColorMapInverter colorMapInverter) 
+            : this(colorMapInverter._width, colorMapInverter._height, colorMapInverter._stride) 
         { }
 
-        private void InitColorMap()
+        private void InitColorMapAndCo()
         {
-            for (int i = 0; i < _colorMap.Length; i++)
-                _colorMap[i] = (byte)(i / 2.0 + 128);
+            for(int i = 0; i < _colorMap.Length; i++)
+                _colorMap[i] = (byte)(255 - i);
         }
 
         public override void ProcessFrame(byte[] srcBuffer, byte[] dstBuffer)
@@ -37,7 +37,7 @@ namespace ImageProcessingUtils.FrameProcessor
             int byteWidth = 4 * _width;
             for (int y = 0; y < _height; y++)
             {
-                for (int x = 0; x < byteWidth; x += 4)
+                for(int x = 0; x < byteWidth; x+=4)
                 {
                     lineOffset = y * _stride + x;
                     dstBuffer[lineOffset] = _colorMap[srcBuffer[lineOffset]];
@@ -50,7 +50,7 @@ namespace ImageProcessingUtils.FrameProcessor
 
         public override IFrameProcessor Clone()
         {
-            return new ColorMapSaturator(this);
+            return new ColorMapInverter(this);
         }
     }
 }

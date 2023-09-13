@@ -11,8 +11,11 @@ namespace ImageProcessingUtils.FrameProcessor
     /// </summary>
     public class MedianFilter : FrameProcessor
     {
+        public const string ELEMENT_TYPE_NAME = "Median filter";
+
         public MedianFilter(int width, int height, int inputBufferStride) : base(width, height, inputBufferStride)
-        { 
+        {
+            ElementTypeName = ELEMENT_TYPE_NAME;
         }
 
         public MedianFilter(MedianFilter medianFilter) 

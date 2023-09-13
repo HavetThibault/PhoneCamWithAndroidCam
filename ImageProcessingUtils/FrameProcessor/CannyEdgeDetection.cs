@@ -5,6 +5,8 @@ namespace ImageProcessingUtils.FrameProcessor;
 
 public class CannyEdgeDetection : FrameProcessor
 {
+    public const string ELEMENT_TYPE_NAME = "Canny edge detection";
+
     private byte[] _grayBuffer1;
     private byte[] _grayBuffer2;
     private double[] _magnitudeBuffer;
@@ -25,6 +27,8 @@ public class CannyEdgeDetection : FrameProcessor
     /// <param name="cursorSize"> Must be odd otherwise the filter is not supported</param>
     public CannyEdgeDetection(int width, int height) : base(width, height)
     {
+        ElementTypeName = ELEMENT_TYPE_NAME;
+
         _width = width; _height = height;
         _pictureArea = new Rectangle(0, 0, _width, _height);
 

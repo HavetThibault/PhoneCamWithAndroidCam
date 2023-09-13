@@ -1,4 +1,5 @@
 ﻿using ImageProcessingUtils.FrameProcessor;
+using ImageProcessingUtils.SpecificFrameProcessor;
 using ProcessingPipelines.PipelineUtils;
 using System;
 using System.Collections.Generic;
@@ -11,14 +12,15 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 {
     public static class PipelineElementFactory
     {
-        public const string COPY = "Copy";
-        public const string CANNY_EDGE_DETECTION = "Canny edge detection";
-        public const string GRAY_COLOR_MAP_INCREMENTOR = "Gray color map incrementor";
-        public const string MEDIAN_FILTER = "Median filter";
-        public const string MOTION_DETECTION = "Motion detection";
-        public const string COLOR_MAP_INCREMENTOR = "Color map incrementor";
-        public const string COLOR_MAP_SATURATOR = "Color map saturator";
-        public const string COLOR_MAP_THRESHOLD = "Color map threshold";
+        public const string COPY = CopyFrameProcessor.ELEMENT_TYPE_NAME;
+        public const string CANNY_EDGE_DETECTION = CannyEdgeDetection.ELEMENT_TYPE_NAME;
+        public const string GRAY_COLOR_MAP_INCREMENTOR = GrayColorMapIncrementor.ELEMENT_TYPE_NAME;
+        public const string MEDIAN_FILTER = MedianFilter.ELEMENT_TYPE_NAME;
+        public const string MOTION_DETECTION = MotionDetection.ELEMENT_TYPE_NAME;
+        public const string COLOR_MAP_INCREMENTOR = ColorMapIncrementor.ELEMENT_TYPE_NAME;
+        public const string COLOR_MAP_SATURATOR = ColorMapSaturator.ELEMENT_TYPE_NAME;
+        public const string COLOR_MAP_THRESHOLD = ColorMapThreshold.ELEMENT_TYPE_NAME;
+        public const string COLOR_MAP_INVERTER = ColorMapInverter.ELEMENT_TYPE_NAME;
 
         public static IEnumerable<string> GetAllPipelineElementNames()
         {
@@ -32,6 +34,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 COLOR_MAP_INCREMENTOR,
                 COLOR_MAP_SATURATOR,
                 COLOR_MAP_THRESHOLD,
+                COLOR_MAP_INVERTER,
             };
             return pipelineNames.OrderBy(x => x);
         }
@@ -71,7 +74,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                     grayColorMapFrameProcessor = new (outputBuffer.Width, outputBuffer.Height, outputBuffer.Stride);
                     return new FrameProcessorPipelineElement(
                         uiDispatcher,
-                        name, 
+                        name,
                         grayColorMapFrameProcessor,
                         null, 
                         outputBuffer);
@@ -108,6 +111,15 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                         name, 
                         colorMapFrameProcessor,
                         null, 
+                        outputBuffer);
+
+                case COLOR_MAP_INVERTER:
+                    var colorMapInverter = new ColorMapInverter(outputBuffer.Width, outputBuffer.Height, outputBuffer.Stride);
+                    return new FrameProcessorPipelineElement(
+                        uiDispatcher,
+                        name,
+                        colorMapInverter,
+                        null,
                         outputBuffer);
 
                 default:

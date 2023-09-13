@@ -8,7 +8,14 @@ namespace ImageProcessingUtils.FrameProcessor
 {
     public class CopyFrameProcessor : IFrameProcessor
     {
-        public CopyFrameProcessor() { }
+        public const string ELEMENT_TYPE_NAME = "Copy";
+
+        public string ElementTypeName { get; set; }
+
+        public CopyFrameProcessor() 
+        {
+            ElementTypeName = ELEMENT_TYPE_NAME;
+        }
 
         public void ProcessFrame(byte[] srcFrame, byte[] dstFrame)
         {

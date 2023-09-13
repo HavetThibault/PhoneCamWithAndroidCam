@@ -13,7 +13,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
     internal class MotionDetectionPipelineElement : PipelineElement
     {
         public MotionDetectionPipelineElement(Dispatcher uiDispatcher, string name, ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer) : 
-            base(uiDispatcher, name, inputBuffer, outputBuffer)
+            base(uiDispatcher, name, MotionDetection.ELEMENT_TYPE_NAME, inputBuffer, outputBuffer)
         { 
         }
 

@@ -9,11 +9,15 @@ namespace ImageProcessingUtils.FrameProcessor
 {
     public class ColorMapIncrementor : FrameProcessor
     {
+        public const string ELEMENT_TYPE_NAME = "Color map incrementor";
+
         private byte[] _colorMap;
         private int[] _upOrDownColorMapIncrement;
 
         public ColorMapIncrementor(int width, int height, int stride) : base(width, height, stride)
         {
+            ElementTypeName = ELEMENT_TYPE_NAME;
+
             _colorMap = new byte[256];
             _upOrDownColorMapIncrement = new int[256];
             _stride = stride;

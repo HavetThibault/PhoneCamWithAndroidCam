@@ -9,6 +9,8 @@ namespace ImageProcessingUtils.FrameProcessor
 {
     public class ColorMapThreshold : FrameProcessor
     {
+        public const string ELEMENT_TYPE_NAME = "Color map threshold";
+
         private int _intervalNbr;
 
         private byte[] _colorMap;
@@ -16,6 +18,7 @@ namespace ImageProcessingUtils.FrameProcessor
 
         public ColorMapThreshold(int width, int height, int stride, int intervalNbr) : base(width, height, stride)
         {
+            ElementTypeName = ELEMENT_TYPE_NAME;
             _colorMap = new byte[256];
             _upOrDownColorMapIncrement = new int[256];
             _stride = stride;

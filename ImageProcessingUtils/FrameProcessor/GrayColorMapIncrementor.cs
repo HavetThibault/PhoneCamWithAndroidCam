@@ -8,6 +8,8 @@ namespace ImageProcessingUtils.FrameProcessor
 {
     public class GrayColorMapIncrementor : FrameProcessor
     {
+        public const string ELEMENT_TYPE_NAME = "Gray color map incrementor";
+
         private byte[] _tempGrayBuffer;
 
         private byte[] _colorMap;
@@ -16,6 +18,7 @@ namespace ImageProcessingUtils.FrameProcessor
         public GrayColorMapIncrementor(int width, int height, int stride) : 
             base(width, height, stride)
         {
+            ElementTypeName = ELEMENT_TYPE_NAME;
             _colorMap = new byte[256];
             _upOrDownColorMapIncrement = new int[256];
             _tempGrayBuffer = new byte[_width * _height];

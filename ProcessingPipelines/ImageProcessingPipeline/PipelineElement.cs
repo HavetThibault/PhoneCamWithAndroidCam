@@ -11,9 +11,11 @@ public abstract class PipelineElement
     public ProducerConsumerBuffers OutputBuffers { get; set; }
     public ProcessPerformancesModel ProcessPerformances { get; set; }
     public string Name { get; set; }
+    public string ElementTypeName { get; }
 
-    public PipelineElement(Dispatcher uiDispatcher, string name, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering)
+    public PipelineElement(Dispatcher uiDispatcher, string name, string elementTypeName, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering)
     {
+        ElementTypeName = elementTypeName;
         OutputBuffers = outputMultipleBuffering;
         InputBuffers = inputMultipleBuffering;
         Name = name;
@@ -23,6 +25,7 @@ public abstract class PipelineElement
 
     public PipelineElement(PipelineElement element, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering)
     {
+        ElementTypeName = element.ElementTypeName;
         InputBuffers = inputMultipleBuffering;
         OutputBuffers = outputMultipleBuffering;
         Name = element.Name;

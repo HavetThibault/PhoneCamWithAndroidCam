@@ -4,6 +4,8 @@ namespace ImageProcessingUtils.SpecificFrameProcessor;
 
 public class MotionDetection
 {
+    public const string ELEMENT_TYPE_NAME = "Motion detection";
+
     private byte[] _grayBuffer1;
     private byte[] _grayBuffer2;
 
@@ -14,8 +16,11 @@ public class MotionDetection
     private int _height;
     private Rectangle _pictureArea;
 
+    public string ElementTypeName { get; set; }
+
     public MotionDetection(int width, int height)
     {
+        ElementTypeName = ELEMENT_TYPE_NAME;
         _width = width; _height = height;
         _pictureArea = new Rectangle(0, 0, _width, _height);
 

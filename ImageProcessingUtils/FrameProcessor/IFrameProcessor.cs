@@ -10,5 +10,6 @@ namespace ImageProcessingUtils.FrameProcessor
     {
         public abstract void ProcessFrame(byte[] srcFrame, byte[] dstFrame);
         public abstract IFrameProcessor Clone();
+        string ElementTypeName { get; set; }
     }
 }

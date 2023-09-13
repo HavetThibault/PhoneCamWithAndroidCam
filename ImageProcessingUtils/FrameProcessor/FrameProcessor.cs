@@ -12,6 +12,8 @@ namespace ImageProcessingUtils.FrameProcessor
         protected int _height;
         protected int _stride;
 
+        public string ElementTypeName { get; set; }
+
         public FrameProcessor(int width, int height)
         {
             _width = width;
