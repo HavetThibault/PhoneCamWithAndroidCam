@@ -210,7 +210,8 @@ namespace ProcessingPipelines.PipelineUtils
     public class ProducerConsumerBuffers<T> : IDisposable
     {
         private readonly object _elementsLock = new();
-        private int _unReadElementNbr;
+        private volatile int _unReadElementNbr;
+        public volatile bool IsDisposed = false;
 
         private readonly AutoResetEvent _canRetreive;
         private readonly AutoResetEvent _canAdd;
@@ -299,6 +300,7 @@ namespace ProcessingPipelines.PipelineUtils
         {
             _canAdd?.Close();
             _canRetreive?.Close();
+            IsDisposed = true;
         }
     }
 }

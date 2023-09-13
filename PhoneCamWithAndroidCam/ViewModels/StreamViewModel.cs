@@ -82,7 +82,13 @@ namespace PhoneCamWithAndroidCam.ViewModels
         {
             _globalCancellationToken = globalCancellationToken;
             _isStreaming = true;
-            
+
+            if(_convertToRawJpegOutput.IsDisposed)
+            {
+                _convertToRawJpegOutput = new(10);
+                _convertToRawJpegThreads.OutputBuffers = _convertToRawJpegOutput;
+            }
+
             Pipeline.Start(globalCancellationToken);
             _convertToRawJpegThreads.LaunchNewWorker(globalCancellationToken);
             _refreshMainPictureThread = new Thread(RefreshMainPicture)
@@ -92,7 +98,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
             _refreshMainPictureThread.Start(globalCancellationToken);
         }
 
-        private async void RefreshMainPicture(object? cancellationTokenObj)
+        private void RefreshMainPicture(object? cancellationTokenObj)
         {
             if(cancellationTokenObj is CancellationTokenSource cancellationToken)
             {
@@ -108,9 +114,9 @@ namespace PhoneCamWithAndroidCam.ViewModels
                         return;
 
                     var frameMemoryStream = new MemoryStream(frame);
-                    var dispatcherOper = _uiDispatcher.BeginInvoke(UpdateMainPicture, frameMemoryStream);
+                    var updateMainPictureOperation = _uiDispatcher.BeginInvoke(UpdateMainPicture, frameMemoryStream);
 
-                    while(!dispatcherOper.Task.IsCompleted) 
+                    while(!updateMainPictureOperation.Task.IsCompleted) 
                     {
                         if (_stopRefreshMainPictureThread.IsCancellationRequested)
                             break;
@@ -131,6 +137,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
         public void StopRefreshMainPictureThread()
         {
+            _convertToRawJpegOutput.Dispose();
             _stopRefreshMainPictureThread?.Cancel();
             _refreshMainPictureThread?.Join();
         }

@@ -33,12 +33,22 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
 
         public PipelineEditorViewModel(ImageProcessingPipeline pipeline, ProducerConsumerBuffers inputBuffer, Dispatcher uiDispatcher) : base($"Edit '{pipeline.Name}'")
         {
-            Pipeline = new ImageProcessingPipeline(inputBuffer, pipeline, uiDispatcher);
             Items = new();
             Items.Add(new AddPipelineButtonViewModel(AddPipelineElement, Items));
+            Pipeline = new ImageProcessingPipeline(inputBuffer, pipeline, uiDispatcher);
             int i = 0;
             foreach(var element in Pipeline.PipelineElements)
                 AddItemsForNewPipelineElements(i++, element.Name);
+        }
+
+        protected override bool CanOk(object parameter)
+        {
+            return Pipeline.PipelineElements.Count > 0;
+        }
+
+        protected override bool CanCancel(object parameter)
+        {
+            return true;
         }
 
         private void AddPipelineElement(int index, string elementType)
@@ -46,6 +56,7 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
             var newElement = Pipeline.InstantiateAndInsert(index, elementType);
 
             AddItemsForNewPipelineElements(index, newElement.Name);
+            OkCommand.RaiseCanExecuteChanged();
         }
 
         private void AddItemsForNewPipelineElements(int index, string elementName)
@@ -78,6 +89,7 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
             int inListIndex = Items.IndexOf(pipelineElement);
             for (int i = 0; i < 4; i++)
                 Items.RemoveAt(inListIndex - 1);
+            OkCommand.RaiseCanExecuteChanged();
         }
     }
 }

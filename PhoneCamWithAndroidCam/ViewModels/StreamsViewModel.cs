@@ -92,10 +92,9 @@ namespace PhoneCamWithAndroidCam.ViewModels
                 inputBuffer,
                 _uiDispatcher);
             var pipelineEditorControl = new PipelineEditorControl(pipelineEditorViewModel);
-            var dialogWindowViewModel = new DialogWindowViewModel("Create new pipeline");
-            new DialogWindow(pipelineEditorControl, dialogWindowViewModel).ShowDialog();
+            new DialogWindow(pipelineEditorControl, pipelineEditorViewModel).ShowDialog();
 
-            if (dialogWindowViewModel.DialogResult is false)
+            if (pipelineEditorViewModel.DialogResult is false)
             {
                 _duplicateBuffersThread.DeleteOutputBuffer(inputBuffer);
                 return;
@@ -126,10 +125,9 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
             var pipelineEditorViewModel = new PipelineEditorViewModel(inputBuffer, _uiDispatcher);
             var pipelineEditorControl = new PipelineEditorControl(pipelineEditorViewModel);
-            var dialogWindowViewModel = new DialogWindowViewModel("Create new pipeline");
-            new DialogWindow(pipelineEditorControl, dialogWindowViewModel).ShowDialog();
+            new DialogWindow(pipelineEditorControl, pipelineEditorViewModel).ShowDialog();
 
-            if (dialogWindowViewModel.DialogResult is false)
+            if (pipelineEditorViewModel.DialogResult is false)
             {
                 _duplicateBuffersThread.DeleteOutputBuffer(inputBuffer);
                 return;

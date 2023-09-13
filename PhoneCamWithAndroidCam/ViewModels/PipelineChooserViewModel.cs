@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Animation;
 using Wpf.Common.Controls;
 
 namespace PhoneCamWithAndroidCam.ViewModels
@@ -18,6 +19,16 @@ namespace PhoneCamWithAndroidCam.ViewModels
         {
             PipelinesName = new(pipelinesName);
             SelectedPipeline = null;
+        }
+
+        protected override bool CanOk(object parameter)
+        {
+            return true;
+        }
+
+        protected override bool CanCancel(object parameter)
+        {
+            return true;
         }
     }
 }
