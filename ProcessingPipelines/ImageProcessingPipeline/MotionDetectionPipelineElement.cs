@@ -60,7 +60,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                 if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                 {
-                    _uiDispatcher.BeginInvoke(new Action(() =>
+                    _uiDispatcher.Invoke(new Action(() =>
                     {
                         ProcessPerformances.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
                         ProcessPerformances.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;

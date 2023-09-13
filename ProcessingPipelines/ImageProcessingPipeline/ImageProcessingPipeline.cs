@@ -7,9 +7,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline;
 
 public class ImageProcessingPipeline
 {
-    
     private CancellationTokenSource _specificCancellationToken;
-    private bool _isStreaming = false;
     private ProducerConsumerBuffers _inputBuffer;
     private Dispatcher _uiDispatcher;
 
@@ -25,35 +23,39 @@ public class ImageProcessingPipeline
         }
     }
 
+    public bool IsStreaming { get; set; } = false;
+
     public string Name { get; set; } = "Default name";
 
     public List<PipelineElement> PipelineElements { get; set; }
 
-    public ProducerConsumerBuffers OutputBuffer => PipelineElements.Last().OutputBuffers;
+    public ProducerConsumerBuffers OutputBuffers => PipelineElements.Last().OutputBuffers;
 
-    public List<ProcessPerformancesModel> ElementsProcessPerformances { get; set; }
-
-    public ImageProcessingPipeline(ProducerConsumerBuffers inputBuffer)
+    public ImageProcessingPipeline(ProducerConsumerBuffers inputBuffer, Dispatcher uiDispatcher)
     {
         PipelineElements = new();
         _inputBuffer = inputBuffer;
-        ElementsProcessPerformances = new();
         _specificCancellationToken = new();
+        _uiDispatcher = uiDispatcher;
     }
 
-    public ImageProcessingPipeline(ProducerConsumerBuffers inputBuffer, ImageProcessingPipeline pipeline) : this(inputBuffer)
+    public ImageProcessingPipeline(ImageProcessingPipeline pipeline, Dispatcher uiDispatcher) 
+        : this(pipeline.InputBuffer, pipeline, uiDispatcher)
+    { }
+
+    public ImageProcessingPipeline(ProducerConsumerBuffers inputBuffer, ImageProcessingPipeline pipeline, Dispatcher uiDispatcher) 
+        : this(inputBuffer, uiDispatcher)
     {
-        int i = 0;
-        ProducerConsumerBuffers previousElementOutput = null;
-        foreach (var element in pipeline.PipelineElements)
+        var firstElem = pipeline.PipelineElements.First();
+        var clonedElement = firstElem.Clone(InputBuffer, (ProducerConsumerBuffers)firstElem.OutputBuffers.Clone());
+        PipelineElements.Add(clonedElement);
+        var previousElementOutput = clonedElement.OutputBuffers;
+        for(int i = 1; i < pipeline.PipelineElements.Count; i++)
         {
-            PipelineElement copiedElement;
-            if(i == 0)
-                PipelineElements.Add(copiedElement = element.Clone(InputBuffer, (ProducerConsumerBuffers)element.OutputBuffers.Clone()));
-            else
-                PipelineElements.Add(copiedElement = element.Clone(previousElementOutput, (ProducerConsumerBuffers)element.OutputBuffers.Clone()));
-            previousElementOutput = copiedElement.OutputBuffers;
-            i = 1;
+            var element = pipeline.PipelineElements[i];
+            clonedElement = element.Clone(previousElementOutput, (ProducerConsumerBuffers)element.OutputBuffers.Clone());
+            PipelineElements.Add(clonedElement);
+            previousElementOutput = clonedElement.OutputBuffers;
         }
     }
 
@@ -119,25 +121,21 @@ public class ImageProcessingPipeline
 
     public void Start(CancellationTokenSource globalCancellationToken)
     {
-        _isStreaming = true;
-        ElementsProcessPerformances.Clear();
+        IsStreaming = true;
         _specificCancellationToken.TryReset();
         foreach (PipelineElement pipelineElement in PipelineElements)
-        {
-            ElementsProcessPerformances.Add(pipelineElement.ProcessPerformances);
             pipelineElement.LaunchNewWorker(globalCancellationToken, _specificCancellationToken);
-        }
     }
 
     private void Stop()
     {
         _specificCancellationToken.Cancel();
-        _isStreaming = false;
+        IsStreaming = false;
     }
 
     public void Dispose()
     {
-        if (_isStreaming)
+        if (IsStreaming)
             Stop();
         _specificCancellationToken.Dispose();
         InputBuffer?.Dispose();

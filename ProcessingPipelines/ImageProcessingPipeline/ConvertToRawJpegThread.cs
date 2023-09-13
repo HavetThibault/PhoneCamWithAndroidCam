@@ -18,15 +18,15 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         private int _width;
         private Dispatcher _uiDispatcher;
 
-        public ProducerConsumerBuffers InputMultipleBuffering { get; set; }
-        public ProducerConsumerBuffers<byte[]> OutputMultipleBuffering { get; set; }
+        public ProducerConsumerBuffers InputBuffers { get; set; }
+        public ProducerConsumerBuffers<byte[]> OutputBuffers { get; set; }
         public ProcessPerformancesModel ProcessPerformances { get; set; }
 
         public ConvertToRawJpegThread(Dispatcher uiDispatcher, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers<byte[]> outputMultipleBuffering)
         {
             _uiDispatcher = uiDispatcher;
-            OutputMultipleBuffering = outputMultipleBuffering;
-            InputMultipleBuffering = inputMultipleBuffering;
+            OutputBuffers = outputMultipleBuffering;
+            InputBuffers = inputMultipleBuffering;
             ProcessPerformances = new("Convert to raw JPEG");
             _height = inputMultipleBuffering.Height;
             _width = inputMultipleBuffering.Width;
@@ -48,7 +48,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 while (!cancellationTokenSource.IsCancellationRequested)
                 {
                     waitingReadTimeWatch.Start();
-                    BitmapFrame? bitmapFrame = InputMultipleBuffering.WaitNextReaderBuffer();
+                    BitmapFrame? bitmapFrame = InputBuffers.WaitNextReaderBuffer();
                     waitingReadTimeWatch.Stop();
 
                     if (bitmapFrame is null)
@@ -66,7 +66,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                     catch
                     {
                         Monitor.Exit(bitmapFrame);
-                        InputMultipleBuffering.FinishReading();
+                        InputBuffers.FinishReading();
                         bmp.Dispose();
                         continue;
                     }
@@ -77,17 +77,17 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                     Monitor.Exit(bitmapFrame);
 
-                    InputMultipleBuffering.FinishReading();
+                    InputBuffers.FinishReading();
                     bmp.Dispose();
                     processTimeWatch.Stop();
 
                     waitingWriteTimeWatch.Start();
-                    OutputMultipleBuffering.AddRawFrame(displayJpegStream.ToArray());
+                    OutputBuffers.AddRawFrame(displayJpegStream.ToArray());
                     waitingWriteTimeWatch.Stop();
 
                     if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                     {
-                        _uiDispatcher.BeginInvoke(new Action(() => {
+                        _uiDispatcher.Invoke(new Action(() => {
                             ProcessPerformances.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
                             ProcessPerformances.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
                             ProcessPerformances.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;

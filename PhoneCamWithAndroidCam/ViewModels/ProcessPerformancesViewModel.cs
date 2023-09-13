@@ -35,9 +35,9 @@ namespace PhoneCamWithAndroidCam.ViewModels
         public void RefreshProcessPerformances(ImageProcessingPipeline pipeline, ProcessPerformancesModel rawJpegConversionPerf)
         {
             ProcessPerformances.Clear();
-            ProcessPerformances.Add(rawJpegConversionPerf);
             foreach(var element in pipeline.PipelineElements)
                 ProcessPerformances.Add(element.ProcessPerformances);
+            ProcessPerformances.Add(rawJpegConversionPerf);
         }
     }
 }

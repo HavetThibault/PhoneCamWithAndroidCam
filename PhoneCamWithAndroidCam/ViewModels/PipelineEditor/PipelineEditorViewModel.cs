@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using Wpf.Common.Controls;
 
 namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
@@ -23,16 +24,16 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
             set => Pipeline.Name = value;
         }
 
-        public PipelineEditorViewModel(ProducerConsumerBuffers inputBuffer) : base("Create pipeline")
+        public PipelineEditorViewModel(ProducerConsumerBuffers inputBuffer, Dispatcher uiDispatcher) : base("Create pipeline")
         {
             Items = new();
             Items.Add(new AddPipelineButtonViewModel(AddPipelineElement, Items));
-            Pipeline = new ImageProcessingPipeline(inputBuffer);
+            Pipeline = new ImageProcessingPipeline(inputBuffer, uiDispatcher);
         }
 
-        public PipelineEditorViewModel(ImageProcessingPipeline pipeline, ProducerConsumerBuffers inputBuffer) : base($"Edit '{pipeline.Name}'")
+        public PipelineEditorViewModel(ImageProcessingPipeline pipeline, ProducerConsumerBuffers inputBuffer, Dispatcher uiDispatcher) : base($"Edit '{pipeline.Name}'")
         {
-            Pipeline = new ImageProcessingPipeline(inputBuffer, pipeline);
+            Pipeline = new ImageProcessingPipeline(inputBuffer, pipeline, uiDispatcher);
             Items = new();
             Items.Add(new AddPipelineButtonViewModel(AddPipelineElement, Items));
             int i = 0;

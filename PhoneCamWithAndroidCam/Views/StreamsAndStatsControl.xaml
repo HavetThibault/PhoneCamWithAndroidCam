@@ -51,11 +51,12 @@
                     </StackPanel>
                     <views:ProcessPerformancesControl DataContext="{Binding ProcessPerformancesViewModel}"/>
                     <StackPanel
+                        DataContext="{Binding ProcessPerformancesViewModel}"
                         Orientation="Horizontal">
                         <Label 
                             Content="Fps:"/>
                         <Label 
-                            Content="{Binding Fps}" 
+                            Content="{Binding ProcessPerformances[2].Fps}" 
                             Margin="5,0,5,0"/>
                     </StackPanel>
                 </StackPanel>

@@ -31,12 +31,6 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
 
     public ProcessPerformancesViewModel ProcessPerformancesViewModel { get; set; }
 
-    public int Fps
-    {
-        get => _fps;
-        set => SetProperty(ref _fps, value);
-    }
-
     public string PhoneIp
     {
         get => _phoneIp;

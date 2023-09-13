@@ -86,20 +86,29 @@ namespace PhoneCamWithAndroidCam.ViewModels
         {
             var inputBuffer = _duplicateBuffersThread.AddNewOutputBuffer();
             var editedViewModel = (StreamViewModel)sender;
-            var pipelineEditorViewModel = new PipelineEditorViewModel(editedViewModel.Pipeline, inputBuffer);
+            bool wasStreaming = editedViewModel.Pipeline.IsStreaming;
+            var pipelineEditorViewModel = new PipelineEditorViewModel(
+                editedViewModel.Pipeline, 
+                inputBuffer,
+                _uiDispatcher);
             var pipelineEditorControl = new PipelineEditorControl(pipelineEditorViewModel);
             var dialogWindowViewModel = new DialogWindowViewModel("Create new pipeline");
             new DialogWindow(pipelineEditorControl, dialogWindowViewModel).ShowDialog();
 
             if (dialogWindowViewModel.DialogResult is false)
+            {
+                _duplicateBuffersThread.DeleteOutputBuffer(inputBuffer);
                 return;
+            }
 
             var newPipeline = new ImageProcessingPipeline(
-                editedViewModel.Pipeline.InputBuffer,
-                pipelineEditorViewModel.Pipeline);
+                pipelineEditorViewModel.Pipeline,
+                _uiDispatcher);
+            _duplicateBuffersThread.DeleteOutputBuffer(editedViewModel.Pipeline.InputBuffer);
             editedViewModel.Pipeline.Dispose();
+            editedViewModel.StopRefreshMainPictureThread();
             editedViewModel.Pipeline = newPipeline;
-            if (!_lastGlobalCancellationToken.IsCancellationRequested)
+            if (wasStreaming)
                 editedViewModel.PlayStreaming(_lastGlobalCancellationToken);
         }
 
@@ -115,7 +124,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         {
             var inputBuffer = _duplicateBuffersThread.AddNewOutputBuffer();
 
-            var pipelineEditorViewModel = new PipelineEditorViewModel(inputBuffer);
+            var pipelineEditorViewModel = new PipelineEditorViewModel(inputBuffer, _uiDispatcher);
             var pipelineEditorControl = new PipelineEditorControl(pipelineEditorViewModel);
             var dialogWindowViewModel = new DialogWindowViewModel("Create new pipeline");
             new DialogWindow(pipelineEditorControl, dialogWindowViewModel).ShowDialog();
