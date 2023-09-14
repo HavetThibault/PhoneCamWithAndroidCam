@@ -10,12 +10,15 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using Helper.MVVM;
 using System.Collections.ObjectModel;
+using PhoneCamWithAndroidCam.Serialization;
 
 namespace PhoneCamWithAndroidCam.ViewModels;
 
 public class DisplayStreamViewModel : BindableClass, IDisposable
 {
-    private int _fps = 0;
+    private const string STREAMS_INFO_PATH = "StreamsInfo.txt";
+    private const string DISPLAY_STREAM_INFO_PATH = "DisplayStreamInfo.txt";
+
     private Dispatcher _uiDispatcher;
 
     private PhoneCamClient _phoneCamClient;
@@ -70,7 +73,7 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
 
         _uiDispatcher = uiDispatcher;
 
-        _phoneIp = "192.168.115.245";
+        RetrieveInfo();
         _phoneCamClient = new(_phoneIp);
 
         ProcessPerformancesViewModel = new();
@@ -82,7 +85,16 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
         ProcessPerformancesViewModel.ProcessPerformances.Add(_feederPipeline.ProcessRawJpegPerf);
         ProcessPerformancesViewModel.ProcessPerformances.Add(_feederPipeline.ProcessBitmapsPerf);
 
-        StreamsViewModel = new(this, uiDispatcher, _feederPipelineOutput);
+        StreamsViewModel = new(this, _uiDispatcher, _feederPipelineOutput, STREAMS_INFO_PATH);
+    }
+
+    private void RetrieveInfo()
+    {
+        var displayStreamViewModelInfoNull = DisplayStreamViewModelInfo.TryLoad(DISPLAY_STREAM_INFO_PATH);
+        if (displayStreamViewModelInfoNull is DisplayStreamViewModelInfo displayStreamViewModelInfo)
+            _phoneIp = displayStreamViewModelInfo.PhoneIp;
+        else
+            _phoneIp = "";
     }
 
     public void LaunchStreaming(object parameter)
@@ -115,6 +127,7 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
 
     public void Dispose()
     {
+        new DisplayStreamViewModelInfo(DISPLAY_STREAM_INFO_PATH, PhoneIp).Serialize();
         _feederPipeline?.Dispose();
         _feederPipelineOutput?.Dispose();
         StreamsViewModel.Dispose();

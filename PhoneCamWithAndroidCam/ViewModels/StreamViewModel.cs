@@ -61,6 +61,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
                 ProcessPerformancesViewModel.RefreshProcessPerformances(
                     _pipeline, 
                     _convertToRawJpegThreads.ProcessPerformances);
+                NotifyPropertyChanged(nameof(PipelineName));
             }
         }
 

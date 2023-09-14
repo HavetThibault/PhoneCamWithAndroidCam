@@ -30,6 +30,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wpf.Common", "SDK\Wpf.Commo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helper.Collection", "SDK\Helper.Collection\Helper.Collection.csproj", "{1E308C86-1FC6-42BB-BD21-55C1D0F8BD2D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helper.Serializer", "SDK\Helper.Serializer\Helper.Serializer.csproj", "{5882121C-C08C-4CB0-A817-B8CF5670F335}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -110,6 +112,14 @@ Global
 		{1E308C86-1FC6-42BB-BD21-55C1D0F8BD2D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1E308C86-1FC6-42BB-BD21-55C1D0F8BD2D}.Release|x64.ActiveCfg = Release|Any CPU
 		{1E308C86-1FC6-42BB-BD21-55C1D0F8BD2D}.Release|x64.Build.0 = Release|Any CPU
+		{5882121C-C08C-4CB0-A817-B8CF5670F335}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5882121C-C08C-4CB0-A817-B8CF5670F335}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5882121C-C08C-4CB0-A817-B8CF5670F335}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5882121C-C08C-4CB0-A817-B8CF5670F335}.Debug|x64.Build.0 = Debug|Any CPU
+		{5882121C-C08C-4CB0-A817-B8CF5670F335}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5882121C-C08C-4CB0-A817-B8CF5670F335}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5882121C-C08C-4CB0-A817-B8CF5670F335}.Release|x64.ActiveCfg = Release|Any CPU
+		{5882121C-C08C-4CB0-A817-B8CF5670F335}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -124,6 +134,7 @@ Global
 		{250DC23B-32E3-4E53-AA1A-10664286F82A} = {639B4491-23BA-468F-BBFC-9150EFCEF9E8}
 		{93D49004-DF5F-48BA-A06F-AD706AECBD8A} = {639B4491-23BA-468F-BBFC-9150EFCEF9E8}
 		{1E308C86-1FC6-42BB-BD21-55C1D0F8BD2D} = {639B4491-23BA-468F-BBFC-9150EFCEF9E8}
+		{5882121C-C08C-4CB0-A817-B8CF5670F335} = {639B4491-23BA-468F-BBFC-9150EFCEF9E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EDE8560A-1DCB-4BDC-88B7-42974D9FBF1F}

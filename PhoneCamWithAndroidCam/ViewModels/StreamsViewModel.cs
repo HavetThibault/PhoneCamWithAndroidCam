@@ -14,6 +14,7 @@ using PropertyTools.Wpf;
 using System.Windows;
 using Wpf.Common.Controls;
 using PhoneCamWithAndroidCam.ViewModels.PipelineEditor;
+using PhoneCamWithAndroidCam.Serialization;
 
 namespace PhoneCamWithAndroidCam.ViewModels
 {
@@ -23,6 +24,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private Dispatcher _uiDispatcher;
         private DisplayStreamViewModel _parent;
         private CancellationTokenSource _lastGlobalCancellationToken;
+        private string _filePath;
 
         public ObservableCollection<StreamViewModel> StreamViews { get; set; }
 
@@ -32,12 +34,14 @@ namespace PhoneCamWithAndroidCam.ViewModels
         public RelayCommand EditCommand { get; set; }
         public RelayCommand DeleteCommand { get; set; }
 
-        public StreamsViewModel(DisplayStreamViewModel parent, Dispatcher uiDispatcher, ProducerConsumerBuffers pipelineInput)
+        public StreamsViewModel(DisplayStreamViewModel parent, Dispatcher uiDispatcher, 
+            ProducerConsumerBuffers pipelineInput, string filePath)
         {
+            _filePath = filePath;
             _parent = parent;
             _uiDispatcher = uiDispatcher;
             _duplicateBuffersThread = new(pipelineInput);
-            StreamViews = new() { };
+            TryLoadStreamViews();
 
             AddPipelineCommand = new(AddPipeline);
             MoveUpCommand = new(MoveUp);
@@ -119,7 +123,13 @@ namespace PhoneCamWithAndroidCam.ViewModels
             deletedViewModel.Dispose();
         }
 
-        private void AddPipeline(object parameter)
+        private void AddPipeline(PipelineStructure pipeline)
+        {
+            var inputBuffer = _duplicateBuffersThread.AddNewOutputBuffer();
+            StreamViews.Add(new StreamViewModel(_uiDispatcher, pipeline.InstantiatePipeline(inputBuffer, _uiDispatcher)));
+        }
+
+        private void AddPipeline(object uselessParameter)
         {
             var inputBuffer = _duplicateBuffersThread.AddNewOutputBuffer();
 
@@ -155,8 +165,18 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
         internal void Dispose()
         {
+            new StreamsInfo(_filePath, this).Serialize();
             foreach (var streamView in StreamViews)
                 streamView.Dispose();
+        }
+
+        private void TryLoadStreamViews()
+        {
+            var streamsInfo = StreamsInfo.TryLoad(_filePath);
+            StreamViews = new();
+            if (streamsInfo is StreamsInfo)
+                foreach (var pipeline in streamsInfo.ActivePipelines)
+                    AddPipeline(pipeline);
         }
     }
 }

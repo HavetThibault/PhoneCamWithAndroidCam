@@ -25,7 +25,7 @@ public class ImageProcessingPipeline
 
     public bool IsStreaming { get; set; } = false;
 
-    public string Name { get; set; } = "Default name";
+    public string Name { get; set; }
 
     public List<PipelineElement> PipelineElements { get; set; }
 
@@ -33,6 +33,7 @@ public class ImageProcessingPipeline
 
     public ImageProcessingPipeline(ProducerConsumerBuffers inputBuffer, Dispatcher uiDispatcher)
     {
+        Name = "Default name";
         PipelineElements = new();
         _inputBuffer = inputBuffer;
         _specificCancellationToken = new();
@@ -46,6 +47,7 @@ public class ImageProcessingPipeline
     public ImageProcessingPipeline(ProducerConsumerBuffers inputBuffer, ImageProcessingPipeline pipeline, Dispatcher uiDispatcher) 
         : this(inputBuffer, uiDispatcher)
     {
+        Name = pipeline.Name;
         var firstElem = pipeline.PipelineElements.First();
         var clonedElement = firstElem.Clone(InputBuffer, (ProducerConsumerBuffers)firstElem.OutputBuffers.Clone());
         PipelineElements.Add(clonedElement);
@@ -70,6 +72,11 @@ public class ImageProcessingPipeline
             return newName;
         }
         return name;
+    }
+
+    public void InstantiateAndAdd(string elementType)
+    {
+        InstantiateAndInsert(PipelineElements.Count, elementType);
     }
 
     public PipelineElement InstantiateAndInsert(int index, string elementType)
