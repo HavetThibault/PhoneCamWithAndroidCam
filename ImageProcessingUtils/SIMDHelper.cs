@@ -52,6 +52,24 @@ namespace ImageProcessingUtils
             pinnedSrcBuffer.Free();
         }
 
+        public static void CopyVerticalPart(byte[] sourceBuffer, byte[] destinationBuffer, int width, int height, 
+            int pixelSize, int srcOffset, int widthToCopy, int destOffset)
+        {
+            GCHandle pinnedSrcBuffer = GCHandle.Alloc(sourceBuffer, GCHandleType.Pinned);
+            IntPtr srcBufferPtr = pinnedSrcBuffer.AddrOfPinnedObject();
+            IntPtr srcBufferPtrMoreOffset = IntPtr.Add(srcBufferPtr, srcOffset * pixelSize);
+
+            GCHandle pinnedDestBuffer = GCHandle.Alloc(destinationBuffer, GCHandleType.Pinned);
+            IntPtr destBuffer = pinnedDestBuffer.AddrOfPinnedObject();
+            IntPtr destBufferMoreOffset = IntPtr.Add(destBuffer, destOffset * pixelSize);
+
+            SIMD.SimdCopy(srcBufferPtrMoreOffset, width * pixelSize, widthToCopy, height, pixelSize, 
+                destBufferMoreOffset, width * pixelSize);
+
+            pinnedDestBuffer.Free();
+            pinnedSrcBuffer.Free();
+        }
+
         public static void SimdGrayToBgra(byte[] grayBuffer, int width, int height, int stride, byte[] bgrBuffer, int bgrStride)
         {
             GCHandle pinnedSrcBuffer = GCHandle.Alloc(grayBuffer, GCHandleType.Pinned);
@@ -142,6 +160,16 @@ namespace ImageProcessingUtils
             IntPtr rightBorderPtr = IntPtr.Add(ptrSrc, width * 2 - borderThickness * 2);
 
             SIMD.SimdFill(rightBorderPtr, width * 2, borderThickness, height, 2, value);
+
+            pinnedSrc.Free();
+        }
+
+        public static void FillBgra(byte[] dst, int stride, byte r, byte g, byte b, Rectangle rectangle)
+        {
+            GCHandle pinnedSrc = GCHandle.Alloc(dst, GCHandleType.Pinned);
+            IntPtr upperLeft = IntPtr.Add(pinnedSrc.AddrOfPinnedObject(), rectangle.Top * stride + rectangle.Left * 4);
+
+            SIMD.SimdFillBgra(upperLeft, stride * 4, rectangle.Width, rectangle.Height, b, g, r, 255);
 
             pinnedSrc.Free();
         }
