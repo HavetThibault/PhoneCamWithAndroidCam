@@ -15,19 +15,17 @@ namespace PhoneCamWithAndroidCam.Serialization
         }
 
         public string PhoneIp { get; set; }
-        public string FilePath { get; set; }
 
         public DisplayStreamViewModelInfo() { }
 
-        public DisplayStreamViewModelInfo(string filePath, string phoneIp) 
+        public DisplayStreamViewModelInfo(string phoneIp) 
         {
-            FilePath = filePath;
             PhoneIp = phoneIp;
         }
 
-        public void Serialize()
+        public void Serialize(string filePath)
         {
-            XmlSerializerHelper.Serialize(FilePath, this);
+            XmlSerializerHelper.Serialize(filePath, this);
         }
     }
 }

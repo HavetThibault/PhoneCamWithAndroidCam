@@ -27,6 +27,9 @@
             Grid.Row="0"
             Orientation="Horizontal"
             FlowDirection="RightToLeft">
+            <common:SymbolButton
+                Glyph="Library"
+                Command="{Binding ManageTemplateCommand}"/>
             <common:SymbolButton 
                 Glyph="Plus"
                 Command="{Binding AddPipelineCommand}"/>

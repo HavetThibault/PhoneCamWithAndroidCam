@@ -8,6 +8,7 @@
              ClipToBounds="True"
              xmlns:controls="http://schemas.thibault/dev"
              d:DataContext="{d:DesignInstance local:PipelineEditorViewModel}">
+    
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type local:VerticalLine}">
             <controls:SymbolIcon 

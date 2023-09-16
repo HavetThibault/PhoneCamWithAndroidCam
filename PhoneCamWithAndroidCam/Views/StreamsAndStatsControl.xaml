@@ -38,7 +38,8 @@
                     <Label Content="Phone stream"/>
                     <Separator Height="2"/>
                     <StackPanel
-                        Orientation="Horizontal">
+                        Orientation="Horizontal"
+                        Margin="0,2,0,0">
                         <Label 
                             Content="Ip:"
                             VerticalContentAlignment="Center"/>

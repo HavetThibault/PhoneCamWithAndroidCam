@@ -19,24 +19,20 @@ namespace PhoneCamWithAndroidCam.Serialization
             return XmlSerializerHelper.Deserialize<StreamsInfo>(filePath);
         }
 
-        public string FilePath { get; set; }
         public List<PipelineStructure> ActivePipelines { get; set; }
-        public List<PipelineStructure> TemplatePipelines { get; set; }
+        public List<PipelineStructure> PipelineTemplates { get; set; }
 
         public StreamsInfo() { }
 
-        public StreamsInfo(string filePath, StreamsViewModel viewModel)
+        public StreamsInfo(IEnumerable<PipelineStructure> activePipelines, IEnumerable<PipelineStructure> pipelineTemplates)
         {
-            ActivePipelines = new();
-            foreach(var streamView in viewModel.StreamViews)
-                ActivePipelines.Add(new PipelineStructure(streamView.Pipeline));
-            TemplatePipelines = new();
-            FilePath = filePath;
+            ActivePipelines = new(activePipelines);
+            PipelineTemplates = new(pipelineTemplates);
         }
 
-        public void Serialize()
+        public void Serialize(string filePath)
         {
-            XmlSerializerHelper.Serialize(FilePath, this);
+            XmlSerializerHelper.Serialize(filePath, this);
         }
     }
 }

@@ -127,7 +127,7 @@ public class DisplayStreamViewModel : BindableClass, IDisposable
 
     public void Dispose()
     {
-        new DisplayStreamViewModelInfo(DISPLAY_STREAM_INFO_PATH, PhoneIp).Serialize();
+        new DisplayStreamViewModelInfo(PhoneIp).Serialize(DISPLAY_STREAM_INFO_PATH);
         _feederPipeline?.Dispose();
         _feederPipelineOutput?.Dispose();
         StreamsViewModel.Dispose();

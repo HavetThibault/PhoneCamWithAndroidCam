@@ -1,4 +1,4 @@
-﻿using PhoneCamWithAndroidCam.ViewModels;
+﻿using PhoneCamWithAndroidCam.ViewModels.TemplateManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +17,11 @@ using Wpf.Common.Controls;
 namespace PhoneCamWithAndroidCam.Views
 {
     /// <summary>
-    /// Logique d'interaction pour PipelineChooserWindow.xaml
+    /// Logique d'interaction pour ManageTemplateWindow.xaml
     /// </summary>
-    public partial class PipelineChooserView : UserControl
+    public partial class ManageTemplateWindow : BaseWindow
     {
-        public PipelineChooserView(PipelineChooserViewModel viewModel) : base()
+        public ManageTemplateWindow(ManageTemplateViewModel viewModel)
         {
             InitializeComponent();
             DataContext = viewModel;

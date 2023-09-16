@@ -15,6 +15,8 @@ using System.Windows;
 using Wpf.Common.Controls;
 using PhoneCamWithAndroidCam.ViewModels.PipelineEditor;
 using PhoneCamWithAndroidCam.Serialization;
+using PhoneCamWithAndroidCam.ViewModels.TemplateManagement;
+using Wpf.Common.Controls.Dialog;
 
 namespace PhoneCamWithAndroidCam.ViewModels
 {
@@ -25,9 +27,11 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private DisplayStreamViewModel _parent;
         private CancellationTokenSource _lastGlobalCancellationToken;
         private string _filePath;
+        private List<PipelineStructure> _pipelineTemplates;
 
         public ObservableCollection<StreamViewModel> StreamViews { get; set; }
 
+        public RelayCommand ManageTemplateCommand { get; set; }
         public RelayCommand AddPipelineCommand { get; set; }
         public RelayCommand MoveUpCommand { get; set; }
         public RelayCommand MoveDownCommand { get; set; }
@@ -43,11 +47,32 @@ namespace PhoneCamWithAndroidCam.ViewModels
             _duplicateBuffersThread = new(pipelineInput);
             TryLoadStreamViews();
 
+            ManageTemplateCommand = new(ManageTemplate);
             AddPipelineCommand = new(AddPipeline);
             MoveUpCommand = new(MoveUp);
             MoveDownCommand = new(MoveDown);
             EditCommand = new(Edit);
             DeleteCommand = new(DeleteAndDispose);
+        }
+
+        private void ManageTemplate(object uselessParameter)
+        {
+            var manageTemplateViewModel = new ManageTemplateViewModel(GetActivePipelines(), _pipelineTemplates);
+            var manageTemplateWindow = new ManageTemplateWindow(manageTemplateViewModel);
+            manageTemplateWindow.ShowDialog();
+
+            if(manageTemplateViewModel.DialogResult)
+            {
+                _pipelineTemplates = manageTemplateViewModel.PipelineTemplates;
+            }
+        }
+
+        private List<PipelineStructure> GetActivePipelines()
+        {
+            var activePipelines = new List<PipelineStructure>();
+            foreach (var streamView in StreamViews)
+                activePipelines.Add(new PipelineStructure(streamView.Pipeline));
+            return activePipelines;
         }
 
         private void MoveUp(object sender)
@@ -165,7 +190,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
 
         internal void Dispose()
         {
-            new StreamsInfo(_filePath, this).Serialize();
+            new StreamsInfo(GetActivePipelines(), _pipelineTemplates).Serialize(_filePath);
             foreach (var streamView in StreamViews)
                 streamView.Dispose();
         }
@@ -175,8 +200,11 @@ namespace PhoneCamWithAndroidCam.ViewModels
             var streamsInfo = StreamsInfo.TryLoad(_filePath);
             StreamViews = new();
             if (streamsInfo is StreamsInfo)
+            {
                 foreach (var pipeline in streamsInfo.ActivePipelines)
                     AddPipeline(pipeline);
+                _pipelineTemplates = streamsInfo.PipelineTemplates;
+            }
         }
     }
 }

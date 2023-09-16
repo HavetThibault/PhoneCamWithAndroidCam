@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wpf.Common.Controls;
+using Wpf.Common.Controls.Dialog;
+using Wpf.Common.Controls.ElementChooser;
 
 namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
 {
@@ -31,17 +33,19 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
 
         private void AddPipelineElement(object param)
         {
-            var pipelineChooserViewModel = new PipelineChooserViewModel(
-                PipelineElementFactory.GetAllPipelineElementNames());
-            var pipelineChooserView = new PipelineChooserView(pipelineChooserViewModel);
-            var dialogWindow = new DialogWindow(pipelineChooserView, pipelineChooserViewModel);
+            var selectionElements = new List<SelectionElement>();
+            foreach(var pipelineNames in PipelineElementFactory.GetAllPipelineElementNames())
+                selectionElements.Add(new (pipelineNames, null));
+            var elementChooserViewModel = new ElementChooserViewModel(selectionElements);
+            var elementChooserView = new ElementChooserControl(elementChooserViewModel);
+            var dialogWindow = new DialogWindow(elementChooserView, elementChooserViewModel);
             dialogWindow.ShowDialog();
 
-            string selectedPipeline = pipelineChooserViewModel.SelectedPipeline;
-            if (!pipelineChooserViewModel.DialogResult || selectedPipeline is null)
+            var selectedPipeline = elementChooserViewModel.SelectedElement;
+            if (!elementChooserViewModel.DialogResult || elementChooserViewModel.SelectedElement is null)
                 return;
 
-            _addPipelineElement(Place, selectedPipeline);
+            _addPipelineElement(Place, selectedPipeline.Name);
         }
     }
 }

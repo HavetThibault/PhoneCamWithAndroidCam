@@ -44,49 +44,19 @@ public class Scanner : FrameProcessor
         : this(scanner._width, scanner._height, scanner._scanStep, scanner._scanIntervalMs) 
     { }
 
-    public override void ProcessFrame(byte[] bytesSource, byte[] bytesDestination)
+    public override void ProcessFrame(byte[] srcBuffer, byte[] destBuffer)
     {
         switch(_scannerState)
         {
             case ScannerStates.Scanning:
-                SIMDHelper.CopyVerticalPart(
-                    bytesSource, 
-                    _scannedPixels, 
-                    _width, 
-                    _height, 
-                    4, 
-                    _scanIndex, 
-                    Math.Min(_scanStep, _width - _scanIndex), 
-                    _scanIndex);
+                SaveNewSliceIntoScannedPixel(srcBuffer);
 
                 if (_scanIndex > 0)
-                    SIMDHelper.CopyVerticalPart(
-                        _scannedPixels, 
-                        bytesDestination, 
-                        _width, 
-                        _height, 
-                        4, 
-                        0, 
-                        _scanIndex, 
-                        0);
+                    CopyScannedPixelIntoDestBuffer(destBuffer);
 
                 _lineRectangle.X = _scanIndex;
-                if(_scanIndex + _lineRectangle.Width <= _width)
-                    SIMDHelper.FillBgra(
-                        bytesDestination, 
-                        _width, 
-                        255, 0, 0, 
-                        _lineRectangle);
-
-                SIMDHelper.CopyVerticalPart(
-                    bytesSource, 
-                    bytesDestination, 
-                    _width, 
-                    _height,
-                    4, 
-                    _scanIndex + _lineRectangle.Width,
-                    _width - _scanIndex - _lineRectangle.Width, 
-                    _scanIndex + _lineRectangle.Width);
+                if (_scanIndex + _lineRectangle.Width <= _width)
+                    AddVerticalLine(destBuffer);
 
                 _scanIndex += _scanStep;
                 if (_scanIndex >= _width)
@@ -101,9 +71,44 @@ public class Scanner : FrameProcessor
                 break;
 
             case ScannerStates.Waiting:
-                Buffer.BlockCopy(_scannedPixels, 0, bytesDestination, 0, _scannedPixels.Length);
+                Buffer.BlockCopy(_scannedPixels, 0, destBuffer, 0, _scannedPixels.Length);
                 break;
         }
+    }
+
+    private void SaveNewSliceIntoScannedPixel(byte[] srcBuffer)
+    {
+        SIMDHelper.CopyVerticalPart(
+            srcBuffer,
+            _scannedPixels,
+            _width,
+            _height,
+            4,
+            _scanIndex,
+            Math.Min(_scanStep, _width - _scanIndex),
+            _scanIndex);
+    }
+
+    private void CopyScannedPixelIntoDestBuffer(byte[] destBuffer)
+    {
+        SIMDHelper.CopyVerticalPart(
+            _scannedPixels,
+            destBuffer,
+            _width,
+            _height,
+            4,
+            0,
+            _scanIndex,
+            0);
+    }
+
+    private void AddVerticalLine(byte[] destBuffer)
+    {
+        SIMDHelper.FillBgra(
+            destBuffer,
+            _width,
+            255, 0, 0,
+            _lineRectangle);
     }
 
     private void ResetScan()

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
-using Wpf.Common.Controls;
+using Wpf.Common.Controls.Dialog;
 
 namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
 {
