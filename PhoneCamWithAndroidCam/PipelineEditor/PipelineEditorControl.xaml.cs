@@ -1,5 +1,5 @@
 ﻿using MahApps.Metro.Controls;
-using PhoneCamWithAndroidCam.ViewModels.PipelineEditor;
+using PhoneCamWithAndroidCam.PipelineEditor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Wpf.Common.Controls;
 
-namespace PhoneCamWithAndroidCam.Views
+namespace PhoneCamWithAndroidCam.PipelineEditor
 {
     /// <summary>
     /// Logique d'interaction pour PipelineEditorControl.xaml

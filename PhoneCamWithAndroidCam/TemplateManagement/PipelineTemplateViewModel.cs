@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhoneCamWithAndroidCam.ViewModels.TemplateManagement
+namespace PhoneCamWithAndroidCam.TemplateManagement
 {
     public class PipelineTemplateViewModel : BindableClass
     {

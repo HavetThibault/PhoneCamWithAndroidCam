@@ -27,8 +27,7 @@ namespace PhoneCamWithAndroidCam.Serialization
 
         public ImageProcessingPipeline InstantiatePipeline(ProducerConsumerBuffers inputBuffer, Dispatcher uiDispatcher)
         {
-            var pipeline = new ImageProcessingPipeline(inputBuffer, uiDispatcher);
-            pipeline.Name = PipelineName;
+            var pipeline = new ImageProcessingPipeline(PipelineName, inputBuffer, uiDispatcher);
             foreach (var elementTypeName in PipelineElementTypeNames)
                 pipeline.InstantiateAndAdd(elementTypeName);
             return pipeline;

@@ -87,11 +87,15 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                     if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                     {
-                        _uiDispatcher.Invoke(new Action(() => {
-                            ProcessPerformances.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
-                            ProcessPerformances.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
-                            ProcessPerformances.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
-                        }));
+                        try
+                        {
+                            _uiDispatcher.Invoke(new Action(() => {
+                                ProcessPerformances.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
+                                ProcessPerformances.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
+                                ProcessPerformances.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
+                            }));
+                        }
+                        catch { break; }
                         waitingReadTimeWatch.Reset();
                         processTimeWatch.Reset();
                         waitingWriteTimeWatch.Reset();

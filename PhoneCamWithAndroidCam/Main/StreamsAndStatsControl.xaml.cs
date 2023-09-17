@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace PhoneCamWithAndroidCam.Views
+namespace PhoneCamWithAndroidCam.Main
 {
     /// <summary>
     /// Logique d'interaction pour MainUserControl.xaml

@@ -1,0 +1,39 @@
+﻿<UserControl x:Class="PhoneCamWithAndroidCam.ProcessPerformances.ProcessPerformancesControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PhoneCamWithAndroidCam.ProcessPerformances"
+             xmlns:models="clr-namespace:ProcessingPipelines.PipelineUtils;assembly=ProcessingPipelines"
+             xmlns:converters="clr-namespace:PhoneCamWithAndroidCam.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance local:ProcessPerformancesViewModel}">
+    <UserControl.Resources>
+        <DataTemplate DataType = "{x:Type local:ProcessPerformancesViewModel}">
+            <local:ProcessPerformancesControl/>
+        </DataTemplate>
+        <converters:ForHundredConverter x:Key="ForHundredConverter"/>
+    </UserControl.Resources>
+    <StackPanel MinWidth="230">
+        <StackPanel Orientation="Horizontal">
+            <Label Content="Name" Width="110"/>
+            <Label Content="Read" Width="50"/>
+            <Label Content="Process" Width="50"/>
+            <Label Content="Write" Width="50"/>
+        </StackPanel>
+        <ItemsControl ItemsSource="{Binding ProcessPerformances}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type models:ProcessPerformancesModel}">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="{Binding ProcessName}" Width="110"/>
+                        <Label Content="{Binding WaitingReadTimeForHundred, Converter={StaticResource ForHundredConverter}}" Width="50"/>
+                        <Label Content="{Binding ProcessTimeForHundred, Converter={StaticResource ForHundredConverter}}" Width="50"/>
+                        <Label Content="{Binding WaitingWriteTimeForHundred, Converter={StaticResource ForHundredConverter}}" Width="50"/>
+                        <Border BorderThickness="1" CornerRadius="0.5"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</UserControl>

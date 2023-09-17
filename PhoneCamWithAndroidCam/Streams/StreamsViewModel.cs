@@ -8,24 +8,24 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using System.Threading;
-using PhoneCamWithAndroidCam.Views;
 using System.Collections.ObjectModel;
 using PropertyTools.Wpf;
 using System.Windows;
 using Wpf.Common.Controls;
-using PhoneCamWithAndroidCam.ViewModels.PipelineEditor;
+using PhoneCamWithAndroidCam.PipelineEditor;
 using PhoneCamWithAndroidCam.Serialization;
-using PhoneCamWithAndroidCam.ViewModels.TemplateManagement;
+using PhoneCamWithAndroidCam.TemplateManagement;
 using Wpf.Common.Controls.Dialog;
 using Wpf.Common.Controls.ElementChooser;
+using PhoneCamWithAndroidCam.Main;
 
-namespace PhoneCamWithAndroidCam.ViewModels
+namespace PhoneCamWithAndroidCam.Streams
 {
     public class StreamsViewModel : BindableClass
     {
         private DuplicateBuffersThread _duplicateBuffersThread;
         private Dispatcher _uiDispatcher;
-        private DisplayStreamViewModel _parent;
+        private StreamsAndStatsViewModels _parent;
         private CancellationTokenSource _lastGlobalCancellationToken;
         private string _filePath;
         private List<PipelineStructure> _pipelineTemplates;
@@ -40,14 +40,14 @@ namespace PhoneCamWithAndroidCam.ViewModels
         public RelayCommand DeleteCommand { get; set; }
         public RelayCommand ImportFromTemplateCommand { get; set; }
 
-        public StreamsViewModel(DisplayStreamViewModel parent, Dispatcher uiDispatcher, 
+        public StreamsViewModel(StreamsAndStatsViewModels parent, Dispatcher uiDispatcher,
             ProducerConsumerBuffers pipelineInput, string filePath)
         {
             _filePath = filePath;
             _parent = parent;
             _uiDispatcher = uiDispatcher;
             _duplicateBuffersThread = new(pipelineInput);
-            
+
             StreamViews = new();
             TryLoadStreamViewsAndTemplates();
 
@@ -69,7 +69,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
             var selectTemplateControl = new ElementChooserControl(selectTemplateViewModel);
             new DialogWindow(selectTemplateControl, selectTemplateViewModel, 380, 250).ShowDialog();
 
-            if(selectTemplateViewModel.DialogResult)
+            if (selectTemplateViewModel.DialogResult)
                 AddPipeline((PipelineStructure)selectTemplateViewModel.SelectedElement.Value);
         }
 
@@ -79,7 +79,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
             var manageTemplateControl = new ManageTemplateControl(manageTemplateViewModel);
             new DialogWindow(manageTemplateControl, manageTemplateViewModel, 380, 250).ShowDialog();
 
-            if(manageTemplateViewModel.DialogResult)
+            if (manageTemplateViewModel.DialogResult)
                 _pipelineTemplates = manageTemplateViewModel.GetPipelineTemplates();
         }
 
@@ -94,7 +94,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         private void MoveUp(object sender)
         {
             int senderViewModelIndex = -1;
-            for(int i = 0; i < StreamViews.Count; i++)
+            for (int i = 0; i < StreamViews.Count; i++)
             {
                 if (sender == StreamViews[i])
                 {
@@ -133,7 +133,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
             var editedViewModel = (StreamViewModel)sender;
             bool wasStreaming = editedViewModel.Pipeline.IsStreaming;
             var pipelineEditorViewModel = new PipelineEditorViewModel(
-                editedViewModel.Pipeline, 
+                editedViewModel.Pipeline,
                 inputBuffer,
                 _uiDispatcher);
             var pipelineEditorControl = new PipelineEditorControl(pipelineEditorViewModel);
@@ -174,9 +174,9 @@ namespace PhoneCamWithAndroidCam.ViewModels
         {
             var inputBuffer = _duplicateBuffersThread.AddNewOutputBuffer();
 
-            var pipelineEditorViewModel = new PipelineEditorViewModel(inputBuffer, _uiDispatcher);
+            var pipelineEditorViewModel = new PipelineEditorViewModel(GetNextDefaultPipelineName(), inputBuffer, _uiDispatcher);
             var pipelineEditorControl = new PipelineEditorControl(pipelineEditorViewModel);
-            new DialogWindow(pipelineEditorControl, pipelineEditorViewModel).ShowDialog();
+            new DialogWindow(pipelineEditorControl, pipelineEditorViewModel, 380, 250, 500, 700).ShowDialog();
 
             if (pipelineEditorViewModel.DialogResult is false)
             {
@@ -184,6 +184,30 @@ namespace PhoneCamWithAndroidCam.ViewModels
                 return;
             }
             AddPipelineFromPipelineEditorViewModel(pipelineEditorViewModel);
+        }
+
+        private string GetNextDefaultPipelineName()
+        {
+            var pipelineNames = GetActivePipelineNames();
+            string defaultName = "Pipeline";
+            if (pipelineNames.Contains(defaultName))
+            {
+                string nextPipelineName = $"{defaultName} 1";
+                for (int i = 2; pipelineNames.Contains(nextPipelineName); i++)
+                {
+                    nextPipelineName = $"{defaultName} {i}";
+                }
+                return nextPipelineName;
+            }
+            return defaultName;
+        }
+
+        private List<string> GetActivePipelineNames()
+        {
+            var activePipelineNames = new List<string>();
+            foreach (var streamView in StreamViews)
+                activePipelineNames.Add(streamView.PipelineName);
+            return activePipelineNames;
         }
 
         private void AddPipelineFromPipelineEditorViewModel(PipelineEditorViewModel pipelineEditorViewModel)
@@ -200,7 +224,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         {
             _lastGlobalCancellationToken = cancellationToken;
             _duplicateBuffersThread.Start(cancellationToken);
-            foreach(var streamView in StreamViews)
+            foreach (var streamView in StreamViews)
                 streamView.PlayStreaming(cancellationToken);
         }
 

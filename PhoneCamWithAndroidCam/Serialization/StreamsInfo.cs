@@ -1,5 +1,4 @@
 ﻿using Helper.Serializer;
-using PhoneCamWithAndroidCam.ViewModels;
 using ProcessingPipelines.PipelineUtils;
 using System;
 using System.Collections.Generic;

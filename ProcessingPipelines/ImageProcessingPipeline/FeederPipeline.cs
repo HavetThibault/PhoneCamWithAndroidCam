@@ -147,12 +147,16 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                     if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                     {
-                        _uiDispatcher.Invoke(new Action(() =>
+                        try
                         {
-                            ProcessRawJpegPerf.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
-                            ProcessRawJpegPerf.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
-                            ProcessRawJpegPerf.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
-                        }));
+                            _uiDispatcher.Invoke(new Action(() =>
+                            {
+                                ProcessRawJpegPerf.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
+                                ProcessRawJpegPerf.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
+                                ProcessRawJpegPerf.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
+                            }));
+                        }
+                        catch { break; }
                         waitingReadTimeWatch.Reset();
                         processTimeWatch.Reset();
                         waitingWriteTimeWatch.Reset();
@@ -195,12 +199,16 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                     if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
                     {
-                        _uiDispatcher.Invoke(new Action(() => {
-                            ProcessBitmapsPerf.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
-                            ProcessBitmapsPerf.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
-                            ProcessBitmapsPerf.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
-                            ProcessBitmapsPerf.Fps = lastSecondProcessedFramesNbr;
-                        }));
+                        try
+                        {
+                            _uiDispatcher.Invoke(new Action(() => {
+                                ProcessBitmapsPerf.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
+                                ProcessBitmapsPerf.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
+                                ProcessBitmapsPerf.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
+                                ProcessBitmapsPerf.Fps = lastSecondProcessedFramesNbr;
+                            }));
+                        }
+                        catch { break; }
                         lastSecondProcessedFramesNbr = 0;
                         waitingReadTimeWatch.Reset();
                         processTimeWatch.Reset();

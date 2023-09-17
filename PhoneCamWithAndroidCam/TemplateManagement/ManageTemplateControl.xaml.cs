@@ -1,4 +1,4 @@
-﻿using PhoneCamWithAndroidCam.ViewModels.TemplateManagement;
+﻿using PhoneCamWithAndroidCam.TemplateManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Wpf.Common.Controls;
 
-namespace PhoneCamWithAndroidCam.Views
+namespace PhoneCamWithAndroidCam.TemplateManagement
 {
     /// <summary>
     /// Logique d'interaction pour ManageTemplateWindow.xaml

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
+namespace PhoneCamWithAndroidCam.PipelineEditor
 {
     public class PipelineElementViewModel
     {

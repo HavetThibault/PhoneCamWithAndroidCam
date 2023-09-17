@@ -1,5 +1,4 @@
 ﻿using Helper.MVVM;
-using PhoneCamWithAndroidCam.Views;
 using ProcessingPipelines.ImageProcessingPipeline;
 using PropertyTools.Wpf;
 using System;
@@ -12,7 +11,7 @@ using Wpf.Common.Controls;
 using Wpf.Common.Controls.Dialog;
 using Wpf.Common.Controls.ElementChooser;
 
-namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
+namespace PhoneCamWithAndroidCam.PipelineEditor
 {
     internal class AddPipelineButtonViewModel : BindableClass
     {
@@ -38,7 +37,7 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
                 selectionElements.Add(new (pipelineNames, null));
             var elementChooserViewModel = new ElementChooserViewModel(selectionElements);
             var elementChooserView = new ElementChooserControl(elementChooserViewModel);
-            var dialogWindow = new DialogWindow(elementChooserView, elementChooserViewModel);
+            var dialogWindow = new DialogWindow(elementChooserView, elementChooserViewModel, 380, 250);
             dialogWindow.ShowDialog();
 
             var selectedPipeline = elementChooserViewModel.SelectedElement;

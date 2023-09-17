@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Threading;
 using Wpf.Common.Controls.Dialog;
 
-namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
+namespace PhoneCamWithAndroidCam.PipelineEditor
 {
     public class PipelineEditorViewModel : DialogWindowViewModel
     {
@@ -24,11 +24,11 @@ namespace PhoneCamWithAndroidCam.ViewModels.PipelineEditor
             set => Pipeline.Name = value;
         }
 
-        public PipelineEditorViewModel(ProducerConsumerBuffers inputBuffer, Dispatcher uiDispatcher) : base("Create pipeline")
+        public PipelineEditorViewModel(string pipelineDefaultName, ProducerConsumerBuffers inputBuffer, Dispatcher uiDispatcher) : base("Create pipeline")
         {
             Items = new();
             Items.Add(new AddPipelineButtonViewModel(AddPipelineElement, Items));
-            Pipeline = new ImageProcessingPipeline(inputBuffer, uiDispatcher);
+            Pipeline = new ImageProcessingPipeline(pipelineDefaultName, inputBuffer, uiDispatcher);
         }
 
         public PipelineEditorViewModel(ImageProcessingPipeline pipeline, ProducerConsumerBuffers inputBuffer, Dispatcher uiDispatcher) : base($"Edit '{pipeline.Name}'")

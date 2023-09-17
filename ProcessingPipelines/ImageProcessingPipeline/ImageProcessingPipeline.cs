@@ -31,13 +31,13 @@ public class ImageProcessingPipeline
 
     public ProducerConsumerBuffers OutputBuffers => PipelineElements.Last().OutputBuffers;
 
-    public ImageProcessingPipeline(ProducerConsumerBuffers inputBuffer, Dispatcher uiDispatcher)
+    public ImageProcessingPipeline(string name, ProducerConsumerBuffers inputBuffer, Dispatcher uiDispatcher)
     {
-        Name = "Default name";
         PipelineElements = new();
         _inputBuffer = inputBuffer;
         _specificCancellationToken = new();
         _uiDispatcher = uiDispatcher;
+        Name = name;
     }
 
     public ImageProcessingPipeline(ImageProcessingPipeline pipeline, Dispatcher uiDispatcher) 
@@ -45,9 +45,8 @@ public class ImageProcessingPipeline
     { }
 
     public ImageProcessingPipeline(ProducerConsumerBuffers inputBuffer, ImageProcessingPipeline pipeline, Dispatcher uiDispatcher) 
-        : this(inputBuffer, uiDispatcher)
+        : this(pipeline.Name, inputBuffer, uiDispatcher)
     {
-        Name = pipeline.Name;
         var firstElem = pipeline.PipelineElements.First();
         var clonedElement = firstElem.Clone(InputBuffer, (ProducerConsumerBuffers)firstElem.OutputBuffers.Clone());
         PipelineElements.Add(clonedElement);

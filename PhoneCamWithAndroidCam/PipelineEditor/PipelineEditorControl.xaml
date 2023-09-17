@@ -1,10 +1,10 @@
-﻿<UserControl x:Class="PhoneCamWithAndroidCam.Views.PipelineEditorControl"
+﻿<UserControl x:Class="PhoneCamWithAndroidCam.PipelineEditor.PipelineEditorControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d"
-             xmlns:local="clr-namespace:PhoneCamWithAndroidCam.ViewModels.PipelineEditor"
+             xmlns:local="clr-namespace:PhoneCamWithAndroidCam.PipelineEditor"
              ClipToBounds="True"
              xmlns:controls="http://schemas.thibault/dev"
              d:DataContext="{d:DesignInstance local:PipelineEditorViewModel}">
@@ -70,22 +70,28 @@
     </UserControl.Resources>
     
     <Grid 
-        ClipToBounds="True">
+        ClipToBounds="True"
+        MinWidth="380"
+        MinHeight="200">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel 
-            Grid.Row="0" 
-            Orientation="Horizontal">
+        <Grid 
+            Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
             <Label 
+                Grid.Column="0"
                 Content="Name : " 
                 Margin="3,3,0,3"/>
-            <TextBox 
-                Text="{Binding Name}" 
-                Width="250" 
+            <TextBox
+                Grid.Column="1"
+                Text="{Binding Name}"
                 Margin="0,3,3,3"/>
-        </StackPanel>
+        </Grid>
         <ScrollViewer 
             Margin="3"
             Grid.Row="1"

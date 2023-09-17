@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PhoneCamWithAndroidCam.Views
+namespace PhoneCamWithAndroidCam.Streams
 {
     /// <summary>
     /// Logique d'interaction pour StreamControl.xaml

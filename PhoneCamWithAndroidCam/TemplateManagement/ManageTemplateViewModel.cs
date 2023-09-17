@@ -1,6 +1,5 @@
 ﻿using Helper.MVVM;
 using PhoneCamWithAndroidCam.Serialization;
-using PhoneCamWithAndroidCam.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,7 +11,7 @@ using Wpf.Common.Controls;
 using Wpf.Common.Controls.Dialog;
 using Wpf.Common.Controls.ElementChooser;
 
-namespace PhoneCamWithAndroidCam.ViewModels.TemplateManagement
+namespace PhoneCamWithAndroidCam.TemplateManagement
 {
     public class ManageTemplateViewModel : DialogWindowViewModel
     {
