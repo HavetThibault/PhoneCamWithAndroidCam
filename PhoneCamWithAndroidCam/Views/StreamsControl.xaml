@@ -33,6 +33,9 @@
             <common:SymbolButton 
                 Glyph="Plus"
                 Command="{Binding AddPipelineCommand}"/>
+            <common:SymbolButton 
+                Glyph="Import"
+                Command="{Binding ImportFromTemplateCommand}"/>
         </StackPanel>
         <Separator 
             Grid.Row="1" 

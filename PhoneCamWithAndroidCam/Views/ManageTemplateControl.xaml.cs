@@ -19,9 +19,9 @@ namespace PhoneCamWithAndroidCam.Views
     /// <summary>
     /// Logique d'interaction pour ManageTemplateWindow.xaml
     /// </summary>
-    public partial class ManageTemplateWindow : BaseWindow
+    public partial class ManageTemplateControl : UserControl
     {
-        public ManageTemplateWindow(ManageTemplateViewModel viewModel)
+        public ManageTemplateControl(ManageTemplateViewModel viewModel)
         {
             InitializeComponent();
             DataContext = viewModel;

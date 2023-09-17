@@ -17,6 +17,7 @@ using PhoneCamWithAndroidCam.ViewModels.PipelineEditor;
 using PhoneCamWithAndroidCam.Serialization;
 using PhoneCamWithAndroidCam.ViewModels.TemplateManagement;
 using Wpf.Common.Controls.Dialog;
+using Wpf.Common.Controls.ElementChooser;
 
 namespace PhoneCamWithAndroidCam.ViewModels
 {
@@ -37,6 +38,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
         public RelayCommand MoveDownCommand { get; set; }
         public RelayCommand EditCommand { get; set; }
         public RelayCommand DeleteCommand { get; set; }
+        public RelayCommand ImportFromTemplateCommand { get; set; }
 
         public StreamsViewModel(DisplayStreamViewModel parent, Dispatcher uiDispatcher, 
             ProducerConsumerBuffers pipelineInput, string filePath)
@@ -45,26 +47,40 @@ namespace PhoneCamWithAndroidCam.ViewModels
             _parent = parent;
             _uiDispatcher = uiDispatcher;
             _duplicateBuffersThread = new(pipelineInput);
-            TryLoadStreamViews();
+            
+            StreamViews = new();
+            TryLoadStreamViewsAndTemplates();
 
             ManageTemplateCommand = new(ManageTemplate);
-            AddPipelineCommand = new(AddPipeline);
+            AddPipelineCommand = new(AddPipelineUsingEditorControl);
             MoveUpCommand = new(MoveUp);
             MoveDownCommand = new(MoveDown);
             EditCommand = new(Edit);
             DeleteCommand = new(DeleteAndDispose);
+            ImportFromTemplateCommand = new(ImportFromTemplate);
+        }
+
+        private void ImportFromTemplate(object uselessParam)
+        {
+            var selectionElements = new List<SelectionElement>();
+            foreach (var template in _pipelineTemplates)
+                selectionElements.Add(new SelectionElement(template.PipelineName, template));
+            var selectTemplateViewModel = new ElementChooserViewModel(selectionElements);
+            var selectTemplateControl = new ElementChooserControl(selectTemplateViewModel);
+            new DialogWindow(selectTemplateControl, selectTemplateViewModel, 380, 250).ShowDialog();
+
+            if(selectTemplateViewModel.DialogResult)
+                AddPipeline((PipelineStructure)selectTemplateViewModel.SelectedElement.Value);
         }
 
         private void ManageTemplate(object uselessParameter)
         {
-            var manageTemplateViewModel = new ManageTemplateViewModel(GetActivePipelines(), _pipelineTemplates);
-            var manageTemplateWindow = new ManageTemplateWindow(manageTemplateViewModel);
-            manageTemplateWindow.ShowDialog();
+            var manageTemplateViewModel = new ManageTemplateViewModel(_pipelineTemplates, GetActivePipelines());
+            var manageTemplateControl = new ManageTemplateControl(manageTemplateViewModel);
+            new DialogWindow(manageTemplateControl, manageTemplateViewModel, 380, 250).ShowDialog();
 
             if(manageTemplateViewModel.DialogResult)
-            {
-                _pipelineTemplates = manageTemplateViewModel.PipelineTemplates;
-            }
+                _pipelineTemplates = manageTemplateViewModel.GetPipelineTemplates();
         }
 
         private List<PipelineStructure> GetActivePipelines()
@@ -154,7 +170,7 @@ namespace PhoneCamWithAndroidCam.ViewModels
             StreamViews.Add(new StreamViewModel(_uiDispatcher, pipeline.InstantiatePipeline(inputBuffer, _uiDispatcher)));
         }
 
-        private void AddPipeline(object uselessParameter)
+        private void AddPipelineUsingEditorControl(object uselessParameter)
         {
             var inputBuffer = _duplicateBuffersThread.AddNewOutputBuffer();
 
@@ -195,16 +211,17 @@ namespace PhoneCamWithAndroidCam.ViewModels
                 streamView.Dispose();
         }
 
-        private void TryLoadStreamViews()
+        private void TryLoadStreamViewsAndTemplates()
         {
             var streamsInfo = StreamsInfo.TryLoad(_filePath);
-            StreamViews = new();
             if (streamsInfo is StreamsInfo)
             {
                 foreach (var pipeline in streamsInfo.ActivePipelines)
                     AddPipeline(pipeline);
                 _pipelineTemplates = streamsInfo.PipelineTemplates;
             }
+            else
+                _pipelineTemplates = new();
         }
     }
 }
