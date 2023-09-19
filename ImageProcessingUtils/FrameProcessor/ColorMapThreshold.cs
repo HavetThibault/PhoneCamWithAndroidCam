@@ -16,9 +16,8 @@ namespace ImageProcessingUtils.FrameProcessor
         private byte[] _colorMap;
         private int[] _upOrDownColorMapIncrement;
 
-        public ColorMapThreshold(int width, int height, int stride, int intervalNbr) : base(width, height, stride)
+        public ColorMapThreshold(int width, int height, int stride, int intervalNbr) : base(width, height, stride, ELEMENT_TYPE_NAME)
         {
-            ElementTypeName = ELEMENT_TYPE_NAME;
             _colorMap = new byte[256];
             _upOrDownColorMapIncrement = new int[256];
             _stride = stride;

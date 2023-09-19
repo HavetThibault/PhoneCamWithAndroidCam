@@ -1,5 +1,4 @@
 ﻿using ImageProcessingUtils.FrameProcessor;
-using ImageProcessingUtils.SpecificFrameProcessor;
 using ProcessingPipelines.PipelineUtils;
 using System;
 using System.Collections.Generic;
@@ -83,18 +82,12 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                     frameProcessor = new Scanner(outputBuffer.Width, outputBuffer.Height, 3, 5000);
                     break;
 
+                case MOTION_DETECTION:
+                    frameProcessor = new MotionDetection(outputBuffer.Width, outputBuffer.Height);
+                    break;
+
                 default:
-                    switch (elementType)
-                    {
-                        case MOTION_DETECTION:
-                            return new MotionDetectionPipelineElement(
-                                uiDispatcher,
-                                name,
-                                null,
-                                outputBuffer);
-                        default:
-                            throw new ArgumentException("No pipeline element with this name.");
-                    }
+                    throw new ArgumentException("No pipeline element with this name.");
             }
             return new FrameProcessorPipelineElement(
                 uiDispatcher,

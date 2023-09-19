@@ -18,6 +18,7 @@ using PhoneCamWithAndroidCam.TemplateManagement;
 using Wpf.Common.Controls.Dialog;
 using Wpf.Common.Controls.ElementChooser;
 using PhoneCamWithAndroidCam.Main;
+using PhoneCamWithAndroidCam.PipelineElementEditor;
 
 namespace PhoneCamWithAndroidCam.Streams
 {
@@ -37,6 +38,7 @@ namespace PhoneCamWithAndroidCam.Streams
         public RelayCommand MoveUpCommand { get; set; }
         public RelayCommand MoveDownCommand { get; set; }
         public RelayCommand EditCommand { get; set; }
+        public RelayCommand EditElementParamCommand { get; set; }
         public RelayCommand DeleteCommand { get; set; }
         public RelayCommand ImportFromTemplateCommand { get; set; }
 
@@ -58,6 +60,15 @@ namespace PhoneCamWithAndroidCam.Streams
             EditCommand = new(Edit);
             DeleteCommand = new(DeleteAndDispose);
             ImportFromTemplateCommand = new(ImportFromTemplate);
+            EditElementParamCommand = new(EditElementParam);
+        }
+
+        private void EditElementParam(object sender)
+        {
+            var streamViewModel = (StreamViewModel)sender;
+            var editElementParamViewModel = new PipelineElementEditorViewModel(streamViewModel.Pipeline.PipelineElements);
+            var editElementParamControl = new PipelineElementEditorControl(editElementParamViewModel);
+            new DialogWindow(editElementParamControl, editElementParamViewModel, 440, 500).ShowDialog();
         }
 
         private void ImportFromTemplate(object uselessParam)
@@ -75,7 +86,7 @@ namespace PhoneCamWithAndroidCam.Streams
 
         private void ManageTemplate(object uselessParameter)
         {
-            var manageTemplateViewModel = new ManageTemplateViewModel(_pipelineTemplates, GetActivePipelines());
+            var manageTemplateViewModel = new ManageTemplateViewModel(_pipelineTemplates, GetActivePipelinesStructures());
             var manageTemplateControl = new ManageTemplateControl(manageTemplateViewModel);
             new DialogWindow(manageTemplateControl, manageTemplateViewModel, 380, 250).ShowDialog();
 
@@ -83,7 +94,7 @@ namespace PhoneCamWithAndroidCam.Streams
                 _pipelineTemplates = manageTemplateViewModel.GetPipelineTemplates();
         }
 
-        private List<PipelineStructure> GetActivePipelines()
+        private List<PipelineStructure> GetActivePipelinesStructures()
         {
             var activePipelines = new List<PipelineStructure>();
             foreach (var streamView in StreamViews)
@@ -230,7 +241,7 @@ namespace PhoneCamWithAndroidCam.Streams
 
         internal void Dispose()
         {
-            new StreamsInfo(GetActivePipelines(), _pipelineTemplates).Serialize(_filePath);
+            new StreamsInfo(GetActivePipelinesStructures(), _pipelineTemplates).Serialize(_filePath);
             foreach (var streamView in StreamViews)
                 streamView.Dispose();
         }

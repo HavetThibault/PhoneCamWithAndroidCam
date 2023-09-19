@@ -12,20 +12,20 @@ using System.Xml.Linq;
 
 namespace ProcessingPipelines.ImageProcessingPipeline
 {
-    internal class FrameProcessorPipelineElement : PipelineElement
+    public class FrameProcessorPipelineElement : PipelineElement
     {
-        private IFrameProcessor _frameProcessor;
+        public IFrameProcessor FrameProcessor { get; private set; }
 
         public FrameProcessorPipelineElement(Dispatcher uiDispatcher, string name, IFrameProcessor frameProcessor, ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer) 
             : base(uiDispatcher, name, frameProcessor.ElementTypeName, inputBuffer, outputBuffer)
         {
-            _frameProcessor = frameProcessor;
+            FrameProcessor = frameProcessor;
         }
 
         public FrameProcessorPipelineElement(FrameProcessorPipelineElement element, ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer) 
             : base(element, inputBuffer, outputBuffer)
         {
-            _frameProcessor = element._frameProcessor.Clone();
+            FrameProcessor = element.FrameProcessor.Clone();
         }
 
         public override PipelineElement Clone(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer)
@@ -51,7 +51,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                 processTimeWatch.Start();
 
-                _frameProcessor.ProcessFrame(frame.Data, destBuffer);
+                FrameProcessor.ProcessFrame(frame.Data, destBuffer);
 
                 Monitor.Exit(frame);
 

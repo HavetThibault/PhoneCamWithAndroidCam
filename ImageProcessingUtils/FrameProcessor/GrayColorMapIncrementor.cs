@@ -16,9 +16,8 @@ namespace ImageProcessingUtils.FrameProcessor
         private int[] _upOrDownColorMapIncrement;
 
         public GrayColorMapIncrementor(int width, int height, int stride) : 
-            base(width, height, stride)
+            base(width, height, stride, ELEMENT_TYPE_NAME)
         {
-            ElementTypeName = ELEMENT_TYPE_NAME;
             _colorMap = new byte[256];
             _upOrDownColorMapIncrement = new int[256];
             _tempGrayBuffer = new byte[_width * _height];

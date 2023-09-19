@@ -29,10 +29,8 @@ public class Scanner : FrameProcessor
     /// <param name="height"></param>
     /// <param name="scanSpeed">Between 1 and 100</param>
     /// <param name="scanIntervalMs"></param>
-    public Scanner(int width, int height, int scanStep, int scanIntervalMs) : base(width, height)
+    public Scanner(int width, int height, int scanStep, int scanIntervalMs) : base(width, height, ELEMENT_TYPE_NAME)
     {
-        ElementTypeName = ELEMENT_TYPE_NAME;
-
         _scanStep = scanStep;
         _scanIntervalMs = scanIntervalMs;
 
@@ -57,6 +55,9 @@ public class Scanner : FrameProcessor
                 _lineRectangle.X = _scanIndex;
                 if (_scanIndex + _lineRectangle.Width <= _width)
                     AddVerticalLine(destBuffer);
+
+                if(_scanIndex + _lineRectangle.Width < _width)
+                    CopySourceImageVerticalPartIntoDestBuffer(srcBuffer, destBuffer);
 
                 _scanIndex += _scanStep;
                 if (_scanIndex >= _width)
@@ -109,6 +110,19 @@ public class Scanner : FrameProcessor
             _width,
             255, 0, 0,
             _lineRectangle);
+    }
+
+    private void CopySourceImageVerticalPartIntoDestBuffer(byte[] srcBuffer, byte[] dstBuffer)
+    {
+        SIMDHelper.CopyVerticalPart(
+            srcBuffer,
+            dstBuffer,
+            _width,
+            _height,
+            4,
+            _scanIndex + _lineRectangle.Width,
+            _width - _scanIndex - _lineRectangle.Width,
+            _scanIndex + _lineRectangle.Width);
     }
 
     private void ResetScan()

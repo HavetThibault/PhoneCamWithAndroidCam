@@ -13,9 +13,8 @@ namespace ImageProcessingUtils.FrameProcessor
 
         private byte[] _colorMap;
 
-        public ColorMapSaturator(int width, int height, int stride) : base(width, height, stride) 
+        public ColorMapSaturator(int width, int height, int stride) : base(width, height, stride, ELEMENT_TYPE_NAME) 
         {
-            ElementTypeName = ELEMENT_TYPE_NAME;
             _colorMap = new byte[256];
             _stride = stride;
             InitColorMap();

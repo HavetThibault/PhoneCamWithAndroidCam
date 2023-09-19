@@ -31,11 +31,11 @@
                 Glyph="Library"
                 Command="{Binding ManageTemplateCommand}"/>
             <common:SymbolButton 
-                Glyph="Plus"
-                Command="{Binding AddPipelineCommand}"/>
-            <common:SymbolButton 
                 Glyph="Download"
                 Command="{Binding ImportFromTemplateCommand}"/>
+            <common:SymbolButton 
+                Glyph="Plus"
+                Command="{Binding AddPipelineCommand}"/>
         </StackPanel>
         <Separator 
             Grid.Row="1" 
@@ -91,6 +91,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <common:SymbolButton
                                         Glyph="ArrowUp8"
@@ -105,14 +106,20 @@
                                         CommandParameter="{Binding ElementName=StreamViewModelGrid, 
                                             Path=DataContext}"/>
                                     <common:SymbolButton 
-                                        Glyph="Edit"
+                                        Glyph="Media"
                                         Grid.Column="2"
+                                        Command="{Binding EditElementParamCommand}"
+                                        CommandParameter="{Binding ElementName=StreamViewModelGrid, 
+                                            Path=DataContext}"/>
+                                    <common:SymbolButton 
+                                        Glyph="Edit"
+                                        Grid.Column="3"
                                         Command="{Binding EditCommand}"
                                         CommandParameter="{Binding ElementName=StreamViewModelGrid, 
                                             Path=DataContext}"/>
                                     <common:SymbolButton 
                                         Style="{StaticResource Style.DeleteSymboButton}"
-                                        Grid.Column="3"
+                                        Grid.Column="4"
                                         Command="{Binding DeleteCommand}"
                                         CommandParameter="{Binding ElementName=StreamViewModelGrid, 
                                             Path=DataContext}"/>
