@@ -4,54 +4,25 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor"
-             xmlns:element_viewmodel="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.PipelineElementViewModels"
+             xmlns:element_viewmodel="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel"
+             xmlns:canny="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel.CannyEdge"
+             xmlns:incrementor="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel.Incrementor"
              xmlns:common="http://schemas.thibault/dev"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:PipelineElementEditorViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
-        <DataTemplate DataType="{x:Type element_viewmodel:CannyEdgeDetectionViewModel}">
-            <common:ContainerBorder>
-                <StackPanel Margin="6,2,6,2">
-                    <Label
-                        Content="{Binding ElementName}"
-                        FontWeight="Bold"
-                        Margin="0,0,0,3"/>
-                    <Label 
-                        Content="Gauss kernel dimension"/>
-                    <Slider
-                        Minimum="{Binding MIN_GAUSS_KERNEL_DIM}"
-                        Maximum="{Binding MAX_GAUSS_KERNEL_DIM}"
-                        Value="{Binding GaussKernelDimension}"/>
-                    <Label 
-                        Content="Min gradient value"/>
-                    <Slider
-                        Minimum="{Binding MIN_MIN_GRADIENT_VALUE}"
-                        Maximum="{Binding MAX_MIN_GRADIENT_VALUE}"
-                        Value="{Binding MinGradientValue}"/>
-                    <Label 
-                        Content="Min gradient magnitude scale"/>
-                    <Slider
-                        Minimum="{Binding MIN_GRADIENT_MAGNITUDE_SCALE}"
-                        Maximum="{Binding MAX_GRADIENT_MAGNITUDE_SCALE}"
-                        Value="{Binding MinGradientMagnitudeScale}"/>
-                    <Label 
-                        Content="Max gradient magnitude scale"/>
-                    <Slider
-                        Minimum="{Binding MIN_GRADIENT_MAGNITUDE_SCALE}"
-                        Maximum="{Binding MAX_GRADIENT_MAGNITUDE_SCALE}"
-                        Value="{Binding MaxGradientMagnitudeScale}"/>
-                    <Label 
-                        Content="Sigma blur"/>
-                    <Slider
-                        Minimum="{Binding MIN_SIGMA_BLUR}"
-                        Maximum="{Binding MAX_SIGMA_BLUR}"
-                        Value="{Binding SigmaBlur}"/>
-                </StackPanel>
-            </common:ContainerBorder>
+        <DataTemplate DataType="{x:Type canny:CannyEdgeDetectionViewModel}">
+            <canny:CannyEdgeDetectionControl
+                DataContext="{Binding}"/>
         </DataTemplate>
-        
+
+        <DataTemplate DataType="{x:Type incrementor:ColorMapIncrementorViewModel}">
+            <incrementor:ColorMapIncrementorControl
+                DataContext="{Binding}"/>
+        </DataTemplate>
+
         <DataTemplate DataType="{x:Type element_viewmodel:PipelineElementViewModel}">
             <common:ContainerBorder>
                 <StackPanel Margin="6,2,6,2">

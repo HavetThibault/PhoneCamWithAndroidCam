@@ -6,17 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhoneCamWithAndroidCam.PipelineElementEditor.PipelineElementViewModels
+namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel.CannyEdge
 {
     internal class CannyEdgeDetectionViewModel : PipelineElementViewModel
     {
         public int MIN_GAUSS_KERNEL_DIM { get; } = 3;
-        public int MAX_GAUSS_KERNEL_DIM { get; }  = 20;
+        public int MAX_GAUSS_KERNEL_DIM { get; } = 20;
 
-        public byte MIN_MIN_GRADIENT_VALUE { get; }  = 1;
-        public byte MAX_MIN_GRADIENT_VALUE { get; }  = 255;
+        public byte MIN_MIN_GRADIENT_VALUE { get; } = 1;
+        public byte MAX_MIN_GRADIENT_VALUE { get; } = 255;
 
-        public double MIN_GRADIENT_MAGNITUDE_SCALE { get; }  = 0d;
+        public double MIN_GRADIENT_MAGNITUDE_SCALE { get; } = 0d;
         public double MAX_GRADIENT_MAGNITUDE_SCALE { get; } = 1d;
 
         public float MIN_SIGMA_BLUR { get; } = 0.5f;
