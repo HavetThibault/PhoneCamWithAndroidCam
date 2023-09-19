@@ -27,27 +27,47 @@ namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel.CannyEdge
         public int GaussKernelDimension
         {
             get => _cannyEdgeDetection.GaussKernelDimension;
-            set => _cannyEdgeDetection.GaussKernelDimension = value;
+            set
+            {
+                _cannyEdgeDetection.GaussKernelDimension = value;
+                NotifyPropertyChanged(nameof(GaussKernelDimension));
+            }
         }
         public byte MinGradientValue
         {
             get => _cannyEdgeDetection.MinGradientValue;
-            set => _cannyEdgeDetection.MinGradientValue = value;
+            set
+            {
+                _cannyEdgeDetection.MinGradientValue = value;
+                NotifyPropertyChanged(nameof(MinGradientValue));
+            }
         }
         public double MinGradientMagnitudeScale
         {
             get => _cannyEdgeDetection.MinGradientMagnitudeScale;
-            set => _cannyEdgeDetection.MinGradientMagnitudeScale = value;
+            set 
+            {
+                _cannyEdgeDetection.MinGradientMagnitudeScale = value;
+                NotifyPropertyChanged(nameof(MinGradientMagnitudeScale));
+            }
         }
         public double MaxGradientMagnitudeScale
         {
             get => _cannyEdgeDetection.MaxGradientMagnitudeScale;
-            set => _cannyEdgeDetection.MaxGradientMagnitudeScale = value;
+            set 
+            {
+                _cannyEdgeDetection.MaxGradientMagnitudeScale = value;
+                NotifyPropertyChanged(nameof(MaxGradientMagnitudeScale));
+            }
         }
         public float SigmaBlur
         {
             get => _cannyEdgeDetection.SigmaBlur;
-            set => _cannyEdgeDetection.SigmaBlur = value;
+            set 
+            {
+                _cannyEdgeDetection.SigmaBlur = value;
+                NotifyPropertyChanged(nameof(SigmaBlur));
+            }
         }
 
         public CannyEdgeDetectionViewModel(string elementName, CannyEdgeDetection cannyEdgeDetection) : base(elementName)

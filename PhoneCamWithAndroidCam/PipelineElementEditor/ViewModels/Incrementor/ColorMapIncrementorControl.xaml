@@ -12,21 +12,43 @@
         <common:ContainerBorder>
             <StackPanel Margin="6,2,6,2">
                 <Label
-                        Content="{Binding ElementName}"
-                        FontWeight="Bold"
-                        Margin="0,0,0,3"/>
-                <Label 
-                        Content="Frames number before increment"/>
+                    Content="{Binding ElementName}"
+                    FontWeight="Bold"
+                    Margin="0,0,0,3"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label 
+                        Content="Frames number before increment"
+                        HorizontalAlignment="Left"/>
+                    <Label
+                        Content="{Binding FramesNbrBeforeIncrement}"
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"/>
+                </Grid>
                 <Slider
-                        Minimum="{Binding MIN_FRAMES_NBR_BEFORE_INCREMENT}"
-                        Maximum="{Binding MAX_FRAMES_NBR_BEFORE_INCREMENT}"
-                        Value="{Binding FramesNbrBeforeIncrement}"/>
-                <Label 
-                        Content="Increment"/>
+                    Minimum="{Binding MIN_FRAMES_NBR_BEFORE_INCREMENT}"
+                    Maximum="{Binding MAX_FRAMES_NBR_BEFORE_INCREMENT}"
+                    Value="{Binding FramesNbrBeforeIncrement}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label 
+                        Content="Increment"
+                        HorizontalAlignment="Left"/>
+                    <Label
+                        Content="{Binding Increment}"
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"/>
+                </Grid>
                 <Slider
-                        Minimum="{Binding MIN_INCREMENT}"
-                        Maximum="{Binding MAX_INCREMENT}"
-                        Value="{Binding Increment}"/>
+                    Minimum="{Binding MIN_INCREMENT}"
+                    Maximum="{Binding MAX_INCREMENT}"
+                    Value="{Binding Increment}"/>
             </StackPanel>
         </common:ContainerBorder>
     </Grid>

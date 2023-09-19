@@ -14,35 +14,44 @@ namespace ImageProcessingUtils.FrameProcessor
         private int _intervalNbr;
 
         private byte[] _colorMap;
-        private int[] _upOrDownColorMapIncrement;
+
+        public int IntervalNbr
+        {
+            get => _intervalNbr;
+            set
+            {
+                _intervalNbr = value;
+                InitColorMapOnIntervalNumber();
+            }
+        }
 
         public ColorMapThreshold(int width, int height, int stride, int intervalNbr) : base(width, height, stride, ELEMENT_TYPE_NAME)
         {
             _colorMap = new byte[256];
-            _upOrDownColorMapIncrement = new int[256];
             _stride = stride;
             _intervalNbr = intervalNbr;
-            InitColorMap();
+            InitColorMapOnIntervalNumber();
         }
 
         public ColorMapThreshold(ColorMapThreshold colorMapThreshold) 
             : this(colorMapThreshold._width, colorMapThreshold._height, colorMapThreshold._stride, colorMapThreshold._intervalNbr)
         { }
 
-        private void InitColorMap()
+        private void InitColorMapOnIntervalNumber()
         {
             double intervalLength = 255 / (double)_intervalNbr;
             int intervalBeginningOffset = 0;
             double intervalColor = intervalLength / 2.0;
-            for (int i = 0; i < _colorMap.Length; i++)
-            {
-                _colorMap[i] = (byte)intervalColor;
-                if (i > intervalBeginningOffset + intervalLength)
+            lock(ParamLock)
+                for (int i = 0; i < _colorMap.Length; i++)
                 {
-                    intervalBeginningOffset = i;
-                    intervalColor += intervalLength;
+                    _colorMap[i] = (byte)intervalColor;
+                    if (i > intervalBeginningOffset + intervalLength)
+                    {
+                        intervalBeginningOffset = i;
+                        intervalColor += intervalLength;
+                    }
                 }
-            }
         }
 
         public override void ProcessFrame(byte[] srcBuffer, byte[] dstBuffer)
@@ -54,27 +63,14 @@ namespace ImageProcessingUtils.FrameProcessor
                 for (int x = 0; x < byteWidth; x += 4)
                 {
                     lineOffset = y * _stride + x;
-                    dstBuffer[lineOffset] = _colorMap[srcBuffer[lineOffset]];
-                    dstBuffer[lineOffset + 1] = _colorMap[srcBuffer[lineOffset + 1]];
-                    dstBuffer[lineOffset + 2] = _colorMap[srcBuffer[lineOffset + 2]];
+                    lock (ParamLock)
+                    {
+                        dstBuffer[lineOffset] = _colorMap[srcBuffer[lineOffset]];
+                        dstBuffer[lineOffset + 1] = _colorMap[srcBuffer[lineOffset + 1]];
+                        dstBuffer[lineOffset + 2] = _colorMap[srcBuffer[lineOffset + 2]];
+                    }
                     dstBuffer[lineOffset + 3] = 255;
                 }
-            }
-            IncrementColorMap();
-        }
-
-        private void IncrementColorMap()
-        {
-            int result;
-            for (int i = 0; i < _colorMap.Length; i++)
-            {
-                result = _colorMap[i] + _upOrDownColorMapIncrement[i];
-                _colorMap[i] = (byte)result;
-
-                if (_colorMap[i] == 255)
-                    _upOrDownColorMapIncrement[i] = -1;
-                else if (_colorMap[i] == 0)
-                    _upOrDownColorMapIncrement[i] = 1;
             }
         }
 

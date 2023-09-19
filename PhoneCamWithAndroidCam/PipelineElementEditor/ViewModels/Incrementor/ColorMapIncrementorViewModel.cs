@@ -23,13 +23,21 @@ namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel.Incrementor
         public int FramesNbrBeforeIncrement
         {
             get => _incrementor.FramesNbrBeforeIncrement;
-            set => _incrementor.FramesNbrBeforeIncrement = value;
+            set
+            {
+                _incrementor.FramesNbrBeforeIncrement = value;
+                NotifyPropertyChanged(nameof(FramesNbrBeforeIncrement));
+            }
         }
 
         public int Increment
         {
             get => _incrementor.Increment;
-            set => _incrementor.Increment = value;
+            set
+            {
+                _incrementor.Increment = value;
+                NotifyPropertyChanged(nameof(Increment));
+            }
         }
 
         public ColorMapIncrementorViewModel(string elementName, ColorMapIncrementor incrementor) : base(elementName)

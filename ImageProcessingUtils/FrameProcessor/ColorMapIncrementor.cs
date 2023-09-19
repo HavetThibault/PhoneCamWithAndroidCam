@@ -105,16 +105,17 @@ namespace ImageProcessingUtils.FrameProcessor
         private void IncrementColorMap()
         {
             int result;
-            for (int i = 0; i < _colorMap.Length; i++)
-            {
-                result = _colorMap[i] + _upOrDownColorMapIncrement[i];
-                _colorMap[i] = (byte)result;
+            lock(ParamLock)
+                for (int i = 0; i < _colorMap.Length; i++)
+                {
+                    result = _colorMap[i] + _upOrDownColorMapIncrement[i];
+                    _colorMap[i] = (byte)result;
 
-                if (_colorMap[i] + Increment > 255)
-                    _upOrDownColorMapIncrement[i] = -Increment;
-                else if (_colorMap[i] - Increment < 0)
-                    _upOrDownColorMapIncrement[i] = Increment;
-            }
+                    if (_colorMap[i] + Increment > 255)
+                        _upOrDownColorMapIncrement[i] = -Increment;
+                    else if (_colorMap[i] - Increment < 0)
+                        _upOrDownColorMapIncrement[i] = Increment;
+                }
         }
 
         public override IFrameProcessor Clone()
