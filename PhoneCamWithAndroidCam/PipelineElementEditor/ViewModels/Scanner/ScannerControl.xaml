@@ -31,7 +31,8 @@
                 <Slider
                     Minimum="{Binding MIN_SCAN_STEP}"
                     Maximum="{Binding MAX_SCAN_STEP}"
-                    Value="{Binding ScanStep}"/>
+                    Value="{Binding ScanStep}"
+                    IsMoveToPointEnabled="True"/>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -48,7 +49,8 @@
                 <Slider
                     Minimum="{Binding MIN_SCAN_INTERVAL_MS}"
                     Maximum="{Binding MAX_SCAN_INTERVAL_MS}"
-                    Value="{Binding ScanIntervalMs}"/>
+                    Value="{Binding ScanIntervalMs}"
+                    IsMoveToPointEnabled="True"/>
             </StackPanel>
         </common:ContainerBorder>        
     </Grid>

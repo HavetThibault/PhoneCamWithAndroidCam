@@ -18,7 +18,7 @@
     <Grid
         x:Name="MainGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="28"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -66,23 +66,31 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
                                     <RowDefinition/>
-                                    <RowDefinition/>
                                 </Grid.RowDefinitions>
 
-                                <common:ClickSelectTextBox
-                                    Grid.Row="0"
-                                    Height="28"
-                                    Text="{Binding PipelineName}"/>
-                                <Label
-                                    Grid.Row="1"
-                                    Content="{Binding Fps, Converter={StaticResource FpsConverter}}"/>
+                                <common:ContainerBorder>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <common:ClickSelectTextBox
+                                            Height="28"
+                                            Text="{Binding PipelineName}"/>
+                                        <Label
+                                            Grid.Row="1"
+                                            Content="{Binding Fps, Converter={StaticResource FpsConverter}}"/>
+                                    </Grid>
+                                </common:ContainerBorder>
+
                                 <process_perf:ProcessPerformancesControl
-                                    Grid.Row="2"
+                                    Grid.Row="1"
                                     DataContext="{Binding ProcessPerformancesViewModel}"/>
                             </Grid>
                             <common:ContainerBorder
                                 Style="{StaticResource Style.OptionsPopupContainerBorder}"
-                                Grid.Column="1"
+                                Grid.Column="0"
+                                HorizontalAlignment="Left"
                                 Visibility="{Binding ElementName=StreamViewModelGrid, Path=IsMouseOver, 
                                         Converter={StaticResource Converter.BoolToVisible}}">
                                 <Grid

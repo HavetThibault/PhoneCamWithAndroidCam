@@ -6,10 +6,15 @@
              xmlns:local="clr-namespace:PhoneCamWithAndroidCam.Main"
              xmlns:process_perf="clr-namespace:PhoneCamWithAndroidCam.ProcessPerformances"
              xmlns:streams="clr-namespace:PhoneCamWithAndroidCam.Streams"
-             xmlns:controls="http://schemas.thibault/dev"
+             xmlns:common="http://schemas.thibault/dev"
+             xmlns:converters="clr-namespace:PhoneCamWithAndroidCam.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="850"
              d:DataContext="{d:DesignInstance local:StreamsAndStatsViewModel}">
+
+    <UserControl.Resources>
+        <converters:FpsConverter x:Key="FpsConverter"/>
+    </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -20,10 +25,10 @@
         <StackPanel 
             Orientation="Horizontal"
             Margin="6,0,0,0">
-            <controls:SymbolButton 
+            <common:SymbolButton 
                 Style="{StaticResource Style.PlaySymbolButton}"
                 Command="{Binding CommandLaunchStreaming}"/>
-            <controls:SymbolButton 
+            <common:SymbolButton 
                 Style="{StaticResource Style.PauseSymbolButton}"
                 Command="{Binding CommandStopStreaming}"/>
         </StackPanel>
@@ -34,40 +39,34 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <controls:ContainerBorder Grid.Column="0">
+            <common:ContainerBorder Grid.Column="0">
                 <StackPanel>
-                    <Label Content="Phone stream"/>
+                    <Label Content="Phone stream" Height="28"/>
                     <Separator Height="2"/>
-                    <StackPanel
-                        Orientation="Horizontal"
-                        Margin="0,2,0,0">
-                        <Label 
-                            Content="Ip:"
-                            VerticalContentAlignment="Center"/>
-                        <controls:ClickSelectTextBox 
-                            Text="{Binding PhoneIp}" 
-                            Margin="5,1,5,0"
-                            Height="25"
-                            Width="130"
-                            IsEnabled="{Binding IsPhoneIpChangeable}"/>
-                    </StackPanel>
-                    <process_perf:ProcessPerformancesControl DataContext="{Binding ProcessPerformancesViewModel}"/>
-                    <StackPanel
-                        DataContext="{Binding ProcessPerformancesViewModel}"
-                        Orientation="Horizontal">
-                        <Label 
-                            Content="Fps:"/>
-                        <Label 
-                            Content="{Binding ProcessPerformances[2].Fps}" 
-                            Margin="5,0,5,0"/>
-                    </StackPanel>
-                </StackPanel>
-            </controls:ContainerBorder>
+                    <common:ContainerBorder>
+                        <StackPanel>
+                            <common:ClickSelectTextBox 
+                                Text="{Binding PhoneIp}" 
+                                Height="28"
+                                Grid.Column="1"
+                                IsEnabled="{Binding IsPhoneIpChangeable}"/>
+                            <StackPanel
+                                DataContext="{Binding ProcessPerformancesViewModel}"
+                                Orientation="Horizontal">
+                                <Label 
+                                    Content="{Binding ProcessPerformances[2].Fps, Converter={StaticResource FpsConverter}}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </common:ContainerBorder>
 
-            <controls:ContainerBorder Grid.Column="1">
+                    <process_perf:ProcessPerformancesControl DataContext="{Binding ProcessPerformancesViewModel}"/>
+                </StackPanel>
+            </common:ContainerBorder>
+
+            <common:ContainerBorder Grid.Column="1">
                 <streams:StreamsControl 
                         DataContext="{Binding StreamsViewModel}"/>
-            </controls:ContainerBorder>
+            </common:ContainerBorder>
         </Grid>
     </Grid>
 </UserControl>

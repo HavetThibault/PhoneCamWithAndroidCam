@@ -31,6 +31,9 @@
     <Compile Update="PipelineElementEditor\ViewModels\Incrementor\ColorMapIncrementorControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="PipelineElementEditor\ViewModels\Lagger\FrameLaggerControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 
 </Project>

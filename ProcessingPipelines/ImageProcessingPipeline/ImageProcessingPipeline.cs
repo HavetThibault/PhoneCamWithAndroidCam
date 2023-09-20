@@ -3,6 +3,7 @@ using ImageProcessingUtils;
 using ImageProcessingUtils.FrameProcessor;
 using ProcessingPipelines.PipelineUtils;
 using System.Windows.Threading;
+using System.Xml.Linq;
 
 namespace ProcessingPipelines.ImageProcessingPipeline;
 
@@ -81,76 +82,57 @@ public class ImageProcessingPipeline
 
     public PipelineElement InstantiateAndInsert(int index, FrameProcessor frameProcessor)
     {
-        string name = GetNextAvailableElementName(frameProcessor.ElementTypeName);
-        PipelineElement previousElement;
-        PipelineElement nextElement;
-        PipelineElement newElement;
-        if (index == 0)
-        {
-            newElement = new(_uiDispatcher, name, frameProcessor, InputBuffer, InputBuffer.Clone());
-            PipelineElements.Insert(0, newElement);
-        }
-        else if (index == PipelineElements.Count)
-        {
-            previousElement = PipelineElements.Last();
-            newElement = new(_uiDispatcher, name, frameProcessor, previousElement.OutputBuffers, previousElement.OutputBuffers.Clone());
-            PipelineElements.Add(newElement);
-        }
-        else
-        {
-            previousElement = PipelineElements.ElementAt(index - 1);
-            previousElement.OutputBuffers = previousElement.OutputBuffers.Clone();
-            nextElement = PipelineElements.ElementAt(index);
-            newElement = new(_uiDispatcher, name, frameProcessor, previousElement.OutputBuffers, nextElement.InputBuffers);
-            PipelineElements.Insert(index, newElement);
-        }
+        var (inputBuffer, outputBuffer) = GetInputOutputBuffersAndWireForInsert(index);
+        var newElement = InstantiatePipelineElement(inputBuffer, outputBuffer, frameProcessor);
+        PipelineElements.Insert(index, newElement);
         return newElement;
     }
 
     public PipelineElement InstantiateAndInsert(int index, string elementType)
     {
-        string name = GetNextAvailableElementName(elementType);
-        PipelineElement previousElement;
-        PipelineElement nextElement;
-        PipelineElement newElement;
-        if (index == 0)
-        {
-            newElement = PipelineElementFactory.GetInstance(
-                elementType,
-                InputBuffer.Clone(),
-                name,
-                _uiDispatcher);
-            newElement.InputBuffers = InputBuffer;
-                
-            PipelineElements.Insert(0, newElement);
-        }
-        else if(index == PipelineElements.Count)
-        {
-            previousElement = PipelineElements.Last();
-            newElement = PipelineElementFactory.GetInstance(
-                elementType, 
-                previousElement.OutputBuffers.Clone(),
-                name,
-                _uiDispatcher);
+        var (inputBuffer, outputBuffer) = GetInputOutputBuffersAndWireForInsert(index);
+        var newElement = InstantiatePipelineElement(inputBuffer, outputBuffer, elementType);
+        PipelineElements.Insert(index, newElement);
+        return newElement;
+    }
 
-            newElement.InputBuffers = previousElement.OutputBuffers;
-            PipelineElements.Add(newElement);
+    private PipelineElement InstantiatePipelineElement(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer, FrameProcessor frameProcessor)
+    {
+        string name = GetNextAvailableElementName(frameProcessor.ElementTypeName);
+        return new(_uiDispatcher, name, frameProcessor, inputBuffer, outputBuffer);
+    }
+
+    private PipelineElement InstantiatePipelineElement(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer, string elementTypeName)
+    {
+        string name = GetNextAvailableElementName(elementTypeName);
+        return PipelineElementFactory.GetInstance(elementTypeName, inputBuffer, outputBuffer, name, _uiDispatcher);
+    }
+
+    private (ProducerConsumerBuffers, ProducerConsumerBuffers) GetInputOutputBuffersAndWireForInsert(int index)
+    {
+        (ProducerConsumerBuffers, ProducerConsumerBuffers) inputOutputBuffers;
+
+        if(index == 0) {
+            inputOutputBuffers.Item1 = InputBuffer;
+            if(PipelineElements.Count == 0)
+                inputOutputBuffers.Item2 = InputBuffer.Clone();
+            else {
+                inputOutputBuffers.Item2 = PipelineElements[0].InputBuffers.Clone();
+                PipelineElements[0].InputBuffers = inputOutputBuffers.Item2;
+            }
+        }
+        else if(index == PipelineElements.Count) {
+            inputOutputBuffers.Item1 = PipelineElements[index - 1].OutputBuffers;
+            inputOutputBuffers.Item2 = inputOutputBuffers.Item1.Clone();
         }
         else
         {
-            previousElement = PipelineElements.ElementAt(index - 1);
-            previousElement.OutputBuffers = previousElement.OutputBuffers.Clone();
-            nextElement = PipelineElements.ElementAt(index);
-            newElement = PipelineElementFactory.GetInstance(
-                elementType,
-                nextElement.InputBuffers,
-                name,
-                _uiDispatcher);
-            newElement.InputBuffers = previousElement.OutputBuffers;
-
-            PipelineElements.Insert(index, newElement);
+            var nextElement = PipelineElements.ElementAt(index);
+            inputOutputBuffers.Item1 = nextElement.InputBuffers;
+            nextElement.InputBuffers = nextElement.InputBuffers.Clone();
+            inputOutputBuffers.Item2 = nextElement.InputBuffers;
         }
-        return newElement;
+        return inputOutputBuffers;
     }
 
     public void Start(CancellationTokenSource globalCancellationToken)

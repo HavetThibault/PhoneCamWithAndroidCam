@@ -43,6 +43,7 @@ namespace ImageProcessingUtils.FrameProcessor
         {
             _increment = colorMapIncrementor._increment;
             FramesNbrBeforeIncrement = colorMapIncrementor.FramesNbrBeforeIncrement;
+            InitColorMapAndCo();
         }
 
         private void InitColorMapAndCo()
@@ -85,21 +86,19 @@ namespace ImageProcessingUtils.FrameProcessor
         {
             int lineOffset;
             int byteWidth = 4 * _width;
-            for (int y = 0; y < _height; y++)
-            {
-                for(int x = 0; x < byteWidth; x+=4)
+            lock(ParamLock)
+                for (int y = 0; y < _height; y++)
                 {
-                    lineOffset = y * _stride + x;
-                    lock(ParamLock)
+                    for(int x = 0; x < byteWidth; x+=4)
                     {
+                        lineOffset = y * _stride + x;
+                    
                         dstBuffer[lineOffset] = _colorMap[srcBuffer[lineOffset]];
                         dstBuffer[lineOffset + 1] = _colorMap[srcBuffer[lineOffset + 1]];
                         dstBuffer[lineOffset + 2] = _colorMap[srcBuffer[lineOffset + 2]];
+                        dstBuffer[lineOffset + 3] = 255;
                     }
-                    
-                    dstBuffer[lineOffset + 3] = 255;
                 }
-            }
             _frameCount++;
             if(_frameCount >= FramesNbrBeforeIncrement)
             {
@@ -115,12 +114,18 @@ namespace ImageProcessingUtils.FrameProcessor
                 for (int i = 0; i < _colorMap.Length; i++)
                 {
                     result = _colorMap[i] + _upOrDownColorMapIncrement[i];
-                    _colorMap[i] = (byte)result;
-
-                    if (_colorMap[i] + Increment > 255)
-                        _upOrDownColorMapIncrement[i] = -Increment;
-                    else if (_colorMap[i] - Increment < 0)
+                    if (result < 0)
+                    {
+                        _colorMap[i] = (byte)-result;
                         _upOrDownColorMapIncrement[i] = Increment;
+                    }
+                    else if (result > 255)
+                    {
+                        _colorMap[i] = (byte)(255 - (result - 255));
+                        _upOrDownColorMapIncrement[i] = -Increment;
+                    }
+                    else
+                        _colorMap[i] = (byte)result;
                 }
         }
 

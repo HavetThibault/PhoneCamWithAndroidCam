@@ -2,6 +2,7 @@
 using ImageProcessingUtils.FrameProcessor;
 using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.CannyEdge;
 using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.Incrementor;
+using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.Lagger;
 using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.MapThreshold;
 using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.Scanner;
 using ProcessingPipelines.ImageProcessingPipeline;
@@ -33,6 +34,10 @@ namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels
             if(pipelineElement.FrameProcessor is ScannerProcessor scanner)
             {
                 return new ScannerViewModel(pipelineElement.Name, scanner);
+            }
+            if(pipelineElement.FrameProcessor is FrameLagger lagger)
+            {
+                return new FrameLaggerViewModel(pipelineElement.Name, lagger);
             }
             return new PipelineElementViewModel(pipelineElement.Name);
         }

@@ -21,6 +21,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         public const string COLOR_MAP_THRESHOLD = ColorMapThreshold.ELEMENT_TYPE_NAME;
         public const string COLOR_MAP_INVERTER = ColorMapInverter.ELEMENT_TYPE_NAME;
         public const string SCANNER = ScannerProcessor.ELEMENT_TYPE_NAME;
+        public const string FRAMES_LAGGER = FrameLagger.ELEMENT_TYPE_NAME;
 
         public static IEnumerable<string> GetAllPipelineElementNames()
         {
@@ -35,17 +36,22 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 COLOR_MAP_THRESHOLD,
                 COLOR_MAP_INVERTER,
                 SCANNER,
+                FRAMES_LAGGER,
             };
             return pipelineNames.OrderBy(x => x);
         }
 
-        public static PipelineElement GetInstance(string elementType, ProducerConsumerBuffers outputBuffer, string name, Dispatcher uiDispatcher)
+        public static PipelineElement GetInstance(string elementType, ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer, string name, Dispatcher uiDispatcher)
         {
             FrameProcessor frameProcessor;
             switch (elementType)
             {
                 case COPY:
                     frameProcessor = new CopyFrameProcessor();
+                    break;
+
+                case FRAMES_LAGGER:
+                    frameProcessor = new FrameLagger(outputBuffer.Width, outputBuffer.Height);
                     break;
 
                 case CANNY_EDGE_DETECTION:
@@ -87,7 +93,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 uiDispatcher,
                 name,
                 frameProcessor,
-                null,
+                inputBuffer,
                 outputBuffer);
         }
     }

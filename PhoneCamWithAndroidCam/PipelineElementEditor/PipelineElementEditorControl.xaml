@@ -9,6 +9,7 @@
              xmlns:incrementor="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.Incrementor"
              xmlns:map_threshold="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.MapThreshold"
              xmlns:scanner="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.Scanner"
+             xmlns:lagger="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.Lagger"
              xmlns:common="http://schemas.thibault/dev"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:PipelineElementEditorViewModel}"
@@ -32,6 +33,11 @@
 
         <DataTemplate DataType="{x:Type scanner:ScannerViewModel}">
             <scanner:ScannerControl
+                DataContext="{Binding}"/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type lagger:FrameLaggerViewModel}">
+            <lagger:FrameLaggerControl
                 DataContext="{Binding}"/>
         </DataTemplate>
 

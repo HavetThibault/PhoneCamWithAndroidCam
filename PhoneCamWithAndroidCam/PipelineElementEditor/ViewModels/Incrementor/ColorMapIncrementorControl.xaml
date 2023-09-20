@@ -31,7 +31,8 @@
                 <Slider
                     Minimum="{Binding MIN_FRAMES_NBR_BEFORE_INCREMENT}"
                     Maximum="{Binding MAX_FRAMES_NBR_BEFORE_INCREMENT}"
-                    Value="{Binding FramesNbrBeforeIncrement}"/>
+                    Value="{Binding FramesNbrBeforeIncrement}"
+                    IsMoveToPointEnabled="True"/>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -48,7 +49,8 @@
                 <Slider
                     Minimum="{Binding MIN_INCREMENT}"
                     Maximum="{Binding MAX_INCREMENT}"
-                    Value="{Binding Increment}"/>
+                    Value="{Binding Increment}"
+                    IsMoveToPointEnabled="True"/>
             </StackPanel>
         </common:ContainerBorder>
     </Grid>

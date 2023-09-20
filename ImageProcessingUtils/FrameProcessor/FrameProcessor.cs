@@ -16,6 +16,7 @@ namespace ImageProcessingUtils.FrameProcessor
     [XmlInclude(typeof(MedianFilter))]
     [XmlInclude(typeof(ScannerProcessor))]
     [XmlInclude(typeof(MotionDetection))]
+    [XmlInclude(typeof(FrameLagger))]
     public abstract class FrameProcessor
     {
         public int _width { get; set; }
