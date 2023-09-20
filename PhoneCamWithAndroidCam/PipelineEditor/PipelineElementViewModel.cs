@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PhoneCamWithAndroidCam.PipelineEditor
 {
-    public class PipelineElementViewModel
+    public class PipelineElementViewModel : BindableClass
     {
         private Action<object> _deleteAction;
 

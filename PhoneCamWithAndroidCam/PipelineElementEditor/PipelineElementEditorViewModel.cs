@@ -1,5 +1,5 @@
 ﻿using Helper.MVVM;
-using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel;
+using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels;
 using ProcessingPipelines.ImageProcessingPipeline;
 using System;
 using System.Collections.Generic;

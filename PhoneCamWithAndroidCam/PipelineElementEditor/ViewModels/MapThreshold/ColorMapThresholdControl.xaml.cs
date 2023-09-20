@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.CannyEdge
+namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.MapThreshold
 {
     /// <summary>
-    /// Logique d'interaction pour CannyEdgeDetectionControl.xaml
+    /// Logique d'interaction pour ColorMapThresholdControl.xaml
     /// </summary>
-    public partial class CannyEdgeDetectionControl : UserControl
+    public partial class ColorMapThresholdControl : UserControl
     {
-        public CannyEdgeDetectionControl()
+        public ColorMapThresholdControl()
         {
             InitializeComponent();
         }

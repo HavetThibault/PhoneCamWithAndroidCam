@@ -4,9 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor"
-             xmlns:element_viewmodel="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel"
-             xmlns:canny="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel.CannyEdge"
-             xmlns:incrementor="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel.Incrementor"
+             xmlns:element_viewmodel="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels"
+             xmlns:canny="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.CannyEdge"
+             xmlns:incrementor="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.Incrementor"
+             xmlns:map_threshold="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.MapThreshold"
+             xmlns:scanner="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.Scanner"
              xmlns:common="http://schemas.thibault/dev"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance local:PipelineElementEditorViewModel}"
@@ -20,6 +22,16 @@
 
         <DataTemplate DataType="{x:Type incrementor:ColorMapIncrementorViewModel}">
             <incrementor:ColorMapIncrementorControl
+                DataContext="{Binding}"/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type map_threshold:ColorMapThresholdViewModel}">
+            <map_threshold:ColorMapThresholdControl
+                DataContext="{Binding}"/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type scanner:ScannerViewModel}">
+            <scanner:ScannerControl
                 DataContext="{Binding}"/>
         </DataTemplate>
 

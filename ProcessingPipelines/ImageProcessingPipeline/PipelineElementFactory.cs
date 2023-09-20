@@ -21,7 +21,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         public const string COLOR_MAP_SATURATOR = ColorMapSaturator.ELEMENT_TYPE_NAME;
         public const string COLOR_MAP_THRESHOLD = ColorMapThreshold.ELEMENT_TYPE_NAME;
         public const string COLOR_MAP_INVERTER = ColorMapInverter.ELEMENT_TYPE_NAME;
-        public const string SCANNER = Scanner.ELEMENT_TYPE_NAME;
+        public const string SCANNER = ScannerProcessor.ELEMENT_TYPE_NAME;
 
         public static IEnumerable<string> GetAllPipelineElementNames()
         {
@@ -79,7 +79,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                     break;
 
                 case SCANNER:
-                    frameProcessor = new Scanner(outputBuffer.Width, outputBuffer.Height, 3, 5000);
+                    frameProcessor = new ScannerProcessor(outputBuffer.Width, outputBuffer.Height, 3, 5000);
                     break;
 
                 case MOTION_DETECTION:

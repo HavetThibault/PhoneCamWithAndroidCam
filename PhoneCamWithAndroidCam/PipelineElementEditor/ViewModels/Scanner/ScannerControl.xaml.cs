@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.CannyEdge
+namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.Scanner
 {
     /// <summary>
-    /// Logique d'interaction pour CannyEdgeDetectionControl.xaml
+    /// Logique d'interaction pour ScannerControl.xaml
     /// </summary>
-    public partial class CannyEdgeDetectionControl : UserControl
+    public partial class ScannerControl : UserControl
     {
-        public CannyEdgeDetectionControl()
+        public ScannerControl()
         {
             InitializeComponent();
         }

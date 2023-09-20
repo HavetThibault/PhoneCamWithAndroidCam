@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel.Incrementor
+namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.Incrementor
 {
     /// <summary>
     /// Logique d'interaction pour CannyEdgeDetectionControl.xaml

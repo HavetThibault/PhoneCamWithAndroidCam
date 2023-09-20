@@ -1,7 +1,9 @@
 ﻿using Helper.MVVM;
 using ImageProcessingUtils.FrameProcessor;
-using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel.CannyEdge;
-using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel.Incrementor;
+using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.CannyEdge;
+using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.Incrementor;
+using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.MapThreshold;
+using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.Scanner;
 using ProcessingPipelines.ImageProcessingPipeline;
 using System;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel
+namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels
 {
     public class PipelineElementViewModel : BindableClass
     {
@@ -23,6 +25,14 @@ namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel
             if(pipelineElement.FrameProcessor is ColorMapIncrementor incrementor)
             {
                 return new ColorMapIncrementorViewModel(pipelineElement.Name, incrementor);
+            }
+            if(pipelineElement.FrameProcessor is ColorMapThreshold threshold)
+            {
+                return new ColorMapThresholdViewModel(pipelineElement.Name, threshold);
+            }
+            if(pipelineElement.FrameProcessor is ScannerProcessor scanner)
+            {
+                return new ScannerViewModel(pipelineElement.Name, scanner);
             }
             return new PipelineElementViewModel(pipelineElement.Name);
         }

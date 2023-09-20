@@ -1,4 +1,5 @@
 ﻿using ImageProcessingUtils.FrameProcessor;
+using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels;
 using ProcessingPipelines.ImageProcessingPipeline;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel.CannyEdge
+namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.CannyEdge
 {
     internal class CannyEdgeDetectionViewModel : PipelineElementViewModel
     {

@@ -1,6 +1,6 @@
 ﻿using Helper.MVVM;
 using ImageProcessingUtils.FrameProcessor;
-using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel;
+using PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels;
 using ProcessingPipelines.ImageProcessingPipeline;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModel.Incrementor
+namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.Incrementor
 {
     public class ColorMapIncrementorViewModel : PipelineElementViewModel
     {

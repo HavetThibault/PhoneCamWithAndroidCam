@@ -1,0 +1,38 @@
+﻿<UserControl x:Class="PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.MapThreshold.ColorMapThresholdControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels.MapThreshold"
+             xmlns:common="http://schemas.thibault/dev"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance local:ColorMapThresholdViewModel}">
+    <Grid>
+        <common:ContainerBorder>
+            <StackPanel Margin="6,2,6,2">
+                <Label
+                    Content="{Binding ElementName}"
+                    FontWeight="Bold"
+                    Margin="0,0,0,3"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label 
+                        Content="Colors interval number"
+                        HorizontalAlignment="Left"/>
+                    <Label
+                        Content="{Binding IntervalNbr}"
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"/>
+                </Grid>
+                <Slider
+                    Minimum="{Binding MIN_INTERVAL_NUMBER}"
+                    Maximum="{Binding MAX_INTERVAL_NUMBER}"
+                    Value="{Binding IntervalNbr}"/>
+            </StackPanel>
+        </common:ContainerBorder>
+    </Grid>
+</UserControl>
