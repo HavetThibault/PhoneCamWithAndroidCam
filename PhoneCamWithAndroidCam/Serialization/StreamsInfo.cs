@@ -21,7 +21,7 @@ namespace PhoneCamWithAndroidCam.Serialization
         public List<PipelineStructure> ActivePipelines { get; set; }
         public List<PipelineStructure> PipelineTemplates { get; set; }
 
-        public StreamsInfo() { }
+        private StreamsInfo() { }
 
         public StreamsInfo(IEnumerable<PipelineStructure> activePipelines, IEnumerable<PipelineStructure> pipelineTemplates)
         {

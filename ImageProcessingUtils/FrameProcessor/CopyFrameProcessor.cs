@@ -6,23 +6,21 @@ using System.Threading.Tasks;
 
 namespace ImageProcessingUtils.FrameProcessor
 {
-    public class CopyFrameProcessor : IFrameProcessor
+    public class CopyFrameProcessor : FrameProcessor
     {
         public const string ELEMENT_TYPE_NAME = "Copy";
 
-        public string ElementTypeName { get; set; }
-
-        public CopyFrameProcessor() 
+        public CopyFrameProcessor() : base(0, 0, ELEMENT_TYPE_NAME)
         {
             ElementTypeName = ELEMENT_TYPE_NAME;
         }
 
-        public void ProcessFrame(byte[] srcFrame, byte[] dstFrame)
+        public override void ProcessFrame(byte[] srcFrame, byte[] dstFrame)
         {
             Buffer.BlockCopy(srcFrame, 0, dstFrame, 0, dstFrame.Length);
         }
 
-        public IFrameProcessor Clone()
+        public override FrameProcessor Clone()
         {
             return new CopyFrameProcessor();
         }

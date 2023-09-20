@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ImageProcessingUtils.FrameProcessor
 {
-    public abstract class FrameProcessor : IFrameProcessor
+    public abstract class FrameProcessor
     {
         protected int _width;
         protected int _height;
@@ -31,7 +31,7 @@ namespace ImageProcessingUtils.FrameProcessor
             _stride = stride;
         }
 
-        public abstract IFrameProcessor Clone();
+        public abstract FrameProcessor Clone();
 
         public abstract void ProcessFrame(byte[] srcFrame, byte[] dstFrame);
     }

@@ -43,7 +43,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
         public static PipelineElement GetInstance(string elementType, ProducerConsumerBuffers outputBuffer, string name, Dispatcher uiDispatcher)
         {
-            IFrameProcessor frameProcessor;
+            FrameProcessor frameProcessor;
             switch (elementType)
             {
                 case COPY:

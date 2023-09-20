@@ -59,7 +59,7 @@ public class CannyEdgeDetection : FrameProcessor
         SIMDHelper.SimdGrayToBgra(_grayBuffer1, _width, _height, _width, bytesDestination, _width * 4);
     }
 
-    public override IFrameProcessor Clone()
+    public override FrameProcessor Clone()
     {
         return new CannyEdgeDetection(this);
     }

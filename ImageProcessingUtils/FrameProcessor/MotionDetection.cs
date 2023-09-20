@@ -41,7 +41,7 @@ public class MotionDetection : FrameProcessor
             SIMDHelper.DrawRectangleOnBgra32bits(bytesDestination, _width, _height, _width * 4, 0, 200, 0, boundingBox);
     }
 
-    public override IFrameProcessor Clone()
+    public override FrameProcessor Clone()
     {
         return new MotionDetection(this);
     }

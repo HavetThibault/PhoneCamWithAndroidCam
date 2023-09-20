@@ -16,7 +16,7 @@ namespace PhoneCamWithAndroidCam.Serialization
 
         public string PhoneIp { get; set; }
 
-        public DisplayStreamViewModelInfo() { }
+        private DisplayStreamViewModelInfo() { }
 
         public DisplayStreamViewModelInfo(string phoneIp) 
         {

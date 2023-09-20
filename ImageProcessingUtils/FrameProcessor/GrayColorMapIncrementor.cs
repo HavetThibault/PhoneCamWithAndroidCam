@@ -63,7 +63,7 @@ namespace ImageProcessingUtils.FrameProcessor
             }
         }
 
-        public override IFrameProcessor Clone()
+        public override FrameProcessor Clone()
         {
             return new GrayColorMapIncrementor(this);
         }

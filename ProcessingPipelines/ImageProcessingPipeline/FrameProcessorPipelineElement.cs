@@ -14,9 +14,9 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 {
     public class FrameProcessorPipelineElement : PipelineElement
     {
-        public IFrameProcessor FrameProcessor { get; private set; }
+        public FrameProcessor FrameProcessor { get; private set; }
 
-        public FrameProcessorPipelineElement(Dispatcher uiDispatcher, string name, IFrameProcessor frameProcessor, ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer) 
+        public FrameProcessorPipelineElement(Dispatcher uiDispatcher, string name, FrameProcessor frameProcessor, ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer) 
             : base(uiDispatcher, name, frameProcessor.ElementTypeName, inputBuffer, outputBuffer)
         {
             FrameProcessor = frameProcessor;

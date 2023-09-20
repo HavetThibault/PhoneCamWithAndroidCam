@@ -142,7 +142,7 @@ public class ScannerProcessor : FrameProcessor
         _scannerState = ScannerStates.Scanning;
     }
 
-    public override IFrameProcessor Clone()
+    public override FrameProcessor Clone()
     {
         return new ScannerProcessor(this);
     }

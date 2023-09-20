@@ -15,7 +15,7 @@ namespace PhoneCamWithAndroidCam.Serialization
         public string PipelineName { get; set; }
         public List<string> PipelineElementTypeNames { get; set; }
 
-        public PipelineStructure() { }
+        private PipelineStructure() { }
 
         public PipelineStructure(ImageProcessingPipeline pipeline) 
         {

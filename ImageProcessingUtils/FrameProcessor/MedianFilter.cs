@@ -28,7 +28,7 @@ namespace ImageProcessingUtils.FrameProcessor
             SIMDHelper.MedianFilter(srcFrame, _width, _height, _stride, 4, dstFrame);
         }
 
-        public override IFrameProcessor Clone()
+        public override FrameProcessor Clone()
         {
             return new MedianFilter(this);
         }
