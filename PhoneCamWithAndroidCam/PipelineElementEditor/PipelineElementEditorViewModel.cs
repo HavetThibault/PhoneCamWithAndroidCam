@@ -19,7 +19,7 @@ namespace PhoneCamWithAndroidCam.PipelineElementEditor
         {
             PipelineElementsViewModel = new();
             foreach(var pipelineElement in pipelineElements)
-                PipelineElementsViewModel.Add(PipelineElementViewModel.GetInstance((FrameProcessorPipelineElement)pipelineElement));
+                PipelineElementsViewModel.Add(PipelineElementViewModel.GetInstance(pipelineElement));
         }
 
         protected override bool CanOk(object parameter)

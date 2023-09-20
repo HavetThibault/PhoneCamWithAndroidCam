@@ -16,7 +16,7 @@ namespace PhoneCamWithAndroidCam.PipelineElementEditor.ViewModels
 {
     public class PipelineElementViewModel : BindableClass
     {
-        public static PipelineElementViewModel GetInstance(FrameProcessorPipelineElement pipelineElement)
+        public static PipelineElementViewModel GetInstance(PipelineElement pipelineElement)
         {
             if (pipelineElement.FrameProcessor is CannyEdgeDetection cannyEdgeDetection)
             {

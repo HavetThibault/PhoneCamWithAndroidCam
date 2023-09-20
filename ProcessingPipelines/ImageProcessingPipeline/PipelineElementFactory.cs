@@ -89,7 +89,7 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                 default:
                     throw new ArgumentException("No pipeline element with this name.");
             }
-            return new FrameProcessorPipelineElement(
+            return new PipelineElement(
                 uiDispatcher,
                 name,
                 frameProcessor,

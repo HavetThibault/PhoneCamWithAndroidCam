@@ -1,21 +1,25 @@
-﻿using ProcessingPipelines.PipelineUtils;
+﻿using ImageProcessingUtils.FrameProcessor;
+using ProcessingPipelines.PipelineUtils;
+using System.Diagnostics;
 using System.Windows.Threading;
 
 namespace ProcessingPipelines.ImageProcessingPipeline;
 
-public abstract class PipelineElement
+public class PipelineElement
 {
     protected Dispatcher _uiDispatcher;
 
     public ProducerConsumerBuffers InputBuffers { get; set; }
     public ProducerConsumerBuffers OutputBuffers { get; set; }
     public ProcessPerformancesModel ProcessPerformances { get; set; }
+    public FrameProcessor FrameProcessor { get; private set; }
     public string Name { get; set; }
     public string ElementTypeName { get; }
 
-    public PipelineElement(Dispatcher uiDispatcher, string name, string elementTypeName, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering)
+    public PipelineElement(Dispatcher uiDispatcher, string name, FrameProcessor frameProcessor, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering)
     {
-        ElementTypeName = elementTypeName;
+        FrameProcessor = frameProcessor;
+        ElementTypeName = frameProcessor.ElementTypeName;
         OutputBuffers = outputMultipleBuffering;
         InputBuffers = inputMultipleBuffering;
         Name = name;
@@ -25,6 +29,7 @@ public abstract class PipelineElement
 
     public PipelineElement(PipelineElement element, ProducerConsumerBuffers inputMultipleBuffering, ProducerConsumerBuffers outputMultipleBuffering)
     {
+        FrameProcessor = element.FrameProcessor.Clone();
         ElementTypeName = element.ElementTypeName;
         InputBuffers = inputMultipleBuffering;
         OutputBuffers = outputMultipleBuffering;
@@ -55,8 +60,56 @@ public abstract class PipelineElement
         OutputBuffers?.Dispose();
     }
 
-    public abstract void Process(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer,
-        CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken);
+    public void Process(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer,
+            CancellationTokenSource globalCancellationToken, CancellationTokenSource specificCancellationToken)
+    {
+        byte[] destBuffer = new byte[inputBuffer.Stride * inputBuffer.Height];
+        Stopwatch waitingReadTimeWatch = new();
+        Stopwatch waitingWriteTimeWatch = new();
+        Stopwatch processTimeWatch = new();
+        while (!globalCancellationToken.IsCancellationRequested && !specificCancellationToken.IsCancellationRequested)
+        {
+            waitingReadTimeWatch.Start();
+            BitmapFrame? frame = inputBuffer.WaitNextReaderBuffer();
+            waitingReadTimeWatch.Stop();
 
-    public abstract PipelineElement Clone(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer);
+            if (frame is null)
+                return;
+
+            processTimeWatch.Start();
+
+            FrameProcessor.ProcessFrame(frame.Data, destBuffer);
+
+            Monitor.Exit(frame);
+
+            processTimeWatch.Stop();
+            inputBuffer.FinishReading();
+
+            waitingWriteTimeWatch.Start();
+            outputBuffer.WaitWriteBuffer(destBuffer, frame.Bitmap);
+            waitingWriteTimeWatch.Stop();
+
+            if (waitingReadTimeWatch.ElapsedMilliseconds + processTimeWatch.ElapsedMilliseconds + waitingWriteTimeWatch.ElapsedMilliseconds > 1000)
+            {
+                try
+                {
+                    _uiDispatcher.Invoke(new Action(() =>
+                    {
+                        ProcessPerformances.WaitingWriteTimeMs = waitingWriteTimeWatch.ElapsedMilliseconds;
+                        ProcessPerformances.WaitingReadTimeMs = waitingReadTimeWatch.ElapsedMilliseconds;
+                        ProcessPerformances.ProcessTimeMs = processTimeWatch.ElapsedMilliseconds;
+                    }));
+                }
+                catch { break; }
+                waitingReadTimeWatch.Reset();
+                processTimeWatch.Reset();
+                waitingWriteTimeWatch.Reset();
+            }
+        }
+    }
+
+    public PipelineElement Clone(ProducerConsumerBuffers inputBuffer, ProducerConsumerBuffers outputBuffer)
+    {
+        return new PipelineElement(this, inputBuffer, outputBuffer);
+    }
 }
