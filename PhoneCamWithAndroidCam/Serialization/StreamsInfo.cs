@@ -15,7 +15,9 @@ namespace PhoneCamWithAndroidCam.Serialization
     {
         public static StreamsInfo? TryLoad(string filePath)
         {
-            return XmlSerializerHelper.Deserialize<StreamsInfo>(filePath);
+            var streamsInfo = XmlSerializerHelper.Deserialize<StreamsInfo>(filePath);
+            streamsInfo?.InitFrameProcessorsAfterDeserialization();
+            return streamsInfo;
         }
 
         public List<PipelineStructure> ActivePipelines { get; set; }
@@ -27,6 +29,17 @@ namespace PhoneCamWithAndroidCam.Serialization
         {
             ActivePipelines = new(activePipelines);
             PipelineTemplates = new(pipelineTemplates);
+        }
+
+        private void InitFrameProcessorsAfterDeserialization()
+        {
+            foreach(var pipeline in ActivePipelines)
+                foreach(var frameProcessor in pipeline.PipelineElementFrameProcessor)
+                    frameProcessor.InitAfterDeserialization();
+
+            foreach (var pipeline in PipelineTemplates)
+                foreach (var frameProcessor in pipeline.PipelineElementFrameProcessor)
+                    frameProcessor.InitAfterDeserialization();
         }
 
         public void Serialize(string filePath)

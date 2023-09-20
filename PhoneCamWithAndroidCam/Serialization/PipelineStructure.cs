@@ -1,4 +1,5 @@
-﻿using ProcessingPipelines.ImageProcessingPipeline;
+﻿using ImageProcessingUtils.FrameProcessor;
+using ProcessingPipelines.ImageProcessingPipeline;
 using ProcessingPipelines.PipelineUtils;
 using System;
 using System.Collections.Generic;
@@ -13,23 +14,23 @@ namespace PhoneCamWithAndroidCam.Serialization
     public class PipelineStructure
     {
         public string PipelineName { get; set; }
-        public List<string> PipelineElementTypeNames { get; set; }
+        public List<FrameProcessor> PipelineElementFrameProcessor { get; set; }
 
         private PipelineStructure() { }
 
         public PipelineStructure(ImageProcessingPipeline pipeline) 
         {
-            PipelineElementTypeNames = new();
+            PipelineElementFrameProcessor = new();
             foreach(var element in pipeline.PipelineElements)
-                PipelineElementTypeNames.Add(element.ElementTypeName);
+                PipelineElementFrameProcessor.Add(element.FrameProcessor);
             PipelineName = pipeline.Name;
         }
 
         public ImageProcessingPipeline InstantiatePipeline(ProducerConsumerBuffers inputBuffer, Dispatcher uiDispatcher)
         {
             var pipeline = new ImageProcessingPipeline(PipelineName, inputBuffer, uiDispatcher);
-            foreach (var elementTypeName in PipelineElementTypeNames)
-                pipeline.InstantiateAndAdd(elementTypeName);
+            foreach (var frameProcessor in PipelineElementFrameProcessor)
+                pipeline.InstantiateAndAdd(frameProcessor);
             return pipeline;
         }
     }

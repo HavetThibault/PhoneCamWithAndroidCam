@@ -14,7 +14,6 @@ namespace ProcessingPipelines.ImageProcessingPipeline
     {
         public const string COPY = CopyFrameProcessor.ELEMENT_TYPE_NAME;
         public const string CANNY_EDGE_DETECTION = CannyEdgeDetection.ELEMENT_TYPE_NAME;
-        public const string GRAY_COLOR_MAP_INCREMENTOR = GrayColorMapIncrementor.ELEMENT_TYPE_NAME;
         public const string MEDIAN_FILTER = MedianFilter.ELEMENT_TYPE_NAME;
         public const string MOTION_DETECTION = MotionDetection.ELEMENT_TYPE_NAME;
         public const string COLOR_MAP_INCREMENTOR = ColorMapIncrementor.ELEMENT_TYPE_NAME;
@@ -29,7 +28,6 @@ namespace ProcessingPipelines.ImageProcessingPipeline
             {
                 COPY,
                 CANNY_EDGE_DETECTION,
-                GRAY_COLOR_MAP_INCREMENTOR,
                 MEDIAN_FILTER,
                 MOTION_DETECTION,
                 COLOR_MAP_INCREMENTOR,
@@ -52,10 +50,6 @@ namespace ProcessingPipelines.ImageProcessingPipeline
 
                 case CANNY_EDGE_DETECTION:
                     frameProcessor = new CannyEdgeDetection(outputBuffer.Width, outputBuffer.Height);
-                    break;
-
-                case GRAY_COLOR_MAP_INCREMENTOR:
-                    frameProcessor = new GrayColorMapIncrementor(outputBuffer.Width, outputBuffer.Height, outputBuffer.Stride);
                     break;
 
                 case MEDIAN_FILTER:

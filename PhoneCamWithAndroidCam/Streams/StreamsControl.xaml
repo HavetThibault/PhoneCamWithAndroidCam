@@ -69,9 +69,10 @@
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
 
-                                <Label
+                                <common:ClickSelectTextBox
                                     Grid.Row="0"
-                                    Content="{Binding PipelineName}"/>
+                                    Height="28"
+                                    Text="{Binding PipelineName}"/>
                                 <Label
                                     Grid.Row="1"
                                     Content="{Binding Fps, Converter={StaticResource FpsConverter}}"/>

@@ -24,5 +24,7 @@ namespace ImageProcessingUtils.FrameProcessor
         {
             return new CopyFrameProcessor();
         }
+
+        public override void InitAfterDeserialization() { }
     }
 }

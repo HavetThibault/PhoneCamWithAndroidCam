@@ -32,6 +32,8 @@ public class ScannerProcessor : FrameProcessor
 
     public int ScanIntervalMs { get; set; }
 
+    private ScannerProcessor() : base() { }
+
     public ScannerProcessor(int width, int height, int scanStep, int scanIntervalMs) : base(width, height, ELEMENT_TYPE_NAME)
     {
         ScanStep = scanStep;
@@ -43,7 +45,10 @@ public class ScannerProcessor : FrameProcessor
 
     public ScannerProcessor(ScannerProcessor scanner) 
         : this(scanner._width, scanner._height, scanner.ScanStep, scanner.ScanIntervalMs) 
-    { }
+    { 
+        _scanStep = scanner._scanStep;
+        ScanIntervalMs = scanner.ScanIntervalMs;
+    }
 
     public override void ProcessFrame(byte[] srcBuffer, byte[] destBuffer)
     {
@@ -145,5 +150,11 @@ public class ScannerProcessor : FrameProcessor
     public override FrameProcessor Clone()
     {
         return new ScannerProcessor(this);
+    }
+
+    public override void InitAfterDeserialization()
+    {
+        _scannedPixels = new byte[_width * _height * 4];
+        _scannerLine = new Rectangle(0, 0, 2, _height);
     }
 }

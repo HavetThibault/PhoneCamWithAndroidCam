@@ -13,6 +13,8 @@ namespace ImageProcessingUtils.FrameProcessor
 
         private byte[] _colorMap;
 
+        private ColorMapInverter() : base() { }
+
         public ColorMapInverter(int width, int height, int stride) : base(width, height, stride, ELEMENT_TYPE_NAME)
         {
             _colorMap = new byte[256];
@@ -50,6 +52,12 @@ namespace ImageProcessingUtils.FrameProcessor
         public override FrameProcessor Clone()
         {
             return new ColorMapInverter(this);
+        }
+
+        public override void InitAfterDeserialization()
+        {
+            _colorMap = new byte[256];
+            InitColorMapAndCo();
         }
     }
 }

@@ -13,18 +13,25 @@ public class MotionDetection : FrameProcessor
 
     private Rectangle _pictureArea;
 
+    private MotionDetection() : base() { }
+
     public MotionDetection(int width, int height) : base(width, height, ELEMENT_TYPE_NAME)
     {
         _pictureArea = new Rectangle(0, 0, _width, _height);
-
-        _grayBuffer1 = new byte[width * height];
-        _grayBuffer2 = new byte[width * height];
-        _lastFrame = new byte[width * height * 4];
+        InitBuffers();
     }
 
     public MotionDetection(MotionDetection motionDetection) 
         : this(motionDetection._width, motionDetection._height)
     { }
+
+    private void InitBuffers()
+    {
+        int bufferSize = _width * _height;
+        _grayBuffer1 = new byte[bufferSize];
+        _grayBuffer2 = new byte[bufferSize];
+        _lastFrame = new byte[bufferSize * 4];
+    }
 
     public override void ProcessFrame(byte[] bytesSource, byte[] bytesDestination)
     {
@@ -44,5 +51,11 @@ public class MotionDetection : FrameProcessor
     public override FrameProcessor Clone()
     {
         return new MotionDetection(this);
+    }
+
+    public override void InitAfterDeserialization()
+    {
+        _pictureArea = new Rectangle(0, 0, _width, _height);
+        InitBuffers();
     }
 }

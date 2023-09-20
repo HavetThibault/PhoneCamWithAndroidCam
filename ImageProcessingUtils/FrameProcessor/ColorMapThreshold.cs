@@ -25,6 +25,8 @@ namespace ImageProcessingUtils.FrameProcessor
             }
         }
 
+        private ColorMapThreshold() : base() { }
+
         public ColorMapThreshold(int width, int height, int stride, int intervalNbr) : base(width, height, stride, ELEMENT_TYPE_NAME)
         {
             _colorMap = new byte[256];
@@ -35,7 +37,9 @@ namespace ImageProcessingUtils.FrameProcessor
 
         public ColorMapThreshold(ColorMapThreshold colorMapThreshold) 
             : this(colorMapThreshold._width, colorMapThreshold._height, colorMapThreshold._stride, colorMapThreshold._intervalNbr)
-        { }
+        {
+            IntervalNbr = colorMapThreshold._intervalNbr;
+        }
 
         private void InitColorMapOnIntervalNumber()
         {
@@ -77,6 +81,12 @@ namespace ImageProcessingUtils.FrameProcessor
         public override FrameProcessor Clone()
         {
             return new ColorMapThreshold(this);
+        }
+
+        public override void InitAfterDeserialization()
+        {
+            _colorMap = new byte[256];
+            InitColorMapOnIntervalNumber();
         }
     }
 }

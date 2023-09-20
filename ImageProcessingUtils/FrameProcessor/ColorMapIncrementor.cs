@@ -23,9 +23,12 @@ namespace ImageProcessingUtils.FrameProcessor
             set
             {
                 _increment = value;
-                UpdateUpOrDownColorMapOnIncrement();
+                if(_upOrDownColorMapIncrement != null && _colorMap != null)
+                    UpdateUpOrDownColorMapOnIncrement();
             }
         }
+
+        private ColorMapIncrementor() : base() { }
 
         public ColorMapIncrementor(int width, int height, int stride) : base(width, height, stride, ELEMENT_TYPE_NAME)
         {
@@ -37,7 +40,10 @@ namespace ImageProcessingUtils.FrameProcessor
 
         public ColorMapIncrementor(ColorMapIncrementor colorMapIncrementor) 
             : this(colorMapIncrementor._width, colorMapIncrementor._height, colorMapIncrementor._stride) 
-        { }
+        {
+            _increment = colorMapIncrementor._increment;
+            FramesNbrBeforeIncrement = colorMapIncrementor.FramesNbrBeforeIncrement;
+        }
 
         private void InitColorMapAndCo()
         {
@@ -121,6 +127,13 @@ namespace ImageProcessingUtils.FrameProcessor
         public override FrameProcessor Clone()
         {
             return new ColorMapIncrementor(this);
+        }
+
+        public override void InitAfterDeserialization()
+        {
+            _colorMap = new byte[256];
+            _upOrDownColorMapIncrement = new int[256];
+            InitColorMapAndCo();
         }
     }
 }

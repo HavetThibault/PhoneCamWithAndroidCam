@@ -12,6 +12,8 @@ namespace ImageProcessingUtils.FrameProcessor
         public const string ELEMENT_TYPE_NAME = "Color map saturator";
 
         private byte[] _colorMap;
+        
+        private ColorMapSaturator() : base() { }
 
         public ColorMapSaturator(int width, int height, int stride) : base(width, height, stride, ELEMENT_TYPE_NAME) 
         {
@@ -50,6 +52,12 @@ namespace ImageProcessingUtils.FrameProcessor
         public override FrameProcessor Clone()
         {
             return new ColorMapSaturator(this);
+        }
+
+        public override void InitAfterDeserialization()
+        {
+            _colorMap = new byte[256];
+            InitColorMap();
         }
     }
 }

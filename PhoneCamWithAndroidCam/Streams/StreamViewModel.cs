@@ -66,7 +66,15 @@ namespace PhoneCamWithAndroidCam.Streams
             }
         }
 
-        public string PipelineName => Pipeline.Name;
+        public string PipelineName
+        {
+            get => Pipeline.Name;
+            set
+            {
+                Pipeline.Name = value;
+                NotifyPropertyChanged(nameof(PipelineName));
+            }
+        }
 
         public ProcessPerformancesViewModel ProcessPerformancesViewModel { get; set; }
 

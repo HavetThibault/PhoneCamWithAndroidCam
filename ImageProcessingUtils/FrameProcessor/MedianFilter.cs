@@ -13,6 +13,8 @@ namespace ImageProcessingUtils.FrameProcessor
     {
         public const string ELEMENT_TYPE_NAME = "Median filter";
 
+        private MedianFilter() : base() { }
+
         public MedianFilter(int width, int height, int inputBufferStride) : base(width, height, inputBufferStride, ELEMENT_TYPE_NAME)
         { }
 
@@ -32,5 +34,7 @@ namespace ImageProcessingUtils.FrameProcessor
         {
             return new MedianFilter(this);
         }
+
+        public override void InitAfterDeserialization() { }
     }
 }

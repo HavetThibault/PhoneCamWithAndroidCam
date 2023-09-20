@@ -23,22 +23,36 @@ public class CannyEdgeDetection : FrameProcessor
     public double MaxGradientMagnitudeScale { get; set; } = 0.3;
     public float SigmaBlur { get; set; } = 1.5f;
 
+    private CannyEdgeDetection() : base() { }
+
     public CannyEdgeDetection(int width, int height) : base(width, height, ELEMENT_TYPE_NAME)
     {
         _width = width; _height = height;
         _pictureArea = new Rectangle(0, 0, _width, _height);
-
-        _grayBuffer1 = new byte[width * height];
-        _grayBuffer2 = new byte[width * height];
-        _magnitudeBuffer = new double[width * height];
-        _angleBuffer = new double[width * height];
-        _sobelDxBuffer = new short[width * height];
-        _sobelDyBuffer = new short[width * height];
+        InitBuffers();
     }
 
     public CannyEdgeDetection(CannyEdgeDetection cannyEdgeDetection) 
         : this(cannyEdgeDetection._width, cannyEdgeDetection._height) 
-    { }
+    {
+        GaussKernelDimension = cannyEdgeDetection.GaussKernelDimension;
+        MinGradientValue = cannyEdgeDetection.MinGradientValue;
+        MinGradientMagnitudeScale = cannyEdgeDetection.MinGradientMagnitudeScale;
+        MaxGradientMagnitudeScale = cannyEdgeDetection.MaxGradientMagnitudeScale;
+        SigmaBlur = cannyEdgeDetection.SigmaBlur;
+        _pictureArea = cannyEdgeDetection._pictureArea;
+    }
+
+    private void InitBuffers()
+    {
+        int bufferSize = _width * _height;
+        _grayBuffer1 = new byte[bufferSize];
+        _grayBuffer2 = new byte[bufferSize];
+        _magnitudeBuffer = new double[bufferSize];
+        _angleBuffer = new double[bufferSize];
+        _sobelDxBuffer = new short[bufferSize];
+        _sobelDyBuffer = new short[bufferSize];
+    }
 
     public override void ProcessFrame(byte[] bytesSource, byte[] bytesDestination)
     {
@@ -62,5 +76,11 @@ public class CannyEdgeDetection : FrameProcessor
     public override FrameProcessor Clone()
     {
         return new CannyEdgeDetection(this);
+    }
+
+    public override void InitAfterDeserialization()
+    {
+        _pictureArea = new Rectangle(0, 0, _width, _height);
+        InitBuffers();
     }
 }

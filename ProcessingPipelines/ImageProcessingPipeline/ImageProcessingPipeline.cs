@@ -1,5 +1,6 @@
 ﻿using Helper.Collection;
 using ImageProcessingUtils;
+using ImageProcessingUtils.FrameProcessor;
 using ProcessingPipelines.PipelineUtils;
 using System.Windows.Threading;
 
@@ -48,13 +49,13 @@ public class ImageProcessingPipeline
         : this(pipeline.Name, inputBuffer, uiDispatcher)
     {
         var firstElem = pipeline.PipelineElements.First();
-        var clonedElement = firstElem.Clone(InputBuffer, (ProducerConsumerBuffers)firstElem.OutputBuffers.Clone());
+        var clonedElement = firstElem.Clone(InputBuffer, firstElem.OutputBuffers.Clone());
         PipelineElements.Add(clonedElement);
         var previousElementOutput = clonedElement.OutputBuffers;
         for(int i = 1; i < pipeline.PipelineElements.Count; i++)
         {
             var element = pipeline.PipelineElements[i];
-            clonedElement = element.Clone(previousElementOutput, (ProducerConsumerBuffers)element.OutputBuffers.Clone());
+            clonedElement = element.Clone(previousElementOutput, element.OutputBuffers.Clone());
             PipelineElements.Add(clonedElement);
             previousElementOutput = clonedElement.OutputBuffers;
         }
@@ -73,9 +74,37 @@ public class ImageProcessingPipeline
         return name;
     }
 
-    public void InstantiateAndAdd(string elementType)
+    public void InstantiateAndAdd(FrameProcessor frameProcessor)
     {
-        InstantiateAndInsert(PipelineElements.Count, elementType);
+        InstantiateAndInsert(PipelineElements.Count, frameProcessor);
+    }
+
+    public PipelineElement InstantiateAndInsert(int index, FrameProcessor frameProcessor)
+    {
+        string name = GetNextAvailableElementName(frameProcessor.ElementTypeName);
+        PipelineElement previousElement;
+        PipelineElement nextElement;
+        PipelineElement newElement;
+        if (index == 0)
+        {
+            newElement = new(_uiDispatcher, name, frameProcessor, InputBuffer, InputBuffer.Clone());
+            PipelineElements.Insert(0, newElement);
+        }
+        else if (index == PipelineElements.Count)
+        {
+            previousElement = PipelineElements.Last();
+            newElement = new(_uiDispatcher, name, frameProcessor, previousElement.OutputBuffers, previousElement.OutputBuffers.Clone());
+            PipelineElements.Add(newElement);
+        }
+        else
+        {
+            previousElement = PipelineElements.ElementAt(index - 1);
+            previousElement.OutputBuffers = previousElement.OutputBuffers.Clone();
+            nextElement = PipelineElements.ElementAt(index);
+            newElement = new(_uiDispatcher, name, frameProcessor, previousElement.OutputBuffers, nextElement.InputBuffers);
+            PipelineElements.Insert(index, newElement);
+        }
+        return newElement;
     }
 
     public PipelineElement InstantiateAndInsert(int index, string elementType)
@@ -88,7 +117,7 @@ public class ImageProcessingPipeline
         {
             newElement = PipelineElementFactory.GetInstance(
                 elementType,
-                (ProducerConsumerBuffers)InputBuffer.Clone(),
+                InputBuffer.Clone(),
                 name,
                 _uiDispatcher);
             newElement.InputBuffers = InputBuffer;
@@ -100,7 +129,7 @@ public class ImageProcessingPipeline
             previousElement = PipelineElements.Last();
             newElement = PipelineElementFactory.GetInstance(
                 elementType, 
-                (ProducerConsumerBuffers)previousElement.OutputBuffers.Clone(),
+                previousElement.OutputBuffers.Clone(),
                 name,
                 _uiDispatcher);
 
@@ -110,8 +139,7 @@ public class ImageProcessingPipeline
         else
         {
             previousElement = PipelineElements.ElementAt(index - 1);
-            previousElement.OutputBuffers = 
-                (ProducerConsumerBuffers)previousElement.OutputBuffers.Clone();
+            previousElement.OutputBuffers = previousElement.OutputBuffers.Clone();
             nextElement = PipelineElements.ElementAt(index);
             newElement = PipelineElementFactory.GetInstance(
                 elementType,

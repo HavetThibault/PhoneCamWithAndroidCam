@@ -193,7 +193,7 @@ namespace ProcessingPipelines.PipelineUtils
             }
         }
 
-        public object Clone()
+        public ProducerConsumerBuffers Clone()
         {
             return new ProducerConsumerBuffers(Width, Height, Stride, BufferNbr, BufferPixelsFormat);
         }
