@@ -19,7 +19,7 @@ public class BBitmapManipulation
         _jpegBuffer = new byte[bytesNbr];
         fs.Seek(0, SeekOrigin.Begin);
         fs.Read(_jpegBuffer, 0, (int)bytesNbr);
-        fs.Close();
+        fs.Dispose();
         _destinationBuffer = new byte[320 * 240 * 4];
     }
 
@@ -83,7 +83,7 @@ public class BBitmapManipulation
     [IterationCleanup(Targets = new string[2] { "BitmapBmpSaveToMemoryStream", "BitmapJpegSaveToMemoryStream" })]
     public void IterationCleanup_BitmapBmpSaveToMemoryStream()
     {
-        _memoryStream.Close();
+        _memoryStream.Dispose();
     }
 
     [GlobalCleanup(Targets = new string[4] { "BitmapExtractPixels", "BitmapSaveToMemoryStream", "BitmapJpegSaveToMemoryStream", "CloneBitmap" })]

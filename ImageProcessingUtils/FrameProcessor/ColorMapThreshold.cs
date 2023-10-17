@@ -13,7 +13,7 @@ namespace ImageProcessingUtils.FrameProcessor
 
         private int _intervalNbr;
 
-        private byte[] _colorMap;
+        private byte[] _colorMap = new byte[256];
 
         public int IntervalNbr
         {
@@ -29,7 +29,6 @@ namespace ImageProcessingUtils.FrameProcessor
 
         public ColorMapThreshold(int width, int height, int stride, int intervalNbr) : base(width, height, stride, ELEMENT_TYPE_NAME)
         {
-            _colorMap = new byte[256];
             _stride = stride;
             _intervalNbr = intervalNbr;
             InitColorMapOnIntervalNumber();

@@ -201,9 +201,9 @@ namespace ProcessingPipelines.PipelineUtils
         public void Dispose()
         {
             _canWriteBuffer?.SafeWaitHandle.SetHandleAsInvalid();
-            _canWriteBuffer?.Close();
+            _canWriteBuffer?.Dispose();
             _canReadBuffer?.SafeWaitHandle.SetHandleAsInvalid();
-            _canReadBuffer?.Close();
+            _canReadBuffer?.Dispose();
         }
     }
 
@@ -298,8 +298,8 @@ namespace ProcessingPipelines.PipelineUtils
 
         public void Dispose()
         {
-            _canAdd?.Close();
-            _canRetreive?.Close();
+            _canAdd?.Dispose();
+            _canRetreive?.Dispose();
             IsDisposed = true;
         }
     }

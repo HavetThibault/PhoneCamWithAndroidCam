@@ -115,7 +115,7 @@
                                         CommandParameter="{Binding ElementName=StreamViewModelGrid, 
                                             Path=DataContext}"/>
                                     <common:SymbolButton 
-                                        Glyph="Media"
+                                        Glyph="Settings"
                                         Grid.Column="2"
                                         Command="{Binding EditElementParamCommand}"
                                         CommandParameter="{Binding ElementName=StreamViewModelGrid, 

@@ -61,28 +61,32 @@ namespace ProcessingPipelines.ImageProcessingPipeline
         /// Put the result into <see cref="RawJpegBuffering"/>
         /// </summary>
         /// <param name="cancellationTokenSourceObj"></param>
-        private async void ProcessRawJegStream(object? cancellationTokenSourceObj)
+        private void ProcessRawJegStream(object? cancellationTokenSourceObj)
         {
-            if (cancellationTokenSourceObj is CancellationTokenSource cancellationTokenSource)
+            if (cancellationTokenSourceObj is CancellationTokenSource cancelToken)
             {
-                Stream _rawJpegStream;
-                try
-                {
-                    _rawJpegStream = await _phoneCamClient.LaunchStream();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Exception de type : {ex.GetType()} : {ex.Message}");
-                    cancellationTokenSource.Cancel();
-                    return;
-                }
                 Stopwatch waitingReadTimeWatch = new();
                 Stopwatch waitingWriteTimeWatch = new();
                 Stopwatch processTimeWatch = new();
-                while (!cancellationTokenSource.IsCancellationRequested)
-                {
+                Stream networkRawJpegString = InitJpegStream(cancelToken);
+                if (networkRawJpegString is null)
+                    return;
+                while (!cancelToken.IsCancellationRequested) {
                     waitingReadTimeWatch.Start();
-                    JpegFrame jpegFrame = PhoneCamClient.GetStreamFrame(_rawJpegStream);
+                    JpegFrame jpegFrame;
+                    try {
+                        jpegFrame = PhoneCamClient.GetStreamFrame(networkRawJpegString);
+                    }
+                    catch {
+                        waitingReadTimeWatch.Stop();
+                        networkRawJpegString.Dispose();
+                        Thread.Sleep(200);
+                        networkRawJpegString = InitJpegStream(cancelToken);
+                        if (networkRawJpegString is null)
+                            return;
+                        continue;
+                    }
+
                     waitingReadTimeWatch.Stop();
 
                     processTimeWatch.Start();
@@ -110,8 +114,28 @@ namespace ProcessingPipelines.ImageProcessingPipeline
                         waitingWriteTimeWatch.Reset();
                     }
                 }
-                _rawJpegStream.Close();
+                networkRawJpegString.Dispose();
             }
+        }
+
+        private Stream? InitJpegStream(CancellationTokenSource cancelToken)
+        {
+            while(!cancelToken.IsCancellationRequested)
+            {
+                var networkRawJpegStringTask = _phoneCamClient.LaunchStream();
+
+                while (!networkRawJpegStringTask.IsCompleted && !cancelToken.IsCancellationRequested)
+                    Thread.Sleep(200);
+
+                if (networkRawJpegStringTask.IsCompletedSuccessfully)
+                    return networkRawJpegStringTask.Result;
+
+                try {
+                    networkRawJpegStringTask.Result.Dispose();
+                }
+                catch { }
+            }
+            return null;
         }
 
         /// <summary>

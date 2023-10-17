@@ -8,20 +8,26 @@ namespace AndroidCamClient.JpegStream
         public static readonly string HEADER_SEPARATOR = "\r\n";
         public static readonly string HEADER_KEYVALUE_SEPARATOR = ": ";
 
-        private HttpClient _httpClient;
+        private HttpClient? _httpClient;
 
-        public JpegStreamDecoder()
-        {
-            _httpClient = new();
-        }
+        public JpegStreamDecoder() { }
 
-        public void Dispose() => _httpClient.Dispose();
+        public void Dispose() => _httpClient?.Dispose();
 
         public Task<Stream> InitMJpegStream(string uri)
         {
+            _httpClient?.Dispose();
+            _httpClient = new();
             return _httpClient.GetStreamAsync(uri);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mjpegStream"></param>
+        /// <returns></returns>
+        /// <exception cref="JpegDecodingException"></exception>
+        /// <exception cref="IOException"></exception>
         public static JpegFrame ReadOneFrame(Stream mjpegStream)
         {
             Dictionary<string, string> headers = ConvertBytesHeaders(GetBytesHeaders(mjpegStream, out int offset));
@@ -35,6 +41,7 @@ namespace AndroidCamClient.JpegStream
             return GetJpegFrame(mjpegStream, contentLength);
         }
 
+        /// <exception cref="IOException"></exception>
         internal static byte[] GetBytesHeaders(Stream stream, out int offset)
         {
             bool firstCharCr = false;
@@ -47,7 +54,15 @@ namespace AndroidCamClient.JpegStream
             offset = 0;
             while (!foundJpegBeginning)
             {
-                b = (byte)stream.ReadByte();
+                try {
+                    b = (byte)stream.ReadByte(); //  network IOException
+                }
+                catch {
+                    mainMemoryStream.Dispose();
+                    subMemoryStream.Dispose();
+                    throw;
+                }
+                
                 subMemoryStream.WriteByte(b);
                 if (foundCr)
                 {
@@ -56,9 +71,7 @@ namespace AndroidCamClient.JpegStream
                     else if (b == JpegMarkers.JPEG_START_OF_IMAGE[1] && foundJpegBeginning1)
                         foundJpegBeginning = true;
                     else
-                    {
                         foundJpegBeginning1 = false;
-                    }
                 }
 
                 if (b == 13)
@@ -67,7 +80,7 @@ namespace AndroidCamClient.JpegStream
                 {
                     foundCr = true;
                     mainMemoryStream.Write(subMemoryStream.ToArray());
-                    subMemoryStream.Close();
+                    subMemoryStream.Dispose();
                     subMemoryStream = new();
                 }
                 else
@@ -77,8 +90,8 @@ namespace AndroidCamClient.JpegStream
             }
             offset -= 2; // Less the 2 magic characters that begin a jpeg
             byte[] byteHeaders = mainMemoryStream.ToArray();
-            mainMemoryStream.Close();
-            subMemoryStream.Close();
+            mainMemoryStream.Dispose();
+            subMemoryStream.Dispose();
             return byteHeaders;
         }
 
@@ -123,7 +136,7 @@ namespace AndroidCamClient.JpegStream
                 string headerValue = headerKeyValueArray[1];
 
                 headers.Add(headerKey, headerValue);
-                mainMemoryStream.Close();
+                mainMemoryStream.Dispose();
             }
 
             return headers;

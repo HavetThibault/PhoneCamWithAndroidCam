@@ -109,12 +109,12 @@ public class StreamsAndStatsViewModels : BindableClass, IDisposable
         StreamsViewModel.PlayStreaming(PipelineCancellationToken);
     }
 
-    public bool CanLaunchStreaming(object parameter)
+    public bool CanLaunchStreaming(object uselessParam)
     {
         return !IsStreaming;
     }
 
-    public void StopStreaming(object parameter)
+    public void StopStreaming(object uselessParam)
     {
         IsStreaming = false;
         IsPhoneIpChangeable = true;
@@ -122,13 +122,14 @@ public class StreamsAndStatsViewModels : BindableClass, IDisposable
         PipelineCancellationToken.Cancel();
     }
 
-    public bool CanStopStreaming(object parameter)
+    public bool CanStopStreaming(object uselessParam)
     {
         return IsStreaming;
     }
 
     public void Dispose()
     {
+        StopStreaming(null);
         new DisplayStreamViewModelInfo(PhoneIp).Serialize(DISPLAY_STREAM_INFO_PATH);
         _feederPipeline?.Dispose();
         _feederPipelineOutput?.Dispose();

@@ -29,6 +29,6 @@ public class BMemoryStream
     [IterationCleanup]
     public void CloseMemoryStream()
     {
-        _memoryStream.Close();
+        _memoryStream.Dispose();
     }
 }
